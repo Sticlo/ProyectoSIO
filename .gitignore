@@ -1,0 +1,25 @@
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Angular
+/frontend/dist/
+/frontend/.angular/
+/frontend/coverage/
+
+# IDEs
+.idea/
+.vscode/
+/frontend/.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
