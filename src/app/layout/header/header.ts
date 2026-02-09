@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal, effect } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -16,6 +16,7 @@ interface MenuItem {
 export class Header {
   brandName = 'SIO';
   promoBanner = 'NUEVA COLECCIÓN 2026 — ENVÍO GRATIS EN TU PRIMERA COMPRA';
+  mobileMenuOpen = signal(false);
   
   menuItems: MenuItem[] = [
     { label: 'Inicio', route: '/' },
@@ -23,4 +24,23 @@ export class Header {
     { label: 'Categorías', route: '/categorias' },
     { label: 'Testimonios', route: '/testimonios' }
   ];
+  
+  constructor() {
+    // Prevenir scroll cuando el menú está abierto
+    effect(() => {
+      if (this.mobileMenuOpen()) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+      }
+    });
+  }
+  
+  toggleMobileMenu() {
+    this.mobileMenuOpen.set(!this.mobileMenuOpen());
+  }
+  
+  closeMobileMenu() {
+    this.mobileMenuOpen.set(false);
+  }
 }

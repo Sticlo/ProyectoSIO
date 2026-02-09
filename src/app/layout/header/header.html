@@ -9,19 +9,23 @@
           <span class="logo-text">{{ brandName }}</span>
         </a>
       </div>
-      <ul class="navbar-menu">
+      
+      <!-- Desktop Menu -->
+      <ul class="navbar-menu desktop-menu">
         <li class="nav-item" *ngFor="let item of menuItems">
           <a [routerLink]="item.route" class="nav-link">{{ item.label }}</a>
         </li>
       </ul>
+      
       <div class="navbar-actions">
-        <button class="icon-btn" aria-label="Buscar">
+        <!-- Desktop Icons -->
+        <button class="icon-btn desktop-icon" aria-label="Buscar">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8"></circle>
             <path d="m21 21-4.35-4.35"></path>
           </svg>
         </button>
-        <button class="icon-btn" aria-label="Usuario">
+        <button class="icon-btn desktop-icon" aria-label="Usuario">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
             <circle cx="12" cy="7" r="4"></circle>
@@ -34,7 +38,61 @@
             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
           </svg>
         </button>
+        
+        <!-- Hamburger Button (Mobile Only) -->
+        <button 
+          class="hamburger-btn mobile-only" 
+          aria-label="Menú"
+          (click)="toggleMobileMenu()">
+          <svg 
+            *ngIf="!mobileMenuOpen()" 
+            xmlns="http://www.w3.org/2000/svg" 
+            width="24" 
+            height="24" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+          <svg 
+            *ngIf="mobileMenuOpen()" 
+            xmlns="http://www.w3.org/2000/svg" 
+            width="24" 
+            height="24" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
       </div>
     </div>
   </nav>
+  
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" [class.open]="mobileMenuOpen()">
+    <ul class="mobile-menu-list">
+      <li class="mobile-nav-item" *ngFor="let item of menuItems">
+        <a 
+          [routerLink]="item.route" 
+          class="mobile-nav-link"
+          (click)="closeMobileMenu()">
+          {{ item.label }}
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+  <!-- Overlay -->
+  <div 
+    class="mobile-overlay" 
+    [class.visible]="mobileMenuOpen()"
+    (click)="closeMobileMenu()">
+  </div>
 </header>
+
