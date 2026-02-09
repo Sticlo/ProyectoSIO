@@ -130,22 +130,6 @@
   }
 }
 
-// Products Section
-.products-section {
-  padding: 6rem 0;
-  background-color: white;
-  
-  .products-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 2rem;
-    
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
-    }
-  }
-}
-
 // Stats Section
 .stats-section {
   padding: 5rem 0;

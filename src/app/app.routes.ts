@@ -11,6 +11,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/home/home').then(m => m.Home)
   },
   {
+    path: 'productos',
+    loadComponent: () => import('./features/productos/productos').then(m => m.Productos)
+  },
+  {
     path: '**',
     loadComponent: () => import('./features/not-found/not-found').then(m => m.NotFound)
   }

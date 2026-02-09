@@ -28,23 +28,6 @@
     </div>
   </section>
 
-  <!-- Featured Products Section -->
-  <section class="products-section">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">Productos Destacados</h2>
-        <p class="section-subtitle">
-          Selección especial de nuestros productos más vendidos
-        </p>
-      </div>
-      <div class="products-grid">
-        @for (product of featuredProducts; track product.id) {
-          <app-product-card [product]="product"></app-product-card>
-        }
-      </div>
-    </div>
-  </section>
-
   <!-- Stats Section -->
   <section class="stats-section">
     <div class="container">

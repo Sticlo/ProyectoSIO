@@ -1,46 +1,14 @@
 import { Component } from '@angular/core';
 import { ButtonComponent } from '../../shared/components/button/button.component';
-import { ProductCardComponent, Product } from '../../shared/components/product-card/product-card.component';
 import { TestimonialCardComponent, Testimonial } from '../../shared/components/testimonial-card/testimonial-card.component';
 
 @Component({
   selector: 'app-home',
-  imports: [ButtonComponent, ProductCardComponent, TestimonialCardComponent],
+  imports: [ButtonComponent, TestimonialCardComponent],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
 export class Home {
-  // Productos destacados
-  featuredProducts: Product[] = [
-    {
-      id: '1',
-      name: 'Producto Premium',
-      description: 'Descripción elegante del producto con las mejores características.',
-      price: 299.99,
-      badge: 'Nuevo'
-    },
-    {
-      id: '2',
-      name: 'Edición Limitada',
-      description: 'Producto exclusivo de nuestra colección especial.',
-      price: 399.99,
-      badge: 'Exclusivo'
-    },
-    {
-      id: '3',
-      name: 'Clásico Atemporal',
-      description: 'Diseño que nunca pasa de moda, calidad garantizada.',
-      price: 249.99
-    },
-    {
-      id: '4',
-      name: 'Innovación 2026',
-      description: 'Lo último en tecnología y diseño contemporáneo.',
-      price: 449.99,
-      badge: 'Popular'
-    }
-  ];
-  
   // Testimonios
   testimonials: Testimonial[] = [
     {

@@ -1,3 +1,5 @@
+@use 'variables' as *;
+
 // Responsive breakpoint mixins
 @mixin respond-to($breakpoint) {
   @if $breakpoint == 'xs' {

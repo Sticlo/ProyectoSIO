@@ -1,5 +1,6 @@
-@import '../../../styles/variables';
-@import '../../../styles/mixins';
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+@use 'sass:color';
 
 .not-found-page {
   min-height: calc(100vh - 200px);
@@ -49,7 +50,7 @@
     @include transition($transition-base);
     
     &:hover {
-      background-color: darken($primary-color, 10%);
+      background-color: color.adjust($primary-color, $lightness: -10%);
       text-decoration: none;
       transform: scale(1.05);
     }

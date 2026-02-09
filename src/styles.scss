@@ -1,8 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
 
 // Import variables and mixins
-@import 'styles/variables';
-@import 'styles/mixins';
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+@use 'sass:color';
 
 // CSS Reset / Normalize
 *, *::before, *::after {
@@ -52,7 +53,7 @@ a {
   @include transition($transition-base);
 
   &:hover {
-    color: darken($primary-color, 15%);
+    color: color.adjust($primary-color, $lightness: -15%);
     text-decoration: underline;
   }
 }
