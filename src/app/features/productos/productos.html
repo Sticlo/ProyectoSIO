@@ -1,27 +1,109 @@
 <div class="productos-page">
-  <!-- Page Header -->
-  <section class="page-header">
+  <!-- Hero Section - Producto Destacado -->
+  <section class="hero-product">
     <div class="container">
-      <h1 class="page-title">Nuestros Productos</h1>
-      <p class="page-description">
-        Explora nuestra colección completa de productos premium, cada uno seleccionado
-        con el mejor criterio de calidad y diseño.
-      </p>
+      <div class="hero-content">
+        <div class="hero-text">
+          @if (featuredHero.category) {
+            <span class="hero-category">{{ featuredHero.category }}</span>
+          }
+          <h1 class="hero-title">
+            {{ featuredHero.name.split(' ').slice(0, 2).join(' ') }}<br>
+            <span class="hero-title-accent">{{ featuredHero.name.split(' ').slice(2).join(' ') }}</span>
+          </h1>
+          <p class="hero-description">{{ featuredHero.description }}</p>
+          
+          @if (featuredHero.rating) {
+            <div class="hero-rating">
+              <div class="stars">
+                @for (star of [1,2,3,4,5]; track star) {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                }
+              </div>
+              <span class="rating-text">{{ featuredHero.rating }} / 5 — {{ featuredHero.reviewCount?.toLocaleString() }} reseñas</span>
+            </div>
+          }
+          
+          <div class="hero-price">
+            <span class="price-current">\${{ featuredHero.price }}</span>
+            @if (featuredHero.originalPrice) {
+              <span class="price-original">\${{ featuredHero.originalPrice }}</span>
+              <span class="price-discount">-{{ getDiscountPercentage(featuredHero) }}%</span>
+            }
+          </div>
+          
+          <div class="hero-actions">
+            <app-button variant="primary" size="large">Comprar ahora →</app-button>
+            <app-button variant="outline" size="large">Conocer más</app-button>
+          </div>
+        </div>
+        
+        <div class="hero-image">
+          <div class="image-container">
+            @if (featuredHero.image) {
+              <img [src]="featuredHero.image" [alt]="featuredHero.name">
+            } @else {
+              <div class="image-placeholder">
+                <svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                  <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+                  <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
+                </svg>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
-  <!-- Featured Products Section -->
-  <section class="featured-products-section">
+  <!-- Carrusel Section -->
+  <section class="carousel-section">
     <div class="container">
-      <div class="section-header">
+      <div class="carousel-header">
         <h2 class="section-title">Productos Destacados</h2>
-        <p class="section-subtitle">
-          Selección especial de nuestros productos más vendidos
-        </p>
+        <div class="carousel-controls">
+          <button 
+            class="carousel-btn" 
+            [class.disabled]="!canGoPrev"
+            [disabled]="!canGoPrev"
+            (click)="prevSlide()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+          <button 
+            class="carousel-btn" 
+            [class.disabled]="!canGoNext"
+            [disabled]="!canGoNext"
+            (click)="nextSlide()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
       </div>
-      <div class="products-grid">
-        @for (product of featuredProducts; track product.id) {
-          <app-product-card [product]="product"></app-product-card>
+      
+      <div class="carousel-wrapper">
+        <div class="carousel-track">
+          @for (product of visibleProducts; track product.id) {
+            <div class="carousel-item">
+              <app-product-card [product]="product"></app-product-card>
+            </div>
+          }
+        </div>
+      </div>
+      
+      <div class="carousel-indicators">
+        @for (dot of carouselProducts; track $index; let i = $index) {
+          @if (i <= carouselProducts.length - 3) {
+            <button 
+              class="indicator-dot" 
+              [class.active]="i === currentSlide()"
+              (click)="currentSlide.set(i)">
+            </button>
+          }
         }
       </div>
     </div>
@@ -31,9 +113,9 @@
   <section class="all-products-section">
     <div class="container">
       <div class="section-header">
-        <h2 class="section-title">Todos los Productos</h2>
+        <h2 class="section-title">Catálogo Completo</h2>
         <p class="section-subtitle">
-          Catálogo completo de productos disponibles
+          Explora todos nuestros productos disponibles
         </p>
       </div>
       <div class="products-grid">
