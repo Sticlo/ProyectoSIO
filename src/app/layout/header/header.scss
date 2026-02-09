@@ -1,0 +1,59 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.header {
+  background-color: $primary-color;
+  color: white;
+  padding: $spacing-md 0;
+  box-shadow: $box-shadow;
+  position: sticky;
+  top: 0;
+  z-index: $zindex-sticky;
+}
+
+.navbar {
+  @include flex-between;
+}
+
+.navbar-brand {
+  .brand-logo {
+    color: white;
+    text-decoration: none;
+    
+    h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: $font-weight-bold;
+    }
+    
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+
+.navbar-menu {
+  .navbar-nav {
+    @include flex-start;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: $spacing-lg;
+    
+    .nav-item {
+      .nav-link {
+        color: white;
+        text-decoration: none;
+        font-weight: $font-weight-normal;
+        padding: $spacing-sm $spacing-md;
+        border-radius: $border-radius;
+        @include transition($transition-base);
+        
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+          text-decoration: none;
+        }
+      }
+    }
+  }
+}

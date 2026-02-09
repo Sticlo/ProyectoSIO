@@ -1,0 +1,130 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.home-page {
+  min-height: calc(100vh - 200px);
+  padding: $spacing-xxl 0;
+}
+
+.hero-section {
+  text-align: center;
+  margin-bottom: $spacing-xxl;
+  padding: $spacing-xl 0;
+  
+  .hero-title {
+    font-size: 3rem;
+    color: $primary-color;
+    margin-bottom: $spacing-md;
+    
+    @include respond-to('sm') {
+      font-size: 3.5rem;
+    }
+  }
+  
+  .hero-subtitle {
+    font-size: 1.5rem;
+    color: $secondary-color;
+    margin-bottom: $spacing-lg;
+  }
+  
+  .hero-description {
+    font-size: $font-size-lg;
+    color: $text-secondary;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.8;
+  }
+}
+
+.features-section {
+  margin-bottom: $spacing-xxl;
+  
+  .section-title {
+    text-align: center;
+    color: $text-primary;
+    margin-bottom: $spacing-xl;
+    font-size: 2rem;
+  }
+  
+  .features-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-lg;
+    
+    @include respond-to('md') {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    @include respond-to('lg') {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .feature-card {
+      background: white;
+      padding: $spacing-xl;
+      border-radius: $border-radius-lg;
+      @include box-shadow($box-shadow);
+      text-align: center;
+      @include transition($transition-base);
+      
+      &:hover {
+        transform: translateY(-5px);
+        @include box-shadow($box-shadow-lg);
+      }
+      
+      .feature-icon {
+        font-size: 3rem;
+        margin-bottom: $spacing-md;
+      }
+      
+      h4 {
+        color: $text-primary;
+        margin-bottom: $spacing-sm;
+        font-size: $font-size-lg;
+      }
+      
+      p {
+        color: $text-secondary;
+        margin: 0;
+        line-height: 1.6;
+      }
+    }
+  }
+}
+
+.cta-section {
+  text-align: center;
+  padding: $spacing-xl 0;
+  background: linear-gradient(135deg, $primary-color, darken($primary-color, 15%));
+  border-radius: $border-radius-lg;
+  color: white;
+  
+  h3 {
+    font-size: 2rem;
+    margin-bottom: $spacing-md;
+    color: white;
+  }
+  
+  p {
+    font-size: $font-size-lg;
+    margin-bottom: $spacing-lg;
+    color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .btn-primary {
+    background-color: white;
+    color: $primary-color;
+    border: none;
+    padding: $spacing-md $spacing-xl;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    @include border-radius($border-radius);
+    cursor: pointer;
+    @include transition($transition-base);
+    
+    &:hover {
+      background-color: darken(white, 10%);
+      transform: scale(1.05);
+    }
+  }
+}
