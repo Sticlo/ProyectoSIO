@@ -76,3 +76,80 @@ SIO organiza este ciclo de forma clara y trazable.
 - Una base operativa para el negocio
 - Una herramienta de control diario
 - Un punt
+o de partida para escalar
+
+---
+
+## 🚀 Desarrollo
+
+Este proyecto está construido con Angular 21 y utiliza las mejores prácticas de desarrollo.
+
+### Requisitos Previos
+
+- Node.js (v18 o superior)
+- npm (v9 o superior)
+
+### Instalación
+
+```bash
+# Clonar el repositorio
+git clone https://github.com/Sticlo/ProyectoSIO.git
+cd ProyectoSIO
+
+# Instalar dependencias
+npm install
+```
+
+### Comandos Disponibles
+
+```bash
+# Iniciar servidor de desarrollo
+npm start
+# La aplicación estará disponible en http://localhost:4200
+
+# Compilar para producción
+npm run build:prod
+
+# Compilar para desarrollo
+npm run build:dev
+
+# Ejecutar pruebas
+npm test
+
+# Ejecutar linter
+npm run lint
+```
+
+### Estructura del Proyecto
+
+```
+src/
+├── app/
+│   ├── core/              # Servicios singleton, guards, interceptors
+│   ├── shared/            # Componentes, directivas y pipes compartidos
+│   ├── features/          # Módulos de funcionalidades
+│   ├── layout/            # Componentes de layout (header, footer, sidebar)
+│   └── app.component.ts
+├── assets/                # Recursos estáticos
+├── environments/          # Configuración de entornos
+└── styles/                # Estilos globales
+```
+
+### Características Técnicas
+
+- ✅ Angular 21 con componentes standalone
+- ✅ Routing configurado con lazy loading
+- ✅ SCSS como preprocesador de estilos
+- ✅ TypeScript en modo strict
+- ✅ Path aliases configurados (@core, @shared, @features, @layout)
+- ✅ Estructura modular y escalable
+- ✅ Interceptores HTTP configurados
+- ✅ Guards de autenticación
+- ✅ Servicios de API y Storage
+- ✅ Variables y mixins SCSS globales
+
+---
+
+## 📝 Licencia
+
+© 2024 SIO - Sistema Interno Operativo. Todos los derechos reservados.
