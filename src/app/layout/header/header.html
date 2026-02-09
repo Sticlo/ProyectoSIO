@@ -1,21 +1,40 @@
 <header class="header">
-  <div class="container">
-    <nav class="navbar">
+  <div class="promo-banner">
+    <p>{{ promoBanner }}</p>
+  </div>
+  <nav class="navbar">
+    <div class="container">
       <div class="navbar-brand">
         <a routerLink="/" class="brand-logo">
-          <h1>SIO</h1>
+          <span class="logo-text">{{ brandName }}</span>
         </a>
       </div>
-      <div class="navbar-menu">
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <a routerLink="/" class="nav-link">Inicio</a>
-          </li>
-          <li class="nav-item">
-            <a routerLink="/about" class="nav-link">Acerca de</a>
-          </li>
-        </ul>
+      <ul class="navbar-menu">
+        <li class="nav-item" *ngFor="let item of menuItems">
+          <a [routerLink]="item.route" class="nav-link">{{ item.label }}</a>
+        </li>
+      </ul>
+      <div class="navbar-actions">
+        <button class="icon-btn" aria-label="Buscar">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+        </button>
+        <button class="icon-btn" aria-label="Usuario">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </button>
+        <button class="icon-btn" aria-label="Carrito">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 2h6v2H9z"></path>
+            <path d="M9 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2ZM19 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"></path>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+        </button>
       </div>
-    </nav>
-  </div>
+    </div>
+  </nav>
 </header>

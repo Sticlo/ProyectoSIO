@@ -1,5 +1,5 @@
-@import '../styles/variables';
-@import '../styles/mixins';
+@use '../styles/variables';
+@use '../styles/mixins';
 
 .app-container {
   display: flex;
@@ -9,5 +9,4 @@
 
 .main-content {
   flex: 1;
-  background-color: $content-bg;
 }
