@@ -15,7 +15,11 @@ export const SiteConfig = {
   // Datos de contacto
   contact: {
     email: 'contacto@tuempresa.com',
-    phone: '+123 456 7890',
+    phone: '+57 301 745 3703',
+    // IMPORTANTE: Número de WhatsApp para recibir pedidos
+    // Formato: código de país + número (sin + ni espacios ni guiones)
+    // Ejemplo para Colombia: '573017453703'
+    whatsapp: '573015053231',
     address: 'Tu dirección aquí',
     social: {
       facebook: 'https://facebook.com/tuempresa',
@@ -133,5 +137,24 @@ export const SiteConfig = {
     accent: '#764ba2',
     background: '#fafafa',
     text: '#333333'
+  },
+
+  // Configuración de pedidos y checkout
+  orders: {
+    // Habilitar checkout por WhatsApp
+    enableWhatsAppCheckout: true,
+    
+    // Mensaje personalizado para el checkout
+    checkoutButtonText: 'Finalizar pedido por WhatsApp',
+    
+    // Configuración de envío
+    shipping: {
+      isFree: true,
+      cost: 0,
+      freeShippingThreshold: 100000 // Envío gratis en compras mayores a esta cantidad
+    },
+    
+    // Limpiar carrito después de enviar pedido por WhatsApp
+    clearCartAfterCheckout: false
   }
 };

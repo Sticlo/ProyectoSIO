@@ -1,6 +1,8 @@
 import { Component, signal, inject, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../../../core/services/cart.service';
+import { WhatsAppService } from '../../../core/services/whatsapp.service';
+import { SiteConfig } from '../../../config/site.config';
 
 @Component({
   selector: 'app-cart-sidebar',
@@ -11,6 +13,10 @@ import { CartService } from '../../../core/services/cart.service';
 })
 export class CartSidebarComponent {
   private cartService = inject(CartService);
+  private whatsappService = inject(WhatsAppService);
+  
+  // Configuración del sitio
+  protected readonly siteConfig = SiteConfig;
   
   // Signals
   isOpen = signal(false);
@@ -57,6 +63,23 @@ export class CartSidebarComponent {
   }
   
   checkout(): void {
-    alert('Funcionalidad de checkout próximamente');
+    const items = this.cartItems();
+    const total = this.totalPrice();
+    
+    if (items.length === 0) {
+      alert('Tu carrito está vacío');
+      return;
+    }
+    
+    // Enviar pedido por WhatsApp
+    this.whatsappService.sendOrder(items, total);
+    
+    // Limpiar el carrito si está configurado
+    if (SiteConfig.orders.clearCartAfterCheckout) {
+      setTimeout(() => {
+        this.cartService.clearCart();
+        this.closeCart();
+      }, 1000); // Delay para que el usuario vea que se procesó
+    }
   }
 }
