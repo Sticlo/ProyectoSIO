@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ButtonComponent } from '../button/button.component';
 
 export interface Product {
   id: string;
@@ -18,7 +17,7 @@ export interface Product {
 @Component({
   selector: 'app-product-card',
   standalone: true,
-  imports: [CommonModule, ButtonComponent],
+  imports: [CommonModule],
   template: `
     <div class="product-card">
       <div class="product-image">

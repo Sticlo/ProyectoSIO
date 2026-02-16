@@ -10,6 +10,40 @@ import { Injectable } from '@angular/core';
 export class StorageService {
   
   /**
+   * Generic get from localStorage (returns raw string)
+   */
+  getItem(key: string): string | null {
+    try {
+      return localStorage.getItem(key);
+    } catch (error) {
+      console.error('Error getting item from localStorage', error);
+      return null;
+    }
+  }
+
+  /**
+   * Generic set to localStorage (accepts raw string)
+   */
+  setItem(key: string, value: string): void {
+    try {
+      localStorage.setItem(key, value);
+    } catch (error) {
+      console.error('Error setting item in localStorage', error);
+    }
+  }
+
+  /**
+   * Generic remove from localStorage
+   */
+  removeItem(key: string): void {
+    try {
+      localStorage.removeItem(key);
+    } catch (error) {
+      console.error('Error removing item from localStorage', error);
+    }
+  }
+
+  /**
    * Save data to localStorage
    */
   setLocal(key: string, value: any): void {

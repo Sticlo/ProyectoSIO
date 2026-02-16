@@ -1,139 +1,220 @@
 <div class="productos-page">
-  <!-- Hero Section - Producto Destacado -->
-  <section class="hero-product">
+  <!-- Header de la página -->
+  <div class="page-header">
     <div class="container">
-      <div class="hero-content">
-        <div class="hero-text">
-          @if (featuredHero.category) {
-            <span class="hero-category">{{ featuredHero.category }}</span>
-          }
-          <h1 class="hero-title">
-            {{ featuredHero.name.split(' ').slice(0, 2).join(' ') }}<br>
-            <span class="hero-title-accent">{{ featuredHero.name.split(' ').slice(2).join(' ') }}</span>
-          </h1>
-          <p class="hero-description">{{ featuredHero.description }}</p>
-          
-          @if (featuredHero.rating) {
-            <div class="hero-rating">
-              <div class="stars">
-                @for (star of [1,2,3,4,5]; track star) {
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                  </svg>
-                }
-              </div>
-              <span class="rating-text">{{ featuredHero.rating }} / 5 — {{ featuredHero.reviewCount?.toLocaleString() }} reseñas</span>
-            </div>
-          }
-          
-          <div class="hero-price">
-            <span class="price-current">\${{ featuredHero.price }}</span>
-            @if (featuredHero.originalPrice) {
-              <span class="price-original">\${{ featuredHero.originalPrice }}</span>
-              <span class="price-discount">-{{ getDiscountPercentage(featuredHero) }}%</span>
-            }
-          </div>
-          
-          <div class="hero-actions">
-            <app-button variant="primary" size="large">Comprar ahora →</app-button>
-            <app-button variant="outline" size="large">Conocer más</app-button>
-          </div>
-        </div>
-        
-        <div class="hero-image">
-          <div class="image-container">
-            @if (featuredHero.image) {
-              <img [src]="featuredHero.image" [alt]="featuredHero.name">
-            } @else {
-              <div class="image-placeholder">
-                <svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-                  <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
-                  <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
-                </svg>
-              </div>
-            }
-          </div>
-        </div>
+      <div class="breadcrumb">
+        <a href="/">Inicio</a>
+        <span class="separator">›</span>
+        <span>Productos</span>
       </div>
+      <h1 class="page-title">Catálogo de Productos</h1>
+      <p class="page-subtitle">Encuentra los mejores productos de tecnología</p>
     </div>
-  </section>
+  </div>
 
-  <!-- Carrusel Section -->
-  <section class="carousel-section">
+  <!-- Barra de búsqueda y controles -->
+  <div class="search-bar-section">
     <div class="container">
-      <div class="carousel-header">
-        <h2 class="section-title">Productos Destacados</h2>
-        <div class="carousel-controls">
-          <button 
-            class="carousel-btn" 
-            [class.disabled]="!canGoPrev"
-            [disabled]="!canGoPrev"
-            (click)="prevSlide()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
-          </button>
-          <button 
-            class="carousel-btn" 
-            [class.disabled]="!canGoNext"
-            [disabled]="!canGoNext"
-            (click)="nextSlide()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-          </button>
-        </div>
-      </div>
-      
-      <div class="carousel-wrapper">
-        <div class="carousel-track">
-          @for (product of visibleProducts; track product.id) {
-            <div class="carousel-item">
-              <app-product-card [product]="product"></app-product-card>
-            </div>
-          }
-        </div>
-      </div>
-      
-      <div class="carousel-indicators">
-        @for (dot of carouselProducts; track $index; let i = $index) {
-          @if (i <= carouselProducts.length - 3) {
-            <button 
-              class="indicator-dot" 
-              [class.active]="i === currentSlide()"
-              (click)="currentSlide.set(i)">
+      <div class="search-controls">
+        <div class="search-input-wrapper">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          <input 
+            type="text" 
+            class="search-input" 
+            placeholder="Buscar productos por nombre, categoría o descripción..."
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)">
+          @if (searchQuery()) {
+            <button class="clear-search" (click)="searchQuery.set('')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
             </button>
           }
-        }
+        </div>
+        
+        <button class="filter-toggle-btn" (click)="toggleFilters()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+          </svg>
+          Filtros
+          @if (selectedCategories().length > 0 || minRating() > 0) {
+            <span class="filter-badge">{{ selectedCategories().length + (minRating() > 0 ? 1 : 0) }}</span>
+          }
+        </button>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- All Products Section -->
-  <section class="all-products-section">
+  <!-- Contenido principal con sidebar -->
+  <div class="main-content">
     <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">Catálogo Completo</h2>
-        <p class="section-subtitle">
-          Explora todos nuestros productos disponibles
-        </p>
-      </div>
-      <div class="products-grid">
-        @for (product of allProducts; track product.id) {
-          <app-product-card [product]="product"></app-product-card>
-        }
-      </div>
-    </div>
-  </section>
+      <div class="content-layout">
+        <!-- Sidebar de filtros -->
+        <aside class="sidebar" [class.show]="showFilters()">
+          <div class="filters-container">
+            <div class="filters-header">
+              <h3>Filtros</h3>
+              @if (selectedCategories().length > 0 || minRating() > 0 || searchQuery()) {
+                <button class="clear-all" (click)="clearFilters()">Limpiar</button>
+              }
+            </div>
 
-  <!-- CTA Section -->
-  <section class="cta-section">
-    <div class="container">
-      <div class="cta-content">
-        <h2>¿No encuentras lo que buscas?</h2>
-        <p>Contáctanos y te ayudaremos a encontrar el producto perfecto para ti</p>
-        <app-button variant="light" size="large">Contactar</app-button>
+            <!-- Filtro de categorías -->
+            <div class="filter-group">
+              <h4 class="filter-title">Categorías</h4>
+              <div class="filter-options">
+                @for (category of categories; track category.id) {
+                  <label class="filter-option">
+                    <input 
+                      type="checkbox" 
+                      [checked]="selectedCategories().includes(category.id)"
+                      (change)="toggleCategory(category.id)">
+                    <span class="checkbox-custom"></span>
+                    <span class="option-label">{{ category.name }}</span>
+                    <span class="option-count">({{ category.count }})</span>
+                  </label>
+                }
+              </div>
+            </div>
+
+            <!-- Filtro de precio -->
+            <div class="filter-group">
+              <h4 class="filter-title">Rango de Precio</h4>
+              <div class="price-inputs">
+                <div class="price-input-group">
+                  <span class="currency">$</span>
+                  <input 
+                    type="number" 
+                    [value]="priceRange().min"
+                    (input)="priceRange.set({ min: +$any($event.target).value, max: priceRange().max })"
+                    placeholder="Min">
+                </div>
+                <span class="price-separator">-</span>
+                <div class="price-input-group">
+                  <span class="currency">$</span>
+                  <input 
+                    type="number" 
+                    [value]="priceRange().max"
+                    (input)="priceRange.set({ min: priceRange().min, max: +$any($event.target).value })"
+                    placeholder="Max">
+                </div>
+              </div>
+              <input 
+                type="range" 
+                class="price-slider"
+                min="0" 
+                max="1000" 
+                [value]="priceRange().max"
+                (input)="priceRange.set({ min: priceRange().min, max: +$any($event.target).value })">
+            </div>
+
+            <!-- Filtro de calificación -->
+            <div class="filter-group">
+              <h4 class="filter-title">Calificación Mínima</h4>
+              <div class="rating-options">
+                @for (rating of [5, 4, 3, 2, 1]; track rating) {
+                  <button 
+                    class="rating-option"
+                    [class.active]="minRating() === rating"
+                    (click)="minRating.set(minRating() === rating ? 0 : rating)">
+                    <div class="stars">
+                      @for (star of [1,2,3,4,5]; track star) {
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" [attr.fill]="star <= rating ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2">
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                      }
+                    </div>
+                    <span>y más</span>
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Área de productos -->
+        <div class="products-area">
+          <!-- Barra de herramientas -->
+          <div class="toolbar">
+            <div class="results-info">
+              <span class="results-count">{{ filteredProducts().length }} productos</span>
+              @if (searchQuery()) {
+                <span class="search-term">para "<strong>{{ searchQuery() }}</strong>"</span>
+              }
+            </div>
+
+            <div class="toolbar-actions">
+              <div class="sort-select-wrapper">
+                <label for="sort">Ordenar por:</label>
+                <select 
+                  id="sort"
+                  class="sort-select"
+                  [ngModel]="sortBy()"
+                  (ngModelChange)="sortBy.set($event)">
+                  <option value="relevant">Relevancia</option>
+                  <option value="price-asc">Precio: Menor a Mayor</option>
+                  <option value="price-desc">Precio: Mayor a Menor</option>
+                  <option value="name">Nombre</option>
+                  <option value="rating">Mejor Calificados</option>
+                </select>
+              </div>
+
+              <div class="view-toggle">
+                <button 
+                  class="view-btn"
+                  [class.active]="viewMode() === 'grid'"
+                  (click)="viewMode.set('grid')"
+                  title="Vista en cuadrícula">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                  </svg>
+                </button>
+                <button 
+                  class="view-btn"
+                  [class.active]="viewMode() === 'list'"
+                  (click)="viewMode.set('list')"
+                  title="Vista en lista">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="8" y1="6" x2="21" y2="6"></line>
+                    <line x1="8" y1="12" x2="21" y2="12"></line>
+                    <line x1="8" y1="18" x2="21" y2="18"></line>
+                    <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                    <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                    <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grid de productos -->
+          @if (filteredProducts().length > 0) {
+            <div class="products-grid" [class.list-view]="viewMode() === 'list'">
+              @for (product of filteredProducts(); track product.id) {
+                <app-product-card [product]="product"></app-product-card>
+              }
+            </div>
+          } @else {
+            <div class="no-results">
+              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+              </svg>
+              <h3>No se encontraron productos</h3>
+              <p>Intenta ajustar los filtros o realizar una búsqueda diferente</p>
+              <button class="reset-btn" (click)="clearFilters()">Limpiar filtros</button>
+            </div>
+          }
+        </div>
       </div>
     </div>
-  </section>
+  </div>
 </div>
