@@ -1,8 +1,9 @@
-import { Component, signal, effect, computed } from '@angular/core';
+import { Component, signal, effect, computed, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 import { CartService } from '../../core/services/cart.service';
+import { CartSidebarComponent } from '../../shared/components/cart-sidebar/cart-sidebar.component';
 
 interface MenuItem {
   label: string;
@@ -11,7 +12,7 @@ interface MenuItem {
 
 @Component({
   selector: 'app-header',
-  imports: [RouterLink, CommonModule],
+  imports: [RouterLink, CommonModule, CartSidebarComponent],
   templateUrl: './header.html',
   styleUrl: './header.scss',
 })
@@ -19,6 +20,9 @@ export class Header {
   brandName = 'SIO';
   promoBanner = 'NUEVA COLECCIÓN 2026 — ENVÍO GRATIS EN TU PRIMERA COMPRA';
   mobileMenuOpen = signal(false);
+  
+  // ViewChild for cart sidebar
+  cartSidebar = viewChild<CartSidebarComponent>('cartSidebar');
   
   // Auth
   user = computed(() => this.authService.user());
@@ -53,6 +57,10 @@ export class Header {
   
   closeMobileMenu() {
     this.mobileMenuOpen.set(false);
+  }
+  
+  openCart() {
+    this.cartSidebar()?.open();
   }
   
   logout() {

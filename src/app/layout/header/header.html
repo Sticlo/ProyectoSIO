@@ -53,7 +53,7 @@
           </a>
         }
         
-        <button class="icon-btn cart-btn" aria-label="Carrito">
+        <button class="icon-btn cart-btn" aria-label="Carrito" (click)="openCart()">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 2h6v2H9z"></path>
             <path d="M9 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2ZM19 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"></path>
@@ -154,4 +154,7 @@
     (click)="closeMobileMenu()">
   </div>
 </header>
+
+<!-- Cart Sidebar -->
+<app-cart-sidebar #cartSidebar></app-cart-sidebar>
 

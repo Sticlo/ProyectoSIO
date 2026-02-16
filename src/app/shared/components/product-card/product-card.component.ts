@@ -1,5 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { CartService } from '../../../core/services/cart.service';
 
 export interface Product {
   id: string;
@@ -52,6 +53,25 @@ export interface Product {
             <span class="price-original">\${{ product.originalPrice }}</span>
           }
         </div>
+        <button 
+          class="add-to-cart-btn"
+          [class.added]="addedToCart()"
+          (click)="addToCart($event)"
+          [disabled]="addedToCart()">
+          @if (addedToCart()) {
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Agregado
+          } @else {
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+            Agregar al carrito
+          }
+        </button>
       </div>
     </div>
   `,
@@ -62,14 +82,20 @@ export interface Product {
       overflow: hidden;
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       cursor: pointer;
+      border: 1px solid rgba(0, 0, 0, 0.06);
       
       &:hover {
         transform: translateY(-4px);
         box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+        border-color: rgba(0, 0, 0, 0.1);
         
         .product-image img,
         .image-placeholder {
           transform: scale(1.05);
+        }
+        
+        .add-to-cart-btn:not(.added) {
+          background: #000;
         }
       }
     }
@@ -101,7 +127,7 @@ export interface Product {
       position: absolute;
       top: 1rem;
       left: 1rem;
-      background-color: #e63946;
+      background: linear-gradient(135deg, #ff3b30 0%, #ff2d55 100%);
       color: white;
       padding: 0.5rem 0.875rem;
       border-radius: 20px;
@@ -110,6 +136,7 @@ export interface Product {
       text-transform: uppercase;
       letter-spacing: 1px;
       z-index: 2;
+      box-shadow: 0 2px 8px rgba(255, 59, 48, 0.3);
     }
     
     .favorite-btn {
@@ -118,28 +145,30 @@ export interface Product {
       right: 1rem;
       width: 40px;
       height: 40px;
-      background: white;
-      border: none;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 0, 0, 0.06);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       z-index: 2;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
       
       svg {
-        color: #666;
-        transition: all 0.3s ease;
+        color: #86868b;
+        transition: all 0.2s ease;
       }
       
       &:hover {
         transform: scale(1.1);
+        background: white;
         
         svg {
-          color: #e63946;
-          fill: #e63946;
+          color: #ff3b30;
+          fill: #ff3b30;
         }
       }
     }
@@ -153,7 +182,7 @@ export interface Product {
       font-size: 0.625rem;
       font-weight: 700;
       letter-spacing: 1.5px;
-      color: #999;
+      color: #86868b;
       text-transform: uppercase;
       margin-bottom: 0.5rem;
     }
@@ -161,34 +190,103 @@ export interface Product {
     .product-name {
       font-size: 1.125rem;
       font-weight: 600;
-      color: #1a1a1a;
+      color: #1d1d1f;
       margin-bottom: 0.75rem;
       line-height: 1.3;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      letter-spacing: -0.01em;
     }
     
     .product-price {
       display: flex;
       align-items: baseline;
       gap: 0.5rem;
+      margin-bottom: 1rem;
       
       .price-current {
         font-size: 1.5rem;
-        font-weight: 700;
-        color: #1a1a1a;
+        font-weight: 600;
+        color: #1d1d1f;
+        letter-spacing: -0.02em;
       }
       
       .price-original {
         font-size: 1rem;
-        color: #999;
+        color: #86868b;
         text-decoration: line-through;
+      }
+    }
+    
+    .add-to-cart-btn {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: #1d1d1f;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      letter-spacing: -0.01em;
+      
+      &:hover:not(:disabled) {
+        background: #000;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+      
+      &:active:not(:disabled) {
+        transform: translateY(0);
+      }
+      
+      &.added {
+        background: #34c759;
+        cursor: default;
+        
+        &:hover {
+          background: #34c759;
+          transform: none;
+          box-shadow: none;
+        }
+      }
+      
+      &:disabled {
+        cursor: not-allowed;
       }
     }
   `]
 })
 export class ProductCardComponent {
+  private cartService = inject(CartService);
+  
   @Input() product!: Product;
+  
+  addedToCart = signal(false);
+  
+  addToCart(event: Event): void {
+    event.stopPropagation();
+    
+    this.cartService.addToCart({
+      productId: this.product.id,
+      name: this.product.name,
+      price: this.product.price,
+      image: this.product.image,
+      category: this.product.category
+    }, 1);
+    
+    this.addedToCart.set(true);
+    
+    // Reset after 2 seconds
+    setTimeout(() => {
+      this.addedToCart.set(false);
+    }, 2000);
+  }
 }
