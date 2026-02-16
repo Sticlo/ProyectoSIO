@@ -6,6 +6,7 @@ export interface Product {
   longDescription?: string;
   price: number;
   originalPrice?: number;
+  cost?: number; // Costo de compra/producción del producto
   rating?: number;
   reviewCount?: number;
   image?: string;

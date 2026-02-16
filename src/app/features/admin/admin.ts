@@ -7,13 +7,15 @@ import { ProductService } from '../../core/services/product.service';
 import { AuthService } from '../../core/services/auth.service';
 import { OrderService } from '../../core/services/order.service';
 import { InventoryService } from '../../core/services/inventory.service';
+import { ExpenseService } from '../../core/services/expense.service';
 import { OrdersDashboardComponent } from './orders-dashboard/orders-dashboard.component';
 import { InventoryDashboardComponent } from './inventory-dashboard/inventory-dashboard.component';
+import { FinancesDashboardComponent } from './finances-dashboard/finances-dashboard.component';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, OrdersDashboardComponent, InventoryDashboardComponent],
+  imports: [CommonModule, FormsModule, OrdersDashboardComponent, InventoryDashboardComponent, FinancesDashboardComponent],
   templateUrl: './admin.html',
   styleUrl: './admin.scss'
 })
@@ -30,6 +32,10 @@ export class Admin {
   inventoryDashboard = viewChild.required(InventoryDashboardComponent);
   inventoryStats = computed(() => this.inventoryService.getInventoryStats());
   criticalAlerts = computed(() => this.inventoryService.activeAlerts().length);
+  
+  // Finances dashboard
+  financesDashboard = viewChild.required(FinancesDashboardComponent);
+  financialStats = computed(() => this.expenseService.financialStats());
   
   showModal = signal(false);
   editingProduct = signal<Product | null>(null);
@@ -66,16 +72,9 @@ export class Admin {
     private authService: AuthService,
     private orderService: OrderService,
     private inventoryService: InventoryService,
+    private expenseService: ExpenseService,
     public router: Router
   ) {}
-  
-  openOrdersDashboard(): void {
-    this.ordersDashboard().open();
-  }
-  
-  openInventoryDashboard(): void {
-    this.inventoryDashboard().open();
-  }
   
   openCreateModal(): void {
     this.editingProduct.set(null);
@@ -134,7 +133,21 @@ export class Admin {
     this.formData.update(data => ({ ...data, [field]: value }));
   }
   
+  openOrdersDashboard(): void {
+    this.ordersDashboard().open();
+  }
+  
+  openInventoryDashboard(): void {
+    this.inventoryDashboard().open();
+  }
+  
+  openFinancesDashboard(): void {
+    this.financesDashboard().open();
+  }
+  
   logout(): void {
     this.authService.logout();
   }
 }
+  
+  

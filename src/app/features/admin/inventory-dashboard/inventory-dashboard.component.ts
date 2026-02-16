@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InventoryService, InventoryMovement, StockAlert } from '../../../core/services/inventory.service';
 import { ProductService } from '../../../core/services/product.service';
+import { ReportService } from '../../../core/services/report.service';
 import { Product } from '../../../shared/models/product.model';
 
 @Component({
@@ -15,6 +16,7 @@ import { Product } from '../../../shared/models/product.model';
 export class InventoryDashboardComponent {
   private inventoryService = inject(InventoryService);
   private productService = inject(ProductService);
+  private reportService = inject(ReportService);
   
   // State
   isOpen = signal(false);
@@ -231,5 +233,12 @@ export class InventoryDashboardComponent {
       normal: 'Normal'
     };
     return labels[severity] || severity;
+  }
+  
+  /**
+   * Generar reporte PDF de inventario
+   */
+  downloadInventoryReport(): void {
+    this.reportService.generateInventoryReport();
   }
 }

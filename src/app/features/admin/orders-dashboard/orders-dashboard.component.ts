@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OrderService, Order } from '../../../core/services/order.service';
 import { WhatsAppService } from '../../../core/services/whatsapp.service';
+import { ReportService } from '../../../core/services/report.service';
 
 @Component({
   selector: 'app-orders-dashboard',
@@ -14,6 +15,7 @@ import { WhatsAppService } from '../../../core/services/whatsapp.service';
 export class OrdersDashboardComponent {
   private orderService = inject(OrderService);
   private whatsappService = inject(WhatsAppService);
+  private reportService = inject(ReportService);
   
   // State
   isOpen = signal(false);
@@ -142,5 +144,12 @@ export class OrdersDashboardComponent {
    */
   sendReminder(order: Order): void {
     this.whatsappService.sendReminder(order);
+  }
+  
+  /**
+   * Generar reporte PDF de pedidos
+   */
+  downloadOrdersReport(): void {
+    this.reportService.generateOrdersReport();
   }
 }
