@@ -6,12 +6,14 @@ import { Product } from '../../shared/models/product.model';
 import { ProductService } from '../../core/services/product.service';
 import { AuthService } from '../../core/services/auth.service';
 import { OrderService } from '../../core/services/order.service';
+import { InventoryService } from '../../core/services/inventory.service';
 import { OrdersDashboardComponent } from './orders-dashboard/orders-dashboard.component';
+import { InventoryDashboardComponent } from './inventory-dashboard/inventory-dashboard.component';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, OrdersDashboardComponent],
+  imports: [CommonModule, FormsModule, OrdersDashboardComponent, InventoryDashboardComponent],
   templateUrl: './admin.html',
   styleUrl: './admin.scss'
 })
@@ -23,6 +25,11 @@ export class Admin {
   ordersDashboard = viewChild.required(OrdersDashboardComponent);
   ordersStats = computed(() => this.orderService.stats());
   unreadOrders = computed(() => this.orderService.unreadOrders().length);
+  
+  // Inventory dashboard
+  inventoryDashboard = viewChild.required(InventoryDashboardComponent);
+  inventoryStats = computed(() => this.inventoryService.getInventoryStats());
+  criticalAlerts = computed(() => this.inventoryService.activeAlerts().length);
   
   showModal = signal(false);
   editingProduct = signal<Product | null>(null);
@@ -58,11 +65,16 @@ export class Admin {
     private productService: ProductService,
     private authService: AuthService,
     private orderService: OrderService,
+    private inventoryService: InventoryService,
     public router: Router
   ) {}
   
   openOrdersDashboard(): void {
     this.ordersDashboard().open();
+  }
+  
+  openInventoryDashboard(): void {
+    this.inventoryDashboard().open();
   }
   
   openCreateModal(): void {

@@ -7,3 +7,4 @@ export * from './product.service';
 export * from './navigation.service';
 export * from './whatsapp.service';
 export * from './order.service';
+export * from './inventory.service';

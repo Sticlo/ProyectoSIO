@@ -2,6 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { CartItem } from './cart.service';
 import { SiteConfig } from '../../config/site.config';
 import { OrderService } from './order.service';
+import { InventoryService } from './inventory.service';
+import { ProductService } from './product.service';
 
 export interface CustomerInfo {
   name: string;
@@ -15,6 +17,8 @@ export interface CustomerInfo {
 })
 export class WhatsAppService {
   private orderService = inject(OrderService);
+  private inventoryService = inject(InventoryService);
+  private productService = inject(ProductService);
   
   // Número de WhatsApp del destinatario (desde configuración)
   private readonly phoneNumber = SiteConfig.contact.whatsapp;
@@ -48,6 +52,9 @@ export class WhatsAppService {
       customerInfo.notes,
       customerInfo.address
     );
+    
+    // Descontar stock automáticamente
+    this.decreaseStockForOrder(items, order.id);
     
     // Abrir WhatsApp en una nueva ventana
     window.open(whatsappUrl, '_blank');
@@ -226,6 +233,28 @@ export class WhatsAppService {
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${order.phoneNumber}?text=${encodedMessage}`;
     window.open(whatsappUrl, '_blank');
+  }
+  
+  /**
+   * Descontar stock automáticamente para los productos de una orden
+   */
+  private decreaseStockForOrder(items: CartItem[], orderId: string): void {
+    items.forEach(item => {
+      // Buscar el producto
+      const product = this.productService.getById(item.productId);
+      
+      if (product) {
+        // Descontar stock
+        const updatedProduct = this.inventoryService.decreaseStock(
+          product,
+          item.quantity,
+          orderId
+        );
+        
+        // Actualizar en el servicio de productos
+        this.productService.updateProductStock(product.id, updatedProduct);
+      }
+    });
   }
   
   /**

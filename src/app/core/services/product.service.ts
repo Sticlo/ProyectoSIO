@@ -171,4 +171,34 @@ export class ProductService {
       p.category?.toLowerCase() === category.toLowerCase()
     );
   }
+  
+  /**
+   * Actualizar stock de un producto
+   */
+  updateProductStock(productId: string, updatedProduct: Product): void {
+    this.products.update(products =>
+      products.map(p => p.id === productId ? updatedProduct : p)
+    );
+    this.saveProducts();
+  }
+  
+  /**
+   * Obtener productos con stock bajo
+   */
+  getLowStockProducts(): Product[] {
+    return this.products().filter(p => {
+      const stock = p.stockCount || 0;
+      const minStock = p.minStock || 5;
+      return stock > 0 && stock <= minStock;
+    });
+  }
+  
+  /**
+   * Obtener productos agotados
+   */
+  getOutOfStockProducts(): Product[] {
+    return this.products().filter(p => 
+      (p.stockCount || 0) === 0 || p.inStock === false
+    );
+  }
 }

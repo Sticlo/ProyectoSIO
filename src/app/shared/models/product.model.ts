@@ -15,6 +15,9 @@ export interface Product {
   specifications?: { [key: string]: string }; // Technical specs
   inStock?: boolean;
   stockCount?: number;
+  minStock?: number; // Mínimo para alerta de stock bajo
+  maxStock?: number; // Capacidad máxima de inventario
+  lastRestocked?: Date; // Última vez que se reabastació
 }
 
 export interface ProductReview {

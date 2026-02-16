@@ -52,7 +52,8 @@
 .btn-primary,
 .btn-secondary,
 .btn-danger,
-.btn-orders {
+.btn-orders,
+.btn-inventory {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -102,6 +103,34 @@
     font-size: 0.6875rem;
     font-weight: 700;
     margin-left: 4px;
+  }
+}
+
+.btn-inventory {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+  
+  &:hover {
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
+  }
+  
+  .inventory-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    background: white;
+    color: #8b5cf6;
+    border-radius: 10px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    margin-left: 4px;
+    animation: pulse 2s ease-in-out infinite;
   }
 }
 
