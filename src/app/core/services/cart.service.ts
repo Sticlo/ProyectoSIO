@@ -1,4 +1,4 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { StorageService } from './storage.service';
 
 export interface CartItem {
@@ -14,7 +14,7 @@ export interface CartItem {
   providedIn: 'root'
 })
 export class CartService {
-  private storageService = new StorageService();
+  private storageService = inject(StorageService);
   private readonly CART_KEY = 'shopping_cart';
   
   private items = signal<CartItem[]>(this.loadCart());

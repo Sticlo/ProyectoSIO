@@ -1,6 +1,8 @@
-import { Component, signal, effect } from '@angular/core';
+import { Component, signal, effect, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../core/services/auth.service';
+import { CartService } from '../../core/services/cart.service';
 
 interface MenuItem {
   label: string;
@@ -18,14 +20,23 @@ export class Header {
   promoBanner = 'NUEVA COLECCIÓN 2026 — ENVÍO GRATIS EN TU PRIMERA COMPRA';
   mobileMenuOpen = signal(false);
   
+  // Auth
+  user = computed(() => this.authService.user());
+  isAuthenticated = computed(() => this.authService.isAuthenticated());
+  isAdmin = computed(() => this.authService.isAdmin());
+  
+  // Cart
+  cartItemCount = computed(() => this.cartService.itemCount());
+  
   menuItems: MenuItem[] = [
     { label: 'Inicio', route: '/' },
-    { label: 'Productos', route: '/productos' },
-    { label: 'Categorías', route: '/categorias' },
-    { label: 'Testimonios', route: '/testimonios' }
+    { label: 'Productos', route: '/productos' }
   ];
   
-  constructor() {
+  constructor(
+    private authService: AuthService,
+    private cartService: CartService
+  ) {
     // Prevenir scroll cuando el menú está abierto
     effect(() => {
       if (this.mobileMenuOpen()) {
@@ -42,5 +53,10 @@ export class Header {
   
   closeMobileMenu() {
     this.mobileMenuOpen.set(false);
+  }
+  
+  logout() {
+    this.authService.logout();
+    this.closeMobileMenu();
   }
 }

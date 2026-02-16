@@ -132,6 +132,26 @@
       display: none;
     }
   }
+  
+  .cart-btn {
+    position: relative;
+    
+    .cart-badge {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background-color: #e53935;
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+  }
 }
 
 // Hamburger Button
@@ -211,6 +231,11 @@
       font-size: 1.1rem;
       transition: all 0.2s ease;
       position: relative;
+      width: 100%;
+      text-align: left;
+      border: none;
+      background: none;
+      cursor: pointer;
       
       &::before {
         content: '';
@@ -235,6 +260,14 @@
       
       &:active {
         background-color: #f0f0f0;
+      }
+      
+      &.logout-btn {
+        color: #e53935;
+        
+        &::before {
+          background-color: #e53935;
+        }
       }
     }
   }

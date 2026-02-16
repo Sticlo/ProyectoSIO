@@ -25,18 +25,43 @@
             <path d="m21 21-4.35-4.35"></path>
           </svg>
         </button>
-        <button class="icon-btn desktop-icon" aria-label="Usuario">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-        </button>
-        <button class="icon-btn" aria-label="Carrito">
+        
+        @if (isAuthenticated()) {
+          @if (isAdmin()) {
+            <a routerLink="/admin" class="icon-btn desktop-icon" aria-label="Admin" title="Panel Admin">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+            </a>
+          }
+          <button class="icon-btn desktop-icon" aria-label="Usuario" title="{{ user()?.name }}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </button>
+        } @else {
+          <a routerLink="/login" class="icon-btn desktop-icon" aria-label="Iniciar sesión" title="Iniciar sesión">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+              <polyline points="10 17 15 12 10 7"></polyline>
+              <line x1="15" y1="12" x2="3" y2="12"></line>
+            </svg>
+          </a>
+        }
+        
+        <button class="icon-btn cart-btn" aria-label="Carrito">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 2h6v2H9z"></path>
             <path d="M9 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2ZM19 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"></path>
             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
           </svg>
+          @if (cartItemCount() > 0) {
+            <span class="cart-badge">{{ cartItemCount() }}</span>
+          }
         </button>
         
         <!-- Hamburger Button (Mobile Only) -->
@@ -85,6 +110,40 @@
           {{ item.label }}
         </a>
       </li>
+      @if (isAuthenticated()) {
+        @if (isAdmin()) {
+          <li class="mobile-nav-item">
+            <a 
+              routerLink="/admin" 
+              class="mobile-nav-link"
+              (click)="closeMobileMenu()">
+              Panel Admin
+            </a>
+          </li>
+        }
+        <li class="mobile-nav-item">
+          <button class="mobile-nav-link logout-btn" (click)="logout()">
+            Cerrar Sesión
+          </button>
+        </li>
+      } @else {
+        <li class="mobile-nav-item">
+          <a 
+            routerLink="/login" 
+            class="mobile-nav-link"
+            (click)="closeMobileMenu()">
+            Iniciar Sesión
+          </a>
+        </li>
+        <li class="mobile-nav-item">
+          <a 
+            routerLink="/register" 
+            class="mobile-nav-link"
+            (click)="closeMobileMenu()">
+            Registrarse
+          </a>
+        </li>
+      }
     </ul>
   </div>
   
