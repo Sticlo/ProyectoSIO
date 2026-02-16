@@ -1,13 +1,14 @@
-import { Component, signal, inject, output } from '@angular/core';
+import { Component, signal, inject, output, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../../../core/services/cart.service';
 import { WhatsAppService } from '../../../core/services/whatsapp.service';
 import { SiteConfig } from '../../../config/site.config';
+import { CheckoutModalComponent } from '../checkout-modal/checkout-modal.component';
 
 @Component({
   selector: 'app-cart-sidebar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, CheckoutModalComponent],
   templateUrl: './cart-sidebar.component.html',
   styleUrls: ['./cart-sidebar.component.scss']
 })
@@ -17,6 +18,9 @@ export class CartSidebarComponent {
   
   // Configuración del sitio
   protected readonly siteConfig = SiteConfig;
+  
+  // Checkout modal reference
+  checkoutModal = viewChild.required(CheckoutModalComponent);
   
   // Signals
   isOpen = signal(false);
@@ -64,22 +68,20 @@ export class CartSidebarComponent {
   
   checkout(): void {
     const items = this.cartItems();
-    const total = this.totalPrice();
     
     if (items.length === 0) {
       alert('Tu carrito está vacío');
       return;
     }
     
-    // Enviar pedido por WhatsApp
-    this.whatsappService.sendOrder(items, total);
-    
-    // Limpiar el carrito si está configurado
+    // Abrir el modal de checkout que solicitará datos del cliente
+    this.checkoutModal().open();
+  }
+  
+  onCheckoutSuccess(): void {
+    // Cerrar el sidebar cuando el checkout es exitoso
     if (SiteConfig.orders.clearCartAfterCheckout) {
-      setTimeout(() => {
-        this.cartService.clearCart();
-        this.closeCart();
-      }, 1000); // Delay para que el usuario vea que se procesó
+      this.closeCart();
     }
   }
 }

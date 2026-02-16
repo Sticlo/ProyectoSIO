@@ -51,7 +51,8 @@
 // Buttons
 .btn-primary,
 .btn-secondary,
-.btn-danger {
+.btn-danger,
+.btn-orders {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -63,6 +64,7 @@
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
+  position: relative;
 }
 
 .btn-primary {
@@ -73,6 +75,33 @@
     background: #5568d3;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  }
+}
+
+.btn-orders {
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(37, 211, 102, 0.3);
+  
+  &:hover {
+    background: linear-gradient(135deg, #128C7E 0%, #075E54 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(37, 211, 102, 0.4);
+  }
+  
+  .orders-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    background: white;
+    color: #25D366;
+    border-radius: 10px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    margin-left: 4px;
   }
 }
 

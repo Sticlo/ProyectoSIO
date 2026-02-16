@@ -1,21 +1,28 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Product } from '../../shared/models/product.model';
 import { ProductService } from '../../core/services/product.service';
 import { AuthService } from '../../core/services/auth.service';
+import { OrderService } from '../../core/services/order.service';
+import { OrdersDashboardComponent } from './orders-dashboard/orders-dashboard.component';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, OrdersDashboardComponent],
   templateUrl: './admin.html',
   styleUrl: './admin.scss'
 })
 export class Admin {
   products = computed(() => this.productService.allProducts());
   user = computed(() => this.authService.user());
+  
+  // Orders dashboard
+  ordersDashboard = viewChild.required(OrdersDashboardComponent);
+  ordersStats = computed(() => this.orderService.stats());
+  unreadOrders = computed(() => this.orderService.unreadOrders().length);
   
   showModal = signal(false);
   editingProduct = signal<Product | null>(null);
@@ -50,8 +57,13 @@ export class Admin {
   constructor(
     private productService: ProductService,
     private authService: AuthService,
+    private orderService: OrderService,
     public router: Router
   ) {}
+  
+  openOrdersDashboard(): void {
+    this.ordersDashboard().open();
+  }
   
   openCreateModal(): void {
     this.editingProduct.set(null);
