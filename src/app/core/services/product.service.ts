@@ -44,43 +44,81 @@ export class ProductService {
       {
         id: '1',
         name: 'AirBuds Pro Max',
-        category: 'AURICULARES',
+        category: 'Auriculares',
         description: 'Sonido premium con cancelación de ruido activa y 40 horas de batería.',
         price: 199,
         originalPrice: 249,
         rating: 4.8,
         reviewCount: 1542,
-        badge: 'Oferta'
+        badge: 'Oferta',
+        image: '/assets/placeholder-product.png',
+        inStock: true,
+        stockCount: 25
       },
       {
         id: '2',
         name: 'SoundPulse Speaker',
-        category: 'BOCINAS',
+        category: 'Bocinas',
         description: 'Potencia y claridad en un diseño compacto resistente al agua.',
         price: 149,
         rating: 4.7,
-        reviewCount: 892
+        reviewCount: 892,
+        image: '/assets/placeholder-product.png',
+        inStock: true,
+        stockCount: 18
       },
       {
         id: '3',
         name: 'ChronoWave Watch',
-        category: 'SMARTWATCH',
+        category: 'Smartwatch',
         description: 'Elegancia inteligente con monitoreo de salud 24/7.',
         price: 299,
         originalPrice: 349,
         rating: 4.9,
         reviewCount: 2103,
-        badge: 'Popular'
+        badge: 'Popular',
+        image: '/assets/placeholder-product.png',
+        inStock: true,
+        stockCount: 32
       },
       {
         id: '4',
         name: 'ChargeHub Wireless',
-        category: 'CARGADORES',
+        category: 'Cargadores',
         description: 'Carga rápida inalámbrica de última generación para 3 dispositivos.',
         price: 89,
         rating: 4.6,
         reviewCount: 654,
-        badge: 'Nuevo'
+        badge: 'Nuevo',
+        image: '/assets/placeholder-product.png',
+        inStock: true,
+        stockCount: 45
+      },
+      {
+        id: '5',
+        name: 'Laptop UltraBook Pro',
+        category: 'Laptops',
+        description: 'Rendimiento excepcional con procesador de última generación.',
+        price: 1299,
+        originalPrice: 1499,
+        rating: 4.9,
+        reviewCount: 2341,
+        badge: 'Oferta',
+        image: '/assets/placeholder-product.png',
+        inStock: true,
+        stockCount: 12
+      },
+      {
+        id: '6',
+        name: 'Teclado Mecánico RGB',
+        category: 'Periféricos',
+        description: 'Teclado gaming con switches mecánicos y retroiluminación RGB.',
+        price: 129,
+        rating: 4.7,
+        reviewCount: 856,
+        image: '/assets/placeholder-product.png',
+        inStock: true,
+        stockCount: 23
       }
     ];
     

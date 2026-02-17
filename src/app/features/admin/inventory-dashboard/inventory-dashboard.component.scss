@@ -7,10 +7,11 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  background: rgba(51, 65, 85, 0.6);
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
   z-index: 999;
-  animation: fadeIn 0.3s ease-out;
+  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // Main Dashboard Sidebar
@@ -50,14 +51,15 @@
     gap: 0.75rem;
     
     svg {
-      color: #8b5cf6;
+      color: #0E7490;
     }
     
     h2 {
       font-size: 1.25rem;
       font-weight: 700;
       margin: 0;
-      color: #1d1d1f;
+      color: #334155;
+      letter-spacing: -0.02em;
     }
   }
   

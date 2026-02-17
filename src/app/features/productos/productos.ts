@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ProductCardComponent } from '../../shared/components/product-card/product-card.component';
 import { Product } from '../../shared/models/product.model';
 import { ProductService } from '../../core/services/product.service';
+import { CartService } from '../../core/services/cart.service';
 
 type SortOption = 'relevant' | 'price-asc' | 'price-desc' | 'name' | 'rating';
 type ViewMode = 'grid' | 'list';
@@ -17,6 +18,7 @@ type ViewMode = 'grid' | 'list';
 export class Productos {
   // Servicios
   private productService = inject(ProductService);
+  private cartService = inject(CartService);
   
   // Estados de filtros y búsqueda
   searchQuery = signal('');
@@ -26,12 +28,27 @@ export class Productos {
   sortBy = signal<SortOption>('relevant');
   viewMode = signal<ViewMode>('grid');
   showFilters = signal(false); // Empezar cerrado, especialmente en móvil
+  
+  // Modal de producto
+  selectedProduct = signal<Product | null>(null);
+  showProductModal = signal(false);
 
   constructor() {
     // Effect para prevenir scroll cuando el sidebar está abierto en móvil
     effect(() => {
       if (typeof window !== 'undefined') {
         if (this.showFilters() && window.innerWidth <= 968) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      }
+    });
+    
+    // Effect para prevenir scroll cuando el modal está abierto
+    effect(() => {
+      if (typeof window !== 'undefined') {
+        if (this.showProductModal()) {
           document.body.style.overflow = 'hidden';
         } else {
           document.body.style.overflow = '';
@@ -147,5 +164,29 @@ export class Productos {
   getDiscountPercentage(product: Product): number {
     if (!product.originalPrice) return 0;
     return Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
+  }
+  
+  // Modal de producto
+  openProductModal(product: Product) {
+    this.selectedProduct.set(product);
+    this.showProductModal.set(true);
+  }
+  
+  closeProductModal() {
+    this.showProductModal.set(false);
+    setTimeout(() => {
+      this.selectedProduct.set(null);
+    }, 300);
+  }
+  
+  addProductToCart(product: Product) {
+    this.cartService.addToCart({
+      productId: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      category: product.category
+    });
+    this.closeProductModal();
   }
 }

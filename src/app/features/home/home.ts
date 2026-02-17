@@ -13,36 +13,35 @@ export class Home {
   testimonials: Testimonial[] = [
     {
       id: '1',
-      name: 'María González',
-      role: 'Directora de Marketing',
-      company: 'TechCorp',
-      content: 'Excelente servicio y productos de alta calidad. Han superado todas nuestras expectativas.',
+      name: 'Carlos Méndez',
+      role: 'Director General',
+      company: 'Fashion Boutique',
+      content: 'La plataforma e-commerce que desarrollaron transformó nuestro negocio. Las ventas en línea aumentaron un 300% en los primeros 3 meses.',
       rating: 5
     },
     {
       id: '2',
-      name: 'Carlos Rodríguez',
-      role: 'CEO',
-      company: 'Innovate Inc',
-      content: 'La atención al detalle es impresionante. Definitivamente volveré a comprar.',
+      name: 'Laura Sánchez',
+      role: 'Dueña',
+      company: 'Tienda Local',
+      content: 'El panel de administración es intuitivo y completo. Puedo gestionar inventario, pedidos y finanzas desde cualquier lugar.',
       rating: 5
     },
     {
       id: '3',
-      name: 'Ana Martínez',
-      role: 'Gerente',
-      company: 'StyleCo',
-      content: 'Productos que realmente cumplen lo que prometen. Muy satisfecha con mi compra.',
+      name: 'Roberto Jiménez',
+      role: 'CEO',
+      company: 'TechStore',
+      content: 'La integración con WhatsApp fue un cambio radical. Nuestros clientes ahora realizan pedidos fácilmente y nosotros gestionamos todo desde un solo lugar.',
       rating: 5
     }
   ];
   
   // Estadísticas
   stats = [
-    { value: '10K+', label: 'Clientes Felices' },
-    { value: '50K+', label: 'Productos Vendidos' },
-    { value: '4.9', label: 'Rating Promedio' },
-    { value: '24/7', label: 'Soporte' }
+    { value: '50+', label: 'Proyectos Exitosos' },
+    { value: '99%', label: 'Satisfacción Cliente' },
+    { value: '24/7', label: 'Soporte Técnico' }
   ];
 }
 

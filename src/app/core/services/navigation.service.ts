@@ -33,6 +33,30 @@ export class NavigationService {
       section: 'Navegación',
       icon: 'grid'
     },
+    {
+      title: 'Servicios',
+      description: 'Nuestros servicios digitales',
+      route: '/servicios',
+      keywords: ['servicios', 'soluciones', 'desarrollo', 'web', 'apps'],
+      section: 'Navegación',
+      icon: 'briefcase'
+    },
+    {
+      title: 'Nosotros',
+      description: 'Conoce nuestro equipo',
+      route: '/nosotros',
+      keywords: ['nosotros', 'equipo', 'empresa', 'quienes somos', 'about'],
+      section: 'Navegación',
+      icon: 'users'
+    },
+    {
+      title: 'Contacto',
+      description: 'Contáctanos',
+      route: '/contacto',
+      keywords: ['contacto', 'soporte', 'ayuda', 'contact', 'comunicarse'],
+      section: 'Navegación',
+      icon: 'mail'
+    },
     
     // Autenticación y cuenta
     {

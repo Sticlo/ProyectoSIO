@@ -16,6 +16,18 @@ export const routes: Routes = [
     loadComponent: () => import('./features/productos/productos').then(m => m.Productos)
   },
   {
+    path: 'servicios',
+    loadComponent: () => import('./features/servicios/servicios').then(m => m.Servicios)
+  },
+  {
+    path: 'nosotros',
+    loadComponent: () => import('./features/nosotros/nosotros').then(m => m.Nosotros)
+  },
+  {
+    path: 'contacto',
+    loadComponent: () => import('./features/contacto/contacto').then(m => m.Contacto)
+  },
+  {
     path: 'login',
     loadComponent: () => import('./features/auth/login/login').then(m => m.Login)
   },
