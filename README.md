@@ -6,14 +6,15 @@ Proyecto full-stack para gestión de productos, órdenes, inventario y finanzas.
 
 ```
 proyectosio/
-├── ProyectoSIO/          # Frontend - Angular 18
-├── Backend/              # Backend - Node.js + Express
+├── frontend/             # Aplicaciones Frontend
+│   └── ProyectoSIO/     # Angular 18 - Sistema de gestión
+├── backend/              # API Backend - Node.js + Express
 └── database_schema.sql   # Schema de base de datos MySQL
 ```
 
 ## 🚀 Componentes
 
-### Frontend (ProyectoSIO)
+### Frontend (frontend/ProyectoSIO/)
 - **Framework:** Angular 18
 - **Características:**
   - Gestión de productos
@@ -25,13 +26,13 @@ proyectosio/
 
 **Ejecutar:**
 ```bash
-cd ProyectoSIO
+cd frontend/ProyectoSIO
 npm install
 ng serve
 ```
 Abre http://localhost:4200
 
-### Backend (Backend)
+### Backend (backend/)
 - **Framework:** Node.js + Express
 - **Características:**
   - API RESTful completa
@@ -42,7 +43,7 @@ Abre http://localhost:4200
 
 **Ejecutar:**
 ```bash
-cd Backend
+cd backend
 npm install
 npm run dev
 ```
@@ -64,7 +65,7 @@ API disponible en http://localhost:3000
 ## 🔧 Configuración
 
 ### Backend
-Crear archivo `.env` en la carpeta Backend:
+Crear archivo `.env` en la carpeta backend:
 ```env
 PORT=3000
 NODE_ENV=development
@@ -74,12 +75,12 @@ CORS_ORIGIN=http://localhost:4200
 ```
 
 ### Frontend
-Las configuraciones están en `ProyectoSIO/src/environments/`
+Las configuraciones están en `frontend/ProyectoSIO/src/environments/`
 
 ## 📚 Documentación
 
-- **Frontend:** Ver `ProyectoSIO/README.md`
-- **Backend:** Ver `Backend/README.md`
+- **Frontend:** Ver `frontend/ProyectoSIO/README.md`
+- **Backend:** Ver `backend/README.md`  
 - **Base de Datos:** Comentarios en `database_schema.sql`
 
 ## 🛠️ Tecnologías
@@ -140,14 +141,14 @@ Ver documentación completa en `Backend/README.md`
 
 2. **Instalar Backend:**
    ```bash
-   cd Backend
+   cd backend
    npm install
    npm run dev
    ```
 
 3. **Instalar Frontend:**
    ```bash
-   cd ProyectoSIO
+   cd frontend/ProyectoSIO
    npm install
    ng serve
    ```
