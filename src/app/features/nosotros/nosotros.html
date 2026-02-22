@@ -1,0 +1,48 @@
+<div class="nosotros-page">
+  <section class="hero-section">
+    <div class="hero-content">
+      <h1 class="hero-title">Sobre Nosotros</h1>
+      <p class="hero-subtitle">Transformando ideas en soluciones digitales desde 2020</p>
+    </div>
+  </section>
+
+  <section class="story-section">
+    <div class="container">
+      <div class="story-content">
+        <h2>Nuestra Historia</h2>
+        <p>En <strong>SIO</strong>, somos un equipo apasionado de profesionales dedicados a crear soluciones digitales innovadoras. Fundada en 2020, nuestra misión es ayudar a las empresas a alcanzar su máximo potencial mediante la tecnología.</p>
+        <p>Con años de experiencia combinada en desarrollo, diseño y consultoría, ofrecemos servicios de primera clase que transforman negocios y mejoran la vida de las personas.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="values-section">
+    <div class="container">
+      <h2 class="section-title">Nuestros Valores</h2>
+      <div class="values-grid">
+        @for (value of values; track value.title) {
+          <div class="value-card">
+            <div class="value-icon">{{ value.icon }}</div>
+            <h3>{{ value.title }}</h3>
+            <p>{{ value.description }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="team-section">
+    <div class="container">
+      <h2 class="section-title">Nuestro Equipo</h2>
+      <div class="team-grid">
+        @for (member of team; track member.name) {
+          <div class="team-card">
+            <div class="member-avatar">{{ member.image }}</div>
+            <h3 class="member-name">{{ member.name }}</h3>
+            <p class="member-role">{{ member.role }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+</div>
