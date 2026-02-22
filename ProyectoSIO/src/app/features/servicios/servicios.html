@@ -1,0 +1,21 @@
+<div class="servicios-page">
+  <section class="hero-section">
+    <div class="hero-content">
+      <h1 class="hero-title">Nuestros Servicios</h1>
+      <p class="hero-subtitle">Soluciones digitales integrales para transformar tu negocio</p>
+    </div>
+  </section>
+
+  <section class="services-grid">
+    <div class="container">
+      @for (service of services; track service.title) {
+        <div class="service-card">
+          <div class="service-icon">{{ service.icon }}</div>
+          <h3 class="service-title">{{ service.title }}</h3>
+          <p class="service-description">{{ service.description }}</p>
+          <button class="service-btn">Más información</button>
+        </div>
+      }
+    </div>
+  </section>
+</div>
