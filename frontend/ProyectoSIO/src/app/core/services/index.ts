@@ -10,3 +10,5 @@ export * from './order.service';
 export * from './inventory.service';
 export * from './expense.service';
 export * from './report.service';
+export * from './chat.service';
+export * from './servicio-chat';
