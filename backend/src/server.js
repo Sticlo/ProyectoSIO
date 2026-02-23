@@ -8,6 +8,7 @@ const productRoutes = require('./routes/product.routes');
 const orderRoutes = require('./routes/order.routes');
 const inventoryRoutes = require('./routes/inventory.routes');
 const expenseRoutes = require('./routes/expense.routes');
+const chatRoutes = require('./routes/chat.rutas');
 
 // Cargar variables de entorno
 dotenv.config();
@@ -38,7 +39,8 @@ app.get('/', (req, res) => {
       products: '/api/products',
       orders: '/api/orders',
       inventory: '/api/inventory',
-      expenses: '/api/expenses'
+      expenses: '/api/expenses',
+      chat: '/api/chat'
     }
   });
 });
@@ -48,6 +50,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/expenses', expenseRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Manejo de errores 404
 app.use((req, res) => {

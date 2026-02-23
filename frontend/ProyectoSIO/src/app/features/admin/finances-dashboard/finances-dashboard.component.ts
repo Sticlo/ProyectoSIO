@@ -90,6 +90,14 @@ export class FinancesDashboardComponent {
   
   setTab(tab: 'overview' | 'expenses' | 'add-expense'): void {
     this.activeTab.set(tab);
+    
+    // Scroll to top when changing tabs
+    setTimeout(() => {
+      const dashboardBody = document.querySelector('.finances-dashboard .dashboard-body');
+      if (dashboardBody) {
+        dashboardBody.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }, 0);
   }
   
   submitExpense(): void {
@@ -103,31 +111,40 @@ export class FinancesDashboardComponent {
     // Get category name
     const category = this.categories().find(c => c.id === form.category);
     
-    this.expenseService.addExpense({
-      type: form.type as any,
-      category: category?.name || form.category,
-      description: form.description,
-      amount: form.amount,
-      date: form.date || new Date(),
-      status: form.status as any,
-      notes: form.notes,
-      productId: form.productId,
-      productName: form.productName,
-      quantity: form.quantity
-    });
-    
-    // Reset form
-    this.expenseForm.set({
-      type: 'operational',
-      category: '',
-      description: '',
-      amount: 0,
-      date: new Date(),
-      status: 'paid',
-      notes: ''
-    });
-    
-    this.activeTab.set('expenses');
+    try {
+      this.expenseService.addExpense({
+        type: form.type as any,
+        category: category?.name || form.category,
+        description: form.description,
+        amount: form.amount,
+        date: form.date || new Date(),
+        status: form.status as any,
+        notes: form.notes,
+        productId: form.productId,
+        productName: form.productName,
+        quantity: form.quantity
+      });
+      
+      // Show success message
+      alert('✅ Gasto agregado exitosamente');
+      
+      // Reset form
+      this.expenseForm.set({
+        type: 'operational',
+        category: '',
+        description: '',
+        amount: 0,
+        date: new Date(),
+        status: 'paid',
+        notes: ''
+      });
+      
+      // Go to expenses tab to see the new expense
+      this.activeTab.set('expenses');
+    } catch (error) {
+      console.error('Error al agregar gasto:', error);
+      alert('❌ Error al agregar el gasto. Por favor intenta de nuevo.');
+    }
   }
   
   deleteExpense(id: string): void {
@@ -204,10 +221,10 @@ export class FinancesDashboardComponent {
     });
   }
   
-  updateFormAmount(amount: string): void {
+  updateFormAmount(amount: number | string): void {
     this.expenseForm.set({
       ...this.expenseForm(),
-      amount: Number(amount)
+      amount: typeof amount === 'number' ? amount : Number(amount) || 0
     });
   }
   
@@ -217,6 +234,15 @@ export class FinancesDashboardComponent {
       ...this.expenseForm(),
       date: new Date(value)
     });
+  }
+
+  updateFormDateFromString(dateString: string): void {
+    if (dateString) {
+      this.expenseForm.set({
+        ...this.expenseForm(),
+        date: new Date(dateString + 'T12:00:00')
+      });
+    }
   }
   
   updateFormStatus(status: string): void {

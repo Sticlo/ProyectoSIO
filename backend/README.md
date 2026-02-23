@@ -2,6 +2,15 @@
 
 API RESTful para el sistema de gestión de productos, órdenes, inventario y gastos.
 
+## ✨ Nuevo: Chatbot con IA Integrado
+
+El backend incluye un chatbot inteligente con integración a IAs **completamente gratuitas**:
+- 🤖 **DeepSeek** (Recomendado) - Sin límites, excelente calidad
+- ⚡ **Groq** - Ultra rápido, Llama 3.3 70B
+- 🤗 **Hugging Face** - Mixtral 8x7B
+
+Ver [CHATBOT_IA.md](../CHATBOT_IA.md) para configuración completa.
+
 ## 🚀 Tecnologías
 
 - **Node.js** - Runtime de JavaScript
@@ -10,6 +19,7 @@ API RESTful para el sistema de gestión de productos, órdenes, inventario y gas
 - **bcryptjs** - Encriptación de contraseñas
 - **CORS** - Configuración de origen cruzado
 - **dotenv** - Variables de entorno
+- **axios** - Cliente HTTP para APIs de IA
 
 ## 📁 Estructura del Proyecto
 
@@ -21,7 +31,8 @@ Backend/
 │   │   ├── product.controller.js
 │   │   ├── order.controller.js
 │   │   ├── inventory.controller.js
-│   │   └── expense.controller.js
+│   │   ├── expense.controller.js
+│   │   └── chat.controller.js      # 🆕 Chatbot IA
 │   ├── models/           # Modelos de datos
 │   │   ├── user.model.js
 │   │   ├── product.model.js
@@ -32,11 +43,13 @@ Backend/
 │   │   ├── product.routes.js
 │   │   ├── order.routes.js
 │   │   ├── inventory.routes.js
-│   │   └── expense.routes.js
+│   │   ├── expense.routes.js
+│   │   └── chat.routes.js          # 🆕 Rutas del chatbot
 │   ├── middleware/       # Middlewares
 │   │   └── auth.middleware.js
 │   └── server.js         # Servidor principal
 ├── .env                  # Variables de entorno
+├── .env.example          # 🆕 Plantilla de configuración
 ├── .gitignore
 ├── package.json
 └── README.md
@@ -47,6 +60,27 @@ Backend/
 1. Instalar dependencias:
 ```bash
 npm install
+```
+
+2. Configurar variables de entorno:
+```bash
+# Copia el archivo de ejemplo
+cp .env.example .env
+
+# Edita .env con tus valores
+# Para el chatbot IA, elige un proveedor:
+# - DeepSeek (recomendado): https://platform.deepseek.com/
+# - Groq (rápido): https://console.groq.com/
+# - Hugging Face: https://huggingface.co/settings/tokens
+```
+
+3. Iniciar servidor:
+```bash
+# Modo desarrollo (con nodemon)
+npm run dev
+
+# Modo producción
+npm start
 ```
 
 2. Configurar variables de entorno en `.env`:
@@ -206,6 +240,35 @@ Authorization: Bearer {token}
   "date": "2026-02-01"
 }
 ```
+
+### Chatbot IA (`/api/chat`) 🆕
+
+| Método | Endpoint | Descripción | Auth |
+|--------|----------|-------------|------|
+| POST | `/` | Enviar mensaje al chatbot | Admin |
+
+**Características:**
+- 🤖 Integración con IAs gratuitas (DeepSeek, Groq, Hugging Face)
+- ⚡ Respuestas inteligentes sobre el sistema
+- 🔒 Solo accesible para administradores
+- 💬 No requiere base de datos
+
+**Ejemplo de uso:**
+```json
+POST /api/chat
+Authorization: Bearer {token}
+{
+  "message": "¿Cómo agrego un nuevo producto?"
+}
+
+// Respuesta:
+{
+  "message": "Para agregar un producto, ve al panel de administración...",
+  "timestamp": "2026-02-23T15:30:00.000Z"
+}
+```
+
+**Ver configuración completa en:** [CHATBOT_IA.md](../CHATBOT_IA.md)
 
 ## 🔐 Autenticación
 
