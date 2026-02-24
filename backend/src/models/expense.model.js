@@ -6,9 +6,8 @@ class ExpenseModel {
    */
   static async getAll() {
     const [rows] = await pool.query(`
-      SELECT g.*, c.name AS category_name, u.name AS created_by_name
+      SELECT g.*, u.name AS created_by_name
       FROM gastos g
-      LEFT JOIN categorias c ON g.category_id = c.id
       LEFT JOIN usuarios u ON g.created_by = u.id
       ORDER BY g.date DESC
     `);
@@ -20,9 +19,8 @@ class ExpenseModel {
    */
   static async findById(id) {
     const [rows] = await pool.query(`
-      SELECT g.*, c.name AS category_name, u.name AS created_by_name
+      SELECT g.*, u.name AS created_by_name
       FROM gastos g
-      LEFT JOIN categorias c ON g.category_id = c.id
       LEFT JOIN usuarios u ON g.created_by = u.id
       WHERE g.id = ?
     `, [id]);
@@ -34,9 +32,8 @@ class ExpenseModel {
    */
   static async findByCategory(categoryId) {
     const [rows] = await pool.query(`
-      SELECT g.*, c.name AS category_name
+      SELECT g.*
       FROM gastos g
-      LEFT JOIN categorias c ON g.category_id = c.id
       WHERE g.category_id = ?
       ORDER BY g.date DESC
     `, [categoryId]);
@@ -48,9 +45,8 @@ class ExpenseModel {
    */
   static async findByDateRange(startDate, endDate) {
     const [rows] = await pool.query(`
-      SELECT g.*, c.name AS category_name
+      SELECT g.*
       FROM gastos g
-      LEFT JOIN categorias c ON g.category_id = c.id
       WHERE g.date BETWEEN ? AND ?
       ORDER BY g.date DESC
     `, [startDate, endDate]);
@@ -62,14 +58,42 @@ class ExpenseModel {
    * FK: category_id → categorias(id), created_by → usuarios(id)
    */
   static async create(expenseData) {
-    const { description, amount, category_id, date, notes, created_by } = expenseData;
+    const { description, amount, category_id, category_name, type, status, product_name, quantity, date, notes, created_by } = expenseData;
 
-    const [result] = await pool.query(
-      `INSERT INTO gastos (description, amount, category_id, date, notes, created_by)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [description, amount, category_id || null, date || new Date(), notes || null, created_by || null]
-    );
+    const sql = `INSERT INTO gastos (description, amount, category_id, category_name, type, status, product_name, quantity, date, notes, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
+    const buildValues = (cbValue) => [
+      description, amount,
+      category_id  || null,
+      category_name || null,
+      type   || 'operational',
+      status || 'paid',
+      product_name || null,
+      quantity     || null,
+      date         || new Date(),
+      notes        || null,
+      cbValue
+    ];
+
+    let values = buildValues(created_by || null);
+    console.log('🗄️  [ExpenseModel] INSERT values:', JSON.stringify(values));
+
+    let result;
+    try {
+      [result] = await pool.query(sql, values);
+    } catch (err) {
+      // errno 1452 = FK constraint fail; si falla por created_by, reintenta sin él
+      if ((err.errno === 1452 || err.code === 'ER_NO_REFERENCED_ROW_2') && created_by) {
+        console.warn('⚠️  [ExpenseModel] created_by FK falla, reintentando con NULL');
+        values = buildValues(null);
+        [result] = await pool.query(sql, values);
+      } else {
+        throw err;
+      }
+    }
+
+    console.log('🗄️  [ExpenseModel] insertId:', result.insertId);
     return await ExpenseModel.findById(result.insertId);
   }
 
@@ -82,7 +106,10 @@ class ExpenseModel {
 
     const allowedFields = {
       description: 'description', amount: 'amount',
-      category_id: 'category_id', date: 'date', notes: 'notes'
+      category_id: 'category_id', category_name: 'category_name',
+      type: 'type', status: 'status',
+      product_name: 'product_name', quantity: 'quantity',
+      date: 'date', notes: 'notes'
     };
 
     for (const [key, column] of Object.entries(allowedFields)) {
