@@ -1,0 +1,36 @@
+<div class="terminos-page">
+
+  <!-- Hero -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="hero-icon">📋</div>
+      <h1 class="hero-title">Términos y Condiciones</h1>
+      <p class="hero-subtitle">Última actualización: {{ ultimaActualizacion }}</p>
+    </div>
+  </section>
+
+  <!-- Contenido -->
+  <section class="contenido-section">
+    <div class="container">
+
+      <div class="intro-box">
+        <p>Bienvenido a <strong>SIO</strong>. Por favor, lea detenidamente estos Términos y Condiciones antes de utilizar nuestra plataforma. Al acceder o usar nuestros servicios, usted acepta estos términos en su totalidad.</p>
+      </div>
+
+      <div class="secciones">
+        @for (s of secciones; track s.titulo) {
+          <div class="seccion">
+            <h2 class="seccion-titulo">{{ s.titulo }}</h2>
+            <p class="seccion-contenido">{{ s.contenido }}</p>
+          </div>
+        }
+      </div>
+
+      <div class="footer-nota">
+        <p>¿Tiene preguntas? <a routerLink="/contacto">Contáctenos</a></p>
+      </div>
+
+    </div>
+  </section>
+
+</div>

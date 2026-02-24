@@ -1,0 +1,69 @@
+@if (isOpen()) {
+  <div class="modal-overlay" (click)="close()">
+    <div class="modal-panel" (click)="$event.stopPropagation()">
+
+      <!-- Header -->
+      <div class="modal-header">
+        <div class="header-title">
+          <span class="icon">📱</span>
+          <div>
+            <h2>Códigos QR por Mesa</h2>
+            <p>Imprime los QR para que los clientes pidan desde su celular</p>
+          </div>
+        </div>
+        <button class="btn-cerrar" (click)="close()">✕</button>
+      </div>
+
+      <!-- Config -->
+      <div class="config-bar">
+        <label>
+          Número de mesas:
+          <input
+            type="number"
+            [ngModel]="cantidadMesas()"
+            (ngModelChange)="cantidadMesas.set($event)"
+            min="1" max="50"
+            class="input-mesas"
+          />
+        </label>
+        <div class="url-base">
+          <span>🌐 Base:</span>
+          <code>{{ baseUrl() }}/mesa/N</code>
+        </div>
+      </div>
+
+      <!-- Grid de QRs -->
+      <div class="qr-grid">
+        @for (mesa of getMesas(); track mesa) {
+          <div class="qr-card" [class.activa]="mesaSeleccionada() === mesa" (click)="mesaSeleccionada.set(mesa)">
+            <div class="qr-numero">Mesa {{ mesa }}</div>
+
+            <!-- Imagen del QR con fallback de carga -->
+            <div class="qr-img-wrapper">
+              <img
+                [src]="getQrUrl(mesa)"
+                [alt]="'QR Mesa ' + mesa"
+                class="qr-imagen"
+                (load)="$any($event.target).style.opacity = '1'"
+                (error)="$any($event.target).src = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + getUrlMesa(mesa)"
+              />
+              <div class="qr-loader">Generando QR...</div>
+            </div>
+
+            <div class="qr-url">{{ getUrlMesa(mesa) }}</div>
+
+            <div class="qr-actions">
+              <button class="btn-imprimir" (click)="imprimirQr(mesa); $event.stopPropagation()">
+                🖨️ Imprimir
+              </button>
+              <button class="btn-copiar" (click)="copiarUrl(mesa); $event.stopPropagation()">
+                📋 Copiar
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+    </div>
+  </div>
+}
