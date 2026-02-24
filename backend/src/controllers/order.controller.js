@@ -5,18 +5,18 @@ class OrderController {
   /**
    * Obtener todas las órdenes
    */
-  static getAll(req, res) {
+  static async getAll(req, res) {
     try {
       const { status, phoneNumber } = req.query;
       
       let orders;
 
       if (status) {
-        orders = OrderModel.findByStatus(status);
+        orders = await OrderModel.findByStatus(status);
       } else if (phoneNumber) {
-        orders = OrderModel.findByPhone(phoneNumber);
+        orders = await OrderModel.findByPhone(phoneNumber);
       } else {
-        orders = OrderModel.getAll();
+        orders = await OrderModel.getAll();
       }
 
       res.json({ 
@@ -32,10 +32,10 @@ class OrderController {
   /**
    * Obtener orden por ID
    */
-  static getById(req, res) {
+  static async getById(req, res) {
     try {
       const { id } = req.params;
-      const order = OrderModel.findById(id);
+      const order = await OrderModel.findById(id);
 
       if (!order) {
         return res.status(404).json({ error: 'Orden no encontrada' });
@@ -50,8 +50,12 @@ class OrderController {
 
   /**
    * Crear nueva orden
+   * La transacción en OrderModel.create() se encarga de:
+   *   1. Insertar en ordenes
+   *   2. Insertar cada item en orden_items (FK → ordenes, FK → productos)
+   *   3. Descontar stock en productos
    */
-  static create(req, res) {
+  static async create(req, res) {
     try {
       const { phoneNumber, items, total, shippingCost, customerName, customerAddress, notes } = req.body;
 
@@ -62,23 +66,26 @@ class OrderController {
         });
       }
 
-      // Verificar stock de productos
+      // Verificar stock de productos antes de crear
       for (const item of items) {
-        const product = ProductModel.findById(item.productId || item.id);
-        if (!product) {
-          return res.status(404).json({ 
-            error: `Producto ${item.name} no encontrado` 
-          });
-        }
-        if (product.stockCount < item.quantity) {
-          return res.status(400).json({ 
-            error: `Stock insuficiente para ${item.name}` 
-          });
+        const productId = item.productId || item.product_id || item.id;
+        if (productId) {
+          const product = await ProductModel.findById(productId);
+          if (!product) {
+            return res.status(404).json({ 
+              error: `Producto ${item.name || item.product_name} no encontrado` 
+            });
+          }
+          if (product.stock_count < item.quantity) {
+            return res.status(400).json({ 
+              error: `Stock insuficiente para ${product.name}. Disponible: ${product.stock_count}` 
+            });
+          }
         }
       }
 
-      // Crear orden
-      const newOrder = OrderModel.create({
+      // Crear orden (transacción: inserta orden + items + descuenta stock)
+      const newOrder = await OrderModel.create({
         phoneNumber,
         customerName,
         customerAddress,
@@ -87,11 +94,6 @@ class OrderController {
         shippingCost: shippingCost || 0,
         notes
       });
-
-      // Actualizar stock de productos
-      for (const item of items) {
-        ProductModel.updateStock(item.productId || item.id, -item.quantity);
-      }
 
       res.status(201).json({
         message: 'Orden creada exitosamente',
@@ -106,12 +108,12 @@ class OrderController {
   /**
    * Actualizar orden
    */
-  static update(req, res) {
+  static async update(req, res) {
     try {
       const { id } = req.params;
       const orderData = req.body;
 
-      const updatedOrder = OrderModel.update(id, orderData);
+      const updatedOrder = await OrderModel.update(id, orderData);
 
       if (!updatedOrder) {
         return res.status(404).json({ error: 'Orden no encontrada' });
@@ -130,7 +132,7 @@ class OrderController {
   /**
    * Actualizar estado de la orden
    */
-  static updateStatus(req, res) {
+  static async updateStatus(req, res) {
     try {
       const { id } = req.params;
       const { status } = req.body;
@@ -142,7 +144,7 @@ class OrderController {
         });
       }
 
-      const updatedOrder = OrderModel.updateStatus(id, status);
+      const updatedOrder = await OrderModel.updateStatus(id, status);
 
       if (!updatedOrder) {
         return res.status(404).json({ error: 'Orden no encontrada' });
@@ -161,10 +163,10 @@ class OrderController {
   /**
    * Marcar orden como vista
    */
-  static markAsViewed(req, res) {
+  static async markAsViewed(req, res) {
     try {
       const { id } = req.params;
-      const updatedOrder = OrderModel.markAsViewed(id);
+      const updatedOrder = await OrderModel.markAsViewed(id);
 
       if (!updatedOrder) {
         return res.status(404).json({ error: 'Orden no encontrada' });
@@ -183,9 +185,9 @@ class OrderController {
   /**
    * Obtener estadísticas de órdenes
    */
-  static getStats(req, res) {
+  static async getStats(req, res) {
     try {
-      const stats = OrderModel.getStats();
+      const stats = await OrderModel.getStats();
       res.json({ stats });
     } catch (error) {
       console.error('Error al obtener estadísticas:', error);
@@ -194,12 +196,12 @@ class OrderController {
   }
 
   /**
-   * Eliminar orden
+   * Eliminar orden (CASCADE borra orden_items automáticamente)
    */
-  static delete(req, res) {
+  static async delete(req, res) {
     try {
       const { id } = req.params;
-      const deleted = OrderModel.delete(id);
+      const deleted = await OrderModel.delete(id);
 
       if (!deleted) {
         return res.status(404).json({ error: 'Orden no encontrada' });

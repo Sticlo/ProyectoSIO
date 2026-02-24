@@ -2,16 +2,20 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
+// Cargar variables de entorno ANTES de importar módulos que las usan
+dotenv.config();
+
 // Importar rutas
 const authRoutes = require('./routes/auth.routes');
 const productRoutes = require('./routes/product.routes');
 const orderRoutes = require('./routes/order.routes');
 const inventoryRoutes = require('./routes/inventory.routes');
 const expenseRoutes = require('./routes/expense.routes');
+const categoryRoutes = require('./routes/category.routes');
 const chatRoutes = require('./routes/chat.rutas');
 
-// Cargar variables de entorno
-dotenv.config();
+// Importar conexión a base de datos
+const { testConnection } = require('./config/database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -40,6 +44,7 @@ app.get('/', (req, res) => {
       orders: '/api/orders',
       inventory: '/api/inventory',
       expenses: '/api/expenses',
+      categories: '/api/categories',
       chat: '/api/chat'
     }
   });
@@ -50,6 +55,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/expenses', expenseRoutes);
+app.use('/api/categories', categoryRoutes);
 app.use('/api/chat', chatRoutes);
 
 // Manejo de errores 404
@@ -70,7 +76,13 @@ app.use((err, req, res, next) => {
 });
 
 // Iniciar servidor
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🚀 Servidor ejecutándose en http://localhost:${PORT}`);
   console.log(`📝 Modo: ${process.env.NODE_ENV || 'development'}`);
+  
+  // Verificar conexión a base de datos
+  const dbConnected = await testConnection();
+  if (!dbConnected) {
+    console.error('⚠️  No se pudo conectar a MySQL. Verifica la configuración de la base de datos.');
+  }
 });

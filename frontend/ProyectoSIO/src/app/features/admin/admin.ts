@@ -115,18 +115,33 @@ export class Admin {
     
     if (this.editingProduct()) {
       // Actualizar
-      this.productService.update(this.editingProduct()!.id, data);
+      this.productService.update(this.editingProduct()!.id, data).subscribe({
+        next: () => this.closeModal(),
+        error: (err) => {
+          console.error('Error al actualizar producto:', err);
+          alert('Error al actualizar el producto. Verifica los datos e inténtalo de nuevo.');
+        }
+      });
     } else {
       // Crear
-      this.productService.create(data as Omit<Product, 'id'>);
+      this.productService.create(data).subscribe({
+        next: () => this.closeModal(),
+        error: (err) => {
+          console.error('Error al crear producto:', err);
+          alert('Error al crear el producto. Verifica los datos e inténtalo de nuevo.');
+        }
+      });
     }
-    
-    this.closeModal();
   }
   
   deleteProduct(id: string): void {
     if (confirm('¿Estás seguro de eliminar este producto?')) {
-      this.productService.delete(id);
+      this.productService.delete(id).subscribe({
+        error: (err) => {
+          console.error('Error al eliminar producto:', err);
+          alert('Error al eliminar el producto.');
+        }
+      });
     }
   }
   

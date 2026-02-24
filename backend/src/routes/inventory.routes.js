@@ -8,6 +8,7 @@ router.use(authenticateToken);
 router.use(isAdmin);
 
 // Rutas de inventario
+router.get('/movements', InventoryController.getMovements);
 router.get('/summary', InventoryController.getSummary);
 router.get('/low-stock', InventoryController.getLowStock);
 router.get('/out-of-stock', InventoryController.getOutOfStock);
