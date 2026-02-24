@@ -1,20 +1,43 @@
-/* You can add global styles to this file, and also import other style files */
-
-// Import variables and mixins
+// @use siempre debe ir PRIMERO en SCSS
 @use 'styles/variables' as *;
 @use 'styles/mixins' as *;
 @use 'sass:color';
 
-// CSS Reset / Normalize
+/* =============================================
+   VIEW TRANSITIONS — Transición entre páginas
+   ============================================= */
+
+@keyframes page-fade-out {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(-12px) scale(0.99); }
+}
+
+@keyframes page-fade-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+::view-transition-old(root) {
+  animation: page-fade-out 220ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+::view-transition-new(root) {
+  animation: page-fade-in 280ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* =============================================
+   CSS Reset / Base
+   ============================================= */
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-// Base styles
 html {
   font-size: 16px;
+  scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -43,9 +66,7 @@ h4 { font-size: 1.5rem; }
 h5 { font-size: 1.25rem; }
 h6 { font-size: 1rem; }
 
-p {
-  margin-bottom: $spacing-md;
-}
+p { margin-bottom: $spacing-md; }
 
 a {
   color: $primary-color;
@@ -66,33 +87,19 @@ a {
   margin-right: auto;
   margin-left: auto;
 
-  @include respond-to('sm') {
-    max-width: 540px;
-  }
-
-  @include respond-to('md') {
-    max-width: 720px;
-  }
-
-  @include respond-to('lg') {
-    max-width: 960px;
-  }
-
-  @include respond-to('xl') {
-    max-width: 1140px;
-  }
-
-  @include respond-to('xxl') {
-    max-width: 1320px;
-  }
+  @include respond-to('sm')  { max-width: 540px; }
+  @include respond-to('md')  { max-width: 720px; }
+  @include respond-to('lg')  { max-width: 960px; }
+  @include respond-to('xl')  { max-width: 1140px; }
+  @include respond-to('xxl') { max-width: 1320px; }
 }
 
 .text-center { text-align: center; }
-.text-left { text-align: left; }
-.text-right { text-align: right; }
+.text-left   { text-align: left; }
+.text-right  { text-align: right; }
 
-.d-flex { display: flex; }
-.d-none { display: none; }
+.d-flex  { display: flex; }
+.d-none  { display: none; }
 .d-block { display: block; }
 
 .mt-1 { margin-top: $spacing-xs; }
