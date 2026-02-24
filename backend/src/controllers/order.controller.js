@@ -1,5 +1,6 @@
 const OrderModel = require('../models/order.model');
 const ProductModel = require('../models/product.model');
+const NotificationModel = require('../models/notification.model');
 
 class OrderController {
   /**
@@ -77,6 +78,21 @@ class OrderController {
             });
           }
           if (product.stock_count < item.quantity) {
+            // Registrar notificación de venta fallida por stock
+            NotificationModel.create({
+              type: 'failed_sale',
+              title: `Venta fallida: ${product.name}`,
+              message: `Intento de compra de ${item.quantity} unidades de "${product.name}" pero solo hay ${product.stock_count} en stock.`,
+              data: {
+                product_id: product.id,
+                product_name: product.name,
+                requested: item.quantity,
+                available: product.stock_count,
+                customer_phone: phoneNumber,
+                customer_name: customerName || null
+              }
+            }).catch(err => console.error('Error al crear notificación de venta fallida:', err));
+
             return res.status(400).json({ 
               error: `Stock insuficiente para ${product.name}. Disponible: ${product.stock_count}` 
             });
@@ -84,7 +100,8 @@ class OrderController {
         }
       }
 
-      // Crear orden (transacción: inserta orden + items + descuenta stock)
+      // Crear orden (transacción: inserta orden + items)
+      // El stock se descuenta cuando la orden pasa a 'completed'
       const newOrder = await OrderModel.create({
         phoneNumber,
         customerName,
@@ -94,6 +111,19 @@ class OrderController {
         shippingCost: shippingCost || 0,
         notes
       });
+
+      // Registrar notificación de nuevo pedido
+      NotificationModel.create({
+        type: 'new_order',
+        title: `Nuevo pedido #${newOrder.id}`,
+        message: `Pedido de ${customerName || phoneNumber} por $${total}.`,
+        data: {
+          order_id: newOrder.id,
+          customer_name: customerName || null,
+          customer_phone: phoneNumber,
+          total
+        }
+      }).catch(err => console.error('Error al crear notificación de nuevo pedido:', err));
 
       res.status(201).json({
         message: 'Orden creada exitosamente',
@@ -139,15 +169,23 @@ class OrderController {
 
       const validStatuses = ['pending', 'confirmed', 'cancelled', 'completed', 'no-response'];
       if (!validStatuses.includes(status)) {
-        return res.status(400).json({ 
-          error: 'Estado inválido' 
-        });
+        return res.status(400).json({ error: 'Estado inválido' });
       }
 
       const updatedOrder = await OrderModel.updateStatus(id, status);
-
       if (!updatedOrder) {
         return res.status(404).json({ error: 'Orden no encontrada' });
+      }
+
+      // Descontar stock cuando la orden se completa
+      if (status === 'completed') {
+        const items = await OrderModel.getOrderItems(id);
+        for (const item of items) {
+          if (item.product_id) {
+            await ProductModel.updateStock(item.product_id, -item.quantity)
+              .catch(err => console.error(`Error al descontar stock del producto ${item.product_id}:`, err));
+          }
+        }
       }
 
       res.json({

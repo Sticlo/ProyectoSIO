@@ -271,6 +271,32 @@
   }
 }
 
+// Error de stock / backend
+.checkout-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  padding: 0.875rem 1rem;
+  background: rgba(255, 59, 48, 0.08);
+  border: 1px solid rgba(255, 59, 48, 0.25);
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  color: #c0392b;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.4;
+
+  svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+    color: #e74c3c;
+  }
+
+  span {
+    flex: 1;
+  }
+}
+
 // Submit Button
 .submit-btn {
   width: 100%;

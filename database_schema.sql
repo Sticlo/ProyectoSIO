@@ -164,5 +164,24 @@ CREATE TABLE chat_messages (
 );
 
 -- ============================================
+-- 9. TABLA: notificaciones
+--    Registra eventos del sistema:
+--    - failed_sale: intento de venta sin stock
+--    - new_order:   pedido creado exitosamente
+--    - low_stock:   producto con stock bajo
+--    - comment:     comentario o mensaje recibido
+-- ============================================
+CREATE TABLE notificaciones (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    type ENUM('failed_sale', 'new_order', 'low_stock', 'comment') NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    message TEXT,
+    data JSON,
+    is_read BOOLEAN DEFAULT false,
+    read_at TIMESTAMP NULL DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================
 -- FIN DEL SCRIPT
 -- ============================================

@@ -73,18 +73,26 @@ export class OrdersDashboardComponent {
   }
   
   updateStatus(orderId: string, status: Order['status']): void {
-    this.orderService.updateOrderStatus(orderId, status);
-    // Actualizar la orden seleccionada con el nuevo estado
-    const updatedOrder = this.orderService.orders().find(o => o.id === orderId);
-    if (updatedOrder) {
-      this.selectedOrder.set(updatedOrder);
-    }
+    this.orderService.updateOrderStatus(orderId, status).subscribe({
+      next: (updated) => {
+        this.selectedOrder.set(updated);
+      },
+      error: err => {
+        console.error('Error al actualizar estado:', err);
+        alert('No se pudo actualizar el estado de la orden.');
+      }
+    });
   }
   
   deleteOrder(orderId: string): void {
     if (confirm('¿Estás seguro de que quieres eliminar esta orden? Esta acción no se puede deshacer.')) {
-      this.orderService.deleteOrder(orderId);
-      this.closeOrderDetail();
+      this.orderService.deleteOrder(orderId).subscribe({
+        next: () => this.closeOrderDetail(),
+        error: err => {
+          console.error('Error al eliminar orden:', err);
+          alert('No se pudo eliminar la orden.');
+        }
+      });
     }
   }
   

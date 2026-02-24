@@ -1,6 +1,7 @@
-import { Injectable, signal, computed } from '@angular/core';
-import { StorageService } from './storage.service';
+﻿import { Injectable, signal, computed, inject } from '@angular/core';
+import { Observable, tap, map } from 'rxjs';
 import { CartItem } from './cart.service';
+import { ApiService } from './api.service';
 
 export interface Order {
   id: string;
@@ -27,155 +28,185 @@ export interface OrderStats {
   recentOrders: Order[];
 }
 
+function fromApi(raw: any): Order {
+  return {
+    id: String(raw.id),
+    phoneNumber: raw.phone_number || '',
+    customerName: raw.customer_name || undefined,
+    customerAddress: raw.customer_address || undefined,
+    items: (raw.items || []).map((i: any) => ({
+      productId: String(i.product_id || ''),
+      name: i.product_name || i.name || '',
+      price: Number(i.price),
+      quantity: Number(i.quantity),
+      image: i.image || undefined,
+      category: undefined
+    })),
+    total: Number(raw.total),
+    shippingCost: Number(raw.shipping_cost) || 0,
+    date: new Date(raw.date || raw.created_at),
+    status: raw.status as Order['status'],
+    notes: raw.notes || undefined,
+    viewed: Boolean(raw.viewed)
+  };
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class OrderService {
-  private readonly STORAGE_KEY = 'whatsapp_orders';
-  private ordersSignal = signal<Order[]>([]);
+  private api = inject(ApiService);
 
-  // Computed values
-  orders = computed(() => this.ordersSignal());
-  
-  pendingOrders = computed(() => 
-    this.ordersSignal().filter(o => o.status === 'pending')
+  private _orders = signal<Order[]>([]);
+  readonly isLoading = signal(false);
+
+  orders = computed(() => this._orders());
+
+  pendingOrders = computed(() =>
+    this._orders().filter(o => o.status === 'pending')
   );
-  
-  unreadOrders = computed(() => 
-    this.ordersSignal().filter(o => !o.viewed)
+
+  unreadOrders = computed(() =>
+    this._orders().filter(o => !o.viewed)
   );
-  
+
   stats = computed(() => this.calculateStats());
 
-  constructor(private storageService: StorageService) {
+  constructor() {
     this.loadOrders();
   }
 
-  private loadOrders(): void {
-    const stored = this.storageService.getLocal(this.STORAGE_KEY);
-    if (stored && Array.isArray(stored)) {
-      // Convertir las fechas de string a Date
-      const orders = stored.map(o => ({
-        ...o,
-        date: new Date(o.date)
-      }));
-      this.ordersSignal.set(orders);
-    }
-  }
-
-  private saveOrders(): void {
-    this.storageService.setLocal(this.STORAGE_KEY, this.ordersSignal());
+  loadOrders(): void {
+    this.isLoading.set(true);
+    this.api.get<{ count: number; orders: any[] }>('/orders').subscribe({
+      next: (res) => {
+        this._orders.set(res.orders.map(fromApi));
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error al cargar Ã³rdenes:', err);
+        this.isLoading.set(false);
+      }
+    });
   }
 
   /**
-   * Crear una nueva orden desde el carrito
+   * Crear nueva orden â†’ POST /api/orders
    */
-  createOrder(phoneNumber: string, items: CartItem[], total: number, shippingCost: number = 0): Order {
-    const order: Order = {
-      id: this.generateOrderId(),
+  createOrder(
+    phoneNumber: string,
+    items: CartItem[],
+    total: number,
+    shippingCost: number = 0,
+    customerName?: string,
+    customerAddress?: string,
+    notes?: string
+  ): Observable<Order> {
+    return this.api.post<{ message: string; order: any }>('/orders', {
       phoneNumber,
-      items: [...items],
+      items,
       total,
       shippingCost,
-      date: new Date(),
-      status: 'pending',
-      viewed: false
-    };
-
-    this.ordersSignal.update(orders => [order, ...orders]);
-    this.saveOrders();
-    
-    return order;
-  }
-
-  /**
-   * Actualizar el estado de una orden
-   */
-  updateOrderStatus(orderId: string, status: Order['status']): void {
-    this.ordersSignal.update(orders =>
-      orders.map(o => o.id === orderId ? { ...o, status } : o)
+      customerName,
+      customerAddress,
+      notes,
+      status: 'pending'
+    }).pipe(
+      map(res => fromApi(res.order)),
+      tap(order => this._orders.update(list => [order, ...list]))
     );
-    this.saveOrders();
   }
 
   /**
-   * Marcar orden como vista
+   * Actualizar estado â†’ PATCH /api/orders/:id/status
+   */
+  updateOrderStatus(orderId: string, status: Order['status']): Observable<Order> {
+    return this.api.patch<{ message: string; order: any }>(
+      `/orders/${orderId}/status`, { status }
+    ).pipe(
+      map(res => fromApi(res.order)),
+      tap(updated => this._orders.update(list =>
+        list.map(o => o.id === orderId ? updated : o)
+      ))
+    );
+  }
+
+  /**
+   * Marcar como vista â†’ PATCH /api/orders/:id/viewed
    */
   markAsViewed(orderId: string): void {
-    this.ordersSignal.update(orders =>
-      orders.map(o => o.id === orderId ? { ...o, viewed: true } : o)
-    );
-    this.saveOrders();
+    this.api.patch<any>(`/orders/${orderId}/viewed`, {}).subscribe({
+      next: () => {
+        this._orders.update(list =>
+          list.map(o => o.id === orderId ? { ...o, viewed: true } : o)
+        );
+      },
+      error: err => console.error('Error al marcar como vista:', err)
+    });
   }
 
   /**
-   * Agregar nombre del cliente a la orden
+   * Actualizar info del cliente â†’ PUT /api/orders/:id
    */
-  updateCustomerInfo(orderId: string, customerName: string, notes?: string, customerAddress?: string): void {
-    this.ordersSignal.update(orders =>
-      orders.map(o => 
-        o.id === orderId 
-          ? { ...o, customerName, customerAddress: customerAddress || o.customerAddress, notes: notes || o.notes } 
-          : o
-      )
+  updateCustomerInfo(
+    orderId: string,
+    customerName: string,
+    notes?: string,
+    customerAddress?: string
+  ): Observable<Order> {
+    return this.api.put<{ message: string; order: any }>(`/orders/${orderId}`, {
+      customerName, notes, customerAddress
+    }).pipe(
+      map(res => fromApi(res.order)),
+      tap(updated => this._orders.update(list =>
+        list.map(o => o.id === orderId ? updated : o)
+      ))
     );
-    this.saveOrders();
   }
 
   /**
-   * Eliminar una orden (cuando no se concretó la venta)
+   * Eliminar orden â†’ DELETE /api/orders/:id
    */
-  deleteOrder(orderId: string): void {
-    this.ordersSignal.update(orders => orders.filter(o => o.id !== orderId));
-    this.saveOrders();
+  deleteOrder(orderId: string): Observable<void> {
+    return this.api.delete<{ message: string }>(`/orders/${orderId}`).pipe(
+      tap(() => this._orders.update(list => list.filter(o => o.id !== orderId))),
+      map(() => void 0)
+    );
   }
 
   /**
-   * Eliminar un número de teléfono y todas sus órdenes
+   * Eliminar todas las Ã³rdenes de un telÃ©fono
    */
   deletePhoneNumber(phoneNumber: string): void {
-    this.ordersSignal.update(orders => 
-      orders.filter(o => o.phoneNumber !== phoneNumber)
-    );
-    this.saveOrders();
+    const toDelete = this._orders().filter(o => o.phoneNumber === phoneNumber);
+    // Optimistic update primero
+    this._orders.update(list => list.filter(o => o.phoneNumber !== phoneNumber));
+    // Luego borrar en el backend
+    toDelete.forEach(order => {
+      this.api.delete(`/orders/${order.id}`).subscribe({
+        error: err => console.error('Error al eliminar orden:', err)
+      });
+    });
   }
 
-  /**
-   * Obtener órdenes por número de teléfono
-   */
   getOrdersByPhone(phoneNumber: string): Order[] {
-    return this.ordersSignal().filter(o => o.phoneNumber === phoneNumber);
+    return this._orders().filter(o => o.phoneNumber === phoneNumber);
   }
 
-  /**
-   * Obtener números únicos de clientes
-   */
   getUniquePhoneNumbers(): string[] {
-    const phones = new Set(this.ordersSignal().map(o => o.phoneNumber));
+    const phones = new Set(this._orders().map(o => o.phoneNumber));
     return Array.from(phones);
   }
 
-  /**
-   * Calcular estadísticas
-   */
   private calculateStats(): OrderStats {
-    const orders = this.ordersSignal();
+    const orders = this._orders();
     const completedOrders = orders.filter(o => o.status === 'completed');
-    
-    // Total revenue (solo órdenes completadas)
     const totalRevenue = completedOrders.reduce((sum, o) => sum + o.total, 0);
-    
-    // Average order value
-    const averageOrderValue = completedOrders.length > 0 
-      ? totalRevenue / completedOrders.length 
-      : 0;
-    
-    // Unique customers
+    const averageOrderValue = completedOrders.length > 0
+      ? totalRevenue / completedOrders.length : 0;
     const uniquePhones = new Set(orders.map(o => o.phoneNumber));
-    
-    // Top products
+
     const productMap = new Map<string, { count: number; revenue: number }>();
-    
     completedOrders.forEach(order => {
       order.items.forEach(item => {
         const existing = productMap.get(item.name) || { count: 0, revenue: 0 };
@@ -185,17 +216,16 @@ export class OrderService {
         });
       });
     });
-    
+
     const topProducts = Array.from(productMap.entries())
       .map(([name, data]) => ({ name, ...data }))
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 5);
-    
-    // Recent orders (últimas 5)
+
     const recentOrders = [...orders]
       .sort((a, b) => b.date.getTime() - a.date.getTime())
       .slice(0, 5);
-    
+
     return {
       totalOrders: orders.length,
       pendingOrders: orders.filter(o => o.status === 'pending').length,
@@ -208,18 +238,7 @@ export class OrderService {
     };
   }
 
-  /**
-   * Generar ID único para orden
-   */
-  private generateOrderId(): string {
-    return `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
-  }
-
-  /**
-   * Limpiar todas las órdenes (útil para desarrollo/testing)
-   */
   clearAllOrders(): void {
-    this.ordersSignal.set([]);
-    this.saveOrders();
+    this._orders.set([]);
   }
 }
