@@ -15,7 +15,7 @@
               <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
               <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
             </svg>
-            Pedidos WhatsApp
+            Pedidos
             @if (unreadOrders() > 0) {
               <span class="orders-badge">{{ unreadOrders() }}</span>
             }
@@ -41,6 +41,25 @@
               <span class="finances-badge warning">⚠️</span>
             }
           </button>
+ santiago
+
+          <!-- 🆕 Botón QR Mesas -->
+          <button class="btn-qr" (click)="openQrMesas()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="5" height="5"></rect>
+              <rect x="16" y="3" width="5" height="5"></rect>
+              <rect x="3" y="16" width="5" height="5"></rect>
+              <path d="M21 16h-3a2 2 0 0 0-2 2v3"></path>
+              <path d="M21 21v.01"></path>
+              <path d="M12 7v3a2 2 0 0 1-2 2H7"></path>
+              <path d="M3 12h.01"></path>
+              <path d="M12 3h.01"></path>
+              <path d="M7 21v-3a2 2 0 0 1 2-2h3"></path>
+            </svg>
+            📱 QR Mesas
+          </button>
+
+=======
           <button class="btn-notifications" (click)="openNotificationsDashboard()">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
@@ -51,6 +70,7 @@
               <span class="notif-badge">{{ unreadNotifs() }}</span>
             }
           </button>
+ main
           <button class="btn-secondary" (click)="router.navigate(['/productos'])">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -179,9 +199,7 @@
                       </div>
                     </div>
                   </td>
-                  <td>
-                    <span class="category-badge">{{ product.category }}</span>
-                  </td>
+                  <td><span class="category-badge">{{ product.category }}</span></td>
                   <td>
                     <div class="price-cell">
                       <span class="price-current">\${{ product.price }}</span>
@@ -234,7 +252,7 @@
     </div>
   </main>
 
-  <!-- Modal -->
+  <!-- Modal Crear/Editar Producto -->
   @if (showModal()) {
     <div class="modal-overlay" (click)="closeModal()">
       <div class="modal" (click)="$event.stopPropagation()">
@@ -247,24 +265,15 @@
             </svg>
           </button>
         </div>
-
         <form class="modal-form" (ngSubmit)="saveProduct()">
           <div class="form-row">
             <div class="form-group">
               <label>Nombre *</label>
-              <input 
-                type="text" 
-                [value]="formData().name"
-                (input)="updateField('name', $any($event.target).value)"
-                required>
+              <input type="text" [value]="formData().name" (input)="updateField('name', $any($event.target).value)" required>
             </div>
-
             <div class="form-group">
               <label>Categoría *</label>
-              <select 
-                [value]="formData().category"
-                (change)="updateField('category', $any($event.target).value)"
-                required>
+              <select [value]="formData().category" (change)="updateField('category', $any($event.target).value)" required>
                 <option value="">Seleccionar...</option>
                 @for (cat of categories; track cat) {
                   <option [value]="cat">{{ cat }}</option>
@@ -272,119 +281,69 @@
               </select>
             </div>
           </div>
-
           <div class="form-group">
             <label>Descripción *</label>
-            <textarea 
-              [value]="formData().description"
-              (input)="updateField('description', $any($event.target).value)"
-              rows="3"
-              required></textarea>
+            <textarea [value]="formData().description" (input)="updateField('description', $any($event.target).value)" rows="3" required></textarea>
           </div>
-
           <div class="form-row">
             <div class="form-group">
               <label>Precio *</label>
-              <input 
-                type="number" 
-                [value]="formData().price"
-                (input)="updateField('price', +$any($event.target).value)"
-                min="0"
-                step="0.01"
-                required>
+              <input type="number" [value]="formData().price" (input)="updateField('price', +$any($event.target).value)" min="0" step="0.01" required>
             </div>
-
             <div class="form-group">
               <label>Precio Original</label>
-              <input 
-                type="number" 
-                [value]="formData().originalPrice || ''"
-                (input)="updateField('originalPrice', $any($event.target).value ? +$any($event.target).value : undefined)"
-                min="0"
-                step="0.01">
-            </div>
-            
-            <div class="form-group">
-              <label>Costo (Compra/Producción)</label>
-              <input 
-                type="number" 
-                [value]="formData().cost || ''"
-                (input)="updateField('cost', $any($event.target).value ? +$any($event.target).value : undefined)"
-                min="0"
-                step="0.01"
-                placeholder="Cuánto te cuesta este producto">
-              <small class="field-hint">Para calcular la ganancia real</small>
+              <input type="number" [value]="formData().originalPrice || ''" (input)="updateField('originalPrice', $any($event.target).value ? +$any($event.target).value : undefined)" min="0" step="0.01">
             </div>
           </div>
-
           <div class="form-row">
             <div class="form-group">
               <label>Rating</label>
-              <input 
-                type="number" 
-                [value]="formData().rating || ''"
-                (input)="updateField('rating', $any($event.target).value ? +$any($event.target).value : undefined)"
-                min="0"
-                max="5"
-                step="0.1">
+              <input type="number" [value]="formData().rating || ''" (input)="updateField('rating', $any($event.target).value ? +$any($event.target).value : undefined)" min="0" max="5" step="0.1">
             </div>
-
             <div class="form-group">
               <label>Reseñas</label>
-              <input 
-                type="number" 
-                [value]="formData().reviewCount || ''"
-                (input)="updateField('reviewCount', $any($event.target).value ? +$any($event.target).value : undefined)"
-                min="0">
+              <input type="number" [value]="formData().reviewCount || ''" (input)="updateField('reviewCount', $any($event.target).value ? +$any($event.target).value : undefined)" min="0">
             </div>
           </div>
-
           <div class="form-row">
             <div class="form-group">
               <label>Badge</label>
-              <select 
-                [value]="formData().badge || ''"
-                (change)="updateField('badge', $any($event.target).value || undefined)">
+              <select [value]="formData().badge || ''" (change)="updateField('badge', $any($event.target).value || undefined)">
                 <option value="">Sin badge</option>
                 @for (badge of badges; track badge) {
                   <option [value]="badge">{{ badge }}</option>
                 }
               </select>
             </div>
-
             <div class="form-group">
               <label>URL de Imagen</label>
-              <input 
-                type="text" 
-                [value]="formData().image || ''"
-                (input)="updateField('image', $any($event.target).value || undefined)"
-                placeholder="https://...">
+              <input type="text" [value]="formData().image || ''" (input)="updateField('image', $any($event.target).value || undefined)" placeholder="https://...">
             </div>
           </div>
-
           <div class="modal-actions">
             <button type="button" class="btn-secondary" (click)="closeModal()">Cancelar</button>
-            <button type="submit" class="btn-primary">
-              {{ editingProduct() ? 'Guardar Cambios' : 'Crear Producto' }}
-            </button>
+            <button type="submit" class="btn-primary">{{ editingProduct() ? 'Guardar Cambios' : 'Crear Producto' }}</button>
           </div>
         </form>
       </div>
     </div>
   }
   
-  <!-- Orders Dashboard -->
+  <!-- Dashboards -->
   <app-orders-dashboard />
-  
-  <!-- Inventory Dashboard -->
   <app-inventory-dashboard />
-  
-  <!-- Finances Dashboard -->
   <app-finances-dashboard />
+
+ santiago
+  <!-- 🆕 QR Mesas -->
+  <app-qr-mesas />
+  
+  <!-- Chatbot AI -->
 
   <!-- Notifications Dashboard -->
   <app-notifications-dashboard />
 
   <!-- Chatbot AI Assistant -->
+ main
   <app-chatbot />
 </div>

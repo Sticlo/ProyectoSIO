@@ -1,0 +1,60 @@
+<div class="testimonios-page">
+
+  <!-- Hero -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <h1 class="hero-title">Lo que dicen nuestros clientes</h1>
+      <p class="hero-subtitle">Miles de empresas ya confían en SIO para gestionar su negocio</p>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="stats-section">
+    <div class="container">
+      <div class="stats-grid">
+        @for (stat of stats; track stat.etiqueta) {
+          <div class="stat-card">
+            <span class="stat-valor">{{ stat.valor }}</span>
+            <span class="stat-etiqueta">{{ stat.etiqueta }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonios -->
+  <section class="testimonios-section">
+    <div class="container">
+      <h2 class="section-title">Testimonios reales</h2>
+      <div class="testimonios-grid">
+        @for (t of testimonios; track t.nombre) {
+          <div class="testimonio-card">
+            <div class="card-header">
+              <div class="avatar">{{ t.avatar }}</div>
+              <div class="info">
+                <h3 class="nombre">{{ t.nombre }}</h3>
+                <p class="cargo">{{ t.cargo }} · {{ t.empresa }}</p>
+              </div>
+            </div>
+            <div class="estrellas">
+              @for (e of getEstrellas(t.estrellas); track $index) {
+                <span class="estrella">⭐</span>
+              }
+            </div>
+            <p class="texto">"{{ t.texto }}"</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <h2>¿Listo para transformar tu negocio?</h2>
+      <p>Únete a las cientos de empresas que ya usan SIO</p>
+      <a routerLink="/contacto" class="btn-cta">Contáctanos hoy</a>
+    </div>
+  </section>
+
+</div>
