@@ -27,7 +27,7 @@ export class Productos {
   minRating = signal(0);
   sortBy = signal<SortOption>('relevant');
   viewMode = signal<ViewMode>('grid');
-  showFilters = signal(false); // Empezar cerrado, especialmente en móvil
+  showFilters = signal(false); // Empezar cerrado, especialmente en móvill
   
   // Modal de producto
   selectedProduct = signal<Product | null>(null);
