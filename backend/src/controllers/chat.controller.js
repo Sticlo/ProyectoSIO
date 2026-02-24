@@ -109,22 +109,22 @@ class ChatController {
 
       if (productName) {
         // Buscar producto específico
-        const products = ProductModel.search(productName);
+        const products = await ProductModel.search(productName);
         
         if (products.length > 0) {
           contextInfo = '\n\n[DATOS REALES DE INVENTARIO]:\n';
           products.forEach(p => {
-            contextInfo += `- ${p.name}: ${p.stockCount} unidades disponibles, precio: $${p.price}, categoría: ${p.category}\n`;
+            contextInfo += `- ${p.name}: ${p.stock_count} unidades disponibles, precio: $${p.price}, categoría: ${p.category_name || 'Sin categoría'}\n`;
           });
         }
       } else if (category) {
         // Buscar por categoría
-        const products = ProductModel.findByCategory(category);
+        const products = await ProductModel.findByCategoryName(category);
         contextInfo = `\n\n[PRODUCTOS EN CATEGORÍA ${category}]: ${products.length} productos disponibles\n`;
       } else {
         // Mostrar resumen general
-        const allProducts = ProductModel.getAll();
-        const totalStock = allProducts.reduce((sum, p) => sum + p.stockCount, 0);
+        const allProducts = await ProductModel.getAll();
+        const totalStock = allProducts.reduce((sum, p) => sum + (p.stock_count || 0), 0);
         contextInfo = `\n\n[INVENTARIO TOTAL]: ${allProducts.length} productos, ${totalStock} unidades en stock\n`;
       }
 

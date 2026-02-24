@@ -4,20 +4,24 @@ class ProductController {
   /**
    * Obtener todos los productos
    */
-  static getAll(req, res) {
+  static async getAll(req, res) {
     try {
       const { category, search } = req.query;
       
-      let products = ProductModel.getAll();
+      let products;
 
-      // Filtrar por categoría si se proporciona
-      if (category) {
-        products = ProductModel.findByCategory(category);
-      }
-
-      // Buscar por término si se proporciona
       if (search) {
-        products = ProductModel.search(search);
+        products = await ProductModel.search(search);
+      } else if (category) {
+        // Soportar búsqueda por ID o por nombre de categoría
+        const categoryId = parseInt(category);
+        if (!isNaN(categoryId)) {
+          products = await ProductModel.findByCategory(categoryId);
+        } else {
+          products = await ProductModel.findByCategoryName(category);
+        }
+      } else {
+        products = await ProductModel.getAll();
       }
 
       res.json({ 
@@ -33,10 +37,10 @@ class ProductController {
   /**
    * Obtener producto por ID
    */
-  static getById(req, res) {
+  static async getById(req, res) {
     try {
       const { id } = req.params;
-      const product = ProductModel.findById(id);
+      const product = await ProductModel.findById(id);
 
       if (!product) {
         return res.status(404).json({ error: 'Producto no encontrado' });
@@ -52,7 +56,7 @@ class ProductController {
   /**
    * Crear nuevo producto
    */
-  static create(req, res) {
+  static async create(req, res) {
     try {
       const productData = req.body;
 
@@ -63,14 +67,14 @@ class ProductController {
         });
       }
 
-      const newProduct = ProductModel.create(productData);
+      const newProduct = await ProductModel.create(productData);
 
       res.status(201).json({
         message: 'Producto creado exitosamente',
         product: newProduct
       });
     } catch (error) {
-      console.error('Error al crear producto:', error);
+      console.error('Error al crear producto:', error.message, error.sqlMessage);
       res.status(500).json({ error: 'Error al crear producto' });
     }
   }
@@ -78,12 +82,12 @@ class ProductController {
   /**
    * Actualizar producto
    */
-  static update(req, res) {
+  static async update(req, res) {
     try {
       const { id } = req.params;
       const productData = req.body;
 
-      const updatedProduct = ProductModel.update(id, productData);
+      const updatedProduct = await ProductModel.update(id, productData);
 
       if (!updatedProduct) {
         return res.status(404).json({ error: 'Producto no encontrado' });
@@ -102,7 +106,7 @@ class ProductController {
   /**
    * Actualizar stock de producto
    */
-  static updateStock(req, res) {
+  static async updateStock(req, res) {
     try {
       const { id } = req.params;
       const { quantity } = req.body;
@@ -113,7 +117,7 @@ class ProductController {
         });
       }
 
-      const updatedProduct = ProductModel.updateStock(id, quantity);
+      const updatedProduct = await ProductModel.updateStock(id, quantity);
 
       if (!updatedProduct) {
         return res.status(404).json({ error: 'Producto no encontrado' });
@@ -132,10 +136,10 @@ class ProductController {
   /**
    * Eliminar producto
    */
-  static delete(req, res) {
+  static async delete(req, res) {
     try {
       const { id } = req.params;
-      const deleted = ProductModel.delete(id);
+      const deleted = await ProductModel.delete(id);
 
       if (!deleted) {
         return res.status(404).json({ error: 'Producto no encontrado' });
@@ -148,5 +152,7 @@ class ProductController {
     }
   }
 }
+
+module.exports = ProductController;
 
 module.exports = ProductController;

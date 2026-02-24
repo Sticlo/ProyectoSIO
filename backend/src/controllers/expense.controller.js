@@ -4,18 +4,18 @@ class ExpenseController {
   /**
    * Obtener todos los gastos
    */
-  static getAll(req, res) {
+  static async getAll(req, res) {
     try {
       const { category, startDate, endDate } = req.query;
       
       let expenses;
 
       if (startDate && endDate) {
-        expenses = ExpenseModel.findByDateRange(startDate, endDate);
+        expenses = await ExpenseModel.findByDateRange(startDate, endDate);
       } else if (category) {
-        expenses = ExpenseModel.findByCategory(category);
+        expenses = await ExpenseModel.findByCategory(category);
       } else {
-        expenses = ExpenseModel.getAll();
+        expenses = await ExpenseModel.getAll();
       }
 
       res.json({ 
@@ -31,10 +31,10 @@ class ExpenseController {
   /**
    * Obtener gasto por ID
    */
-  static getById(req, res) {
+  static async getById(req, res) {
     try {
       const { id } = req.params;
-      const expense = ExpenseModel.findById(id);
+      const expense = await ExpenseModel.findById(id);
 
       if (!expense) {
         return res.status(404).json({ error: 'Gasto no encontrado' });
@@ -49,19 +49,25 @@ class ExpenseController {
 
   /**
    * Crear nuevo gasto
+   * Recibe category_id (FK → categorias) y created_by del token
    */
-  static create(req, res) {
+  static async create(req, res) {
     try {
       const expenseData = req.body;
 
       // Validar campos requeridos
-      if (!expenseData.description || !expenseData.amount || !expenseData.category) {
+      if (!expenseData.description || !expenseData.amount) {
         return res.status(400).json({ 
-          error: 'Descripción, monto y categoría son requeridos' 
+          error: 'Descripción y monto son requeridos' 
         });
       }
 
-      const newExpense = ExpenseModel.create(expenseData);
+      // Asignar usuario que crea el gasto (del token JWT)
+      if (req.user && req.user.id) {
+        expenseData.created_by = req.user.id;
+      }
+
+      const newExpense = await ExpenseModel.create(expenseData);
 
       res.status(201).json({
         message: 'Gasto creado exitosamente',
@@ -76,12 +82,12 @@ class ExpenseController {
   /**
    * Actualizar gasto
    */
-  static update(req, res) {
+  static async update(req, res) {
     try {
       const { id } = req.params;
       const expenseData = req.body;
 
-      const updatedExpense = ExpenseModel.update(id, expenseData);
+      const updatedExpense = await ExpenseModel.update(id, expenseData);
 
       if (!updatedExpense) {
         return res.status(404).json({ error: 'Gasto no encontrado' });
@@ -100,10 +106,10 @@ class ExpenseController {
   /**
    * Eliminar gasto
    */
-  static delete(req, res) {
+  static async delete(req, res) {
     try {
       const { id } = req.params;
-      const deleted = ExpenseModel.delete(id);
+      const deleted = await ExpenseModel.delete(id);
 
       if (!deleted) {
         return res.status(404).json({ error: 'Gasto no encontrado' });
@@ -119,9 +125,9 @@ class ExpenseController {
   /**
    * Obtener totales por categoría
    */
-  static getTotalByCategory(req, res) {
+  static async getTotalByCategory(req, res) {
     try {
-      const totals = ExpenseModel.getTotalByCategory();
+      const totals = await ExpenseModel.getTotalByCategory();
       res.json({ totals });
     } catch (error) {
       console.error('Error al obtener totales:', error);
@@ -132,7 +138,7 @@ class ExpenseController {
   /**
    * Obtener total por período
    */
-  static getTotalByPeriod(req, res) {
+  static async getTotalByPeriod(req, res) {
     try {
       const { startDate, endDate } = req.query;
 
@@ -142,7 +148,7 @@ class ExpenseController {
         });
       }
 
-      const total = ExpenseModel.getTotalByPeriod(startDate, endDate);
+      const total = await ExpenseModel.getTotalByPeriod(startDate, endDate);
       res.json({ total });
     } catch (error) {
       console.error('Error al obtener total:', error);

@@ -1,140 +1,157 @@
-// Almacenamiento en memoria para productos
-let products = [
-  {
-    id: '1',
-    name: 'AirBuds Pro Max',
-    category: 'Auriculares',
-    description: 'Sonido premium con cancelación de ruido activa y 40 horas de batería.',
-    price: 199,
-    originalPrice: 249,
-    rating: 4.8,
-    reviewCount: 1542,
-    badge: 'Oferta',
-    image: '/assets/placeholder-product.png',
-    inStock: true,
-    stockCount: 25,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: '2',
-    name: 'SoundPulse Speaker',
-    category: 'Bocinas',
-    description: 'Potencia y claridad en un diseño compacto resistente al agua.',
-    price: 149,
-    rating: 4.7,
-    reviewCount: 892,
-    image: '/assets/placeholder-product.png',
-    inStock: true,
-    stockCount: 18,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: '3',
-    name: 'ChronoWave Watch',
-    category: 'Smartwatch',
-    description: 'Elegancia inteligente con monitoreo de salud 24/7.',
-    price: 299,
-    originalPrice: 349,
-    rating: 4.9,
-    reviewCount: 2103,
-    badge: 'Popular',
-    image: '/assets/placeholder-product.png',
-    inStock: true,
-    stockCount: 32,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  }
-];
+const { pool } = require('../config/database');
 
 class ProductModel {
   /**
-   * Obtener todos los productos
+   * Obtener todos los productos (con nombre de categoría)
    */
-  static getAll() {
-    return products;
+  static async getAll() {
+    const [rows] = await pool.query(`
+      SELECT p.*, c.name AS category_name
+      FROM productos p
+      LEFT JOIN categorias c ON p.category_id = c.id
+      ORDER BY p.created_at DESC
+    `);
+    return rows;
   }
 
   /**
    * Buscar producto por ID
    */
-  static findById(id) {
-    return products.find(p => p.id === id);
+  static async findById(id) {
+    const [rows] = await pool.query(`
+      SELECT p.*, c.name AS category_name
+      FROM productos p
+      LEFT JOIN categorias c ON p.category_id = c.id
+      WHERE p.id = ?
+    `, [id]);
+    return rows[0] || null;
   }
 
   /**
-   * Buscar productos por categoría
+   * Buscar productos por category_id
    */
-  static findByCategory(category) {
-    return products.filter(p => p.category === category);
+  static async findByCategory(categoryId) {
+    const [rows] = await pool.query(`
+      SELECT p.*, c.name AS category_name
+      FROM productos p
+      LEFT JOIN categorias c ON p.category_id = c.id
+      WHERE p.category_id = ?
+      ORDER BY p.created_at DESC
+    `, [categoryId]);
+    return rows;
+  }
+
+  /**
+   * Buscar productos por nombre de categoría
+   */
+  static async findByCategoryName(categoryName) {
+    const [rows] = await pool.query(`
+      SELECT p.*, c.name AS category_name
+      FROM productos p
+      LEFT JOIN categorias c ON p.category_id = c.id
+      WHERE c.name LIKE ?
+      ORDER BY p.created_at DESC
+    `, [`%${categoryName}%`]);
+    return rows;
   }
 
   /**
    * Buscar productos (por nombre o descripción)
    */
-  static search(query) {
-    const lowerQuery = query.toLowerCase();
-    return products.filter(p => 
-      p.name.toLowerCase().includes(lowerQuery) ||
-      p.description.toLowerCase().includes(lowerQuery) ||
-      p.category.toLowerCase().includes(lowerQuery)
-    );
+  static async search(query) {
+    const term = `%${query}%`;
+    const [rows] = await pool.query(`
+      SELECT p.*, c.name AS category_name
+      FROM productos p
+      LEFT JOIN categorias c ON p.category_id = c.id
+      WHERE p.name LIKE ? OR p.description LIKE ? OR c.name LIKE ?
+      ORDER BY p.created_at DESC
+    `, [term, term, term]);
+    return rows;
   }
 
   /**
    * Crear nuevo producto
    */
-  static create(productData) {
-    const newProduct = {
-      id: Date.now().toString(),
-      ...productData,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    products.push(newProduct);
-    return newProduct;
+  static async create(productData) {
+    const {
+      name, category_id, description, price, original_price,
+      rating, review_count, badge, image, in_stock, stock_count
+    } = productData;
+
+    const [result] = await pool.query(
+      `INSERT INTO productos 
+        (name, category_id, description, price, original_price, rating, review_count, badge, image, in_stock, stock_count) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [name, category_id || null, description || null, price, original_price || null,
+       rating || 0, review_count || 0, badge || null, image || null,
+       in_stock !== undefined ? in_stock : true, stock_count || 0]
+    );
+
+    return await ProductModel.findById(result.insertId);
   }
 
   /**
    * Actualizar producto
    */
-  static update(id, productData) {
-    const index = products.findIndex(p => p.id === id);
-    if (index === -1) return null;
-    
-    products[index] = {
-      ...products[index],
-      ...productData,
-      updatedAt: new Date()
+  static async update(id, productData) {
+    const fields = [];
+    const values = [];
+
+    const allowedFields = {
+      name: 'name', category_id: 'category_id', description: 'description',
+      price: 'price', original_price: 'original_price', rating: 'rating',
+      review_count: 'review_count', badge: 'badge', image: 'image',
+      in_stock: 'in_stock', stock_count: 'stock_count'
     };
-    
-    return products[index];
+
+    for (const [key, column] of Object.entries(allowedFields)) {
+      if (productData[key] !== undefined) {
+        fields.push(`${column} = ?`);
+        values.push(productData[key]);
+      }
+    }
+
+    if (fields.length === 0) return null;
+
+    values.push(id);
+    const [result] = await pool.query(
+      `UPDATE productos SET ${fields.join(', ')} WHERE id = ?`,
+      values
+    );
+
+    if (result.affectedRows === 0) return null;
+    return await ProductModel.findById(id);
   }
 
   /**
    * Actualizar stock del producto
    */
-  static updateStock(id, quantity) {
-    const product = this.findById(id);
+  static async updateStock(id, quantity) {
+    const product = await ProductModel.findById(id);
     if (!product) return null;
-    
-    const newStock = product.stockCount + quantity;
-    return this.update(id, { 
-      stockCount: newStock,
-      inStock: newStock > 0 
-    });
+
+    const newStock = product.stock_count + quantity;
+    const [result] = await pool.query(
+      'UPDATE productos SET stock_count = ?, in_stock = ? WHERE id = ?',
+      [newStock, newStock > 0, id]
+    );
+
+    if (result.affectedRows === 0) return null;
+    return await ProductModel.findById(id);
   }
 
   /**
    * Eliminar producto
    */
-  static delete(id) {
-    const index = products.findIndex(p => p.id === id);
-    if (index === -1) return false;
-    products.splice(index, 1);
-    return true;
+  static async delete(id) {
+    const [result] = await pool.query(
+      'DELETE FROM productos WHERE id = ?',
+      [id]
+    );
+    return result.affectedRows > 0;
   }
 }
 
 module.exports = ProductModel;
+

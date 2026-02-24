@@ -1,241 +1,194 @@
 import { Injectable, signal, inject } from '@angular/core';
+import { Observable, map, tap } from 'rxjs';
 import { Product } from '../../shared/models/product.model';
-import { StorageService } from './storage.service';
+import { ApiService } from './api.service';
+
+// Forma del producto tal como llega desde la API (snake_case)
+interface RawProduct {
+  id: number;
+  name: string;
+  description: string;
+  price: string;
+  original_price: string | null;
+  cost: string | null;
+  rating: string | null;
+  review_count: number;
+  badge: string | null;
+  image: string | null;
+  in_stock: number | boolean;
+  stock_count: number;
+  min_stock: number;
+  max_stock: number;
+  category_id: number | null;
+  category_name: string | null;
+}
+
+/** Convierte respuesta de la API → interfaz Product del frontend */
+function fromApi(raw: RawProduct): Product {
+  return {
+    id: String(raw.id),
+    name: raw.name,
+    description: raw.description || '',
+    category: raw.category_name || undefined,
+    price: Number(raw.price),
+    originalPrice: raw.original_price ? Number(raw.original_price) : undefined,
+    cost: raw.cost ? Number(raw.cost) : undefined,
+    rating: raw.rating ? Number(raw.rating) : undefined,
+    reviewCount: raw.review_count ?? 0,
+    badge: raw.badge ?? undefined,
+    image: raw.image ?? undefined,
+    inStock: Boolean(raw.in_stock),
+    stockCount: raw.stock_count ?? 0,
+    minStock: raw.min_stock ?? 5,
+    maxStock: raw.max_stock ?? 100,
+  };
+}
+
+/** Convierte Product del frontend → payload para la API (snake_case) */
+function toApi(p: Partial<Product> & { category_id?: number | null }): Record<string, unknown> {
+  return {
+    name: p.name,
+    description: p.description,
+    price: p.price,
+    original_price: p.originalPrice ?? null,
+    cost: p.cost ?? null,
+    rating: p.rating ?? null,
+    review_count: p.reviewCount ?? 0,
+    badge: p.badge ?? null,
+    image: p.image ?? null,
+    in_stock: p.inStock ?? true,
+    stock_count: p.stockCount ?? 0,
+    min_stock: p.minStock ?? 5,
+    max_stock: p.maxStock ?? 100,
+    category_id: p.category_id ?? null,
+  };
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductService {
-  private readonly PRODUCTS_KEY = 'products';
-  
-  private storageService = inject(StorageService);
-  
-  private products = signal<Product[]>(this.loadProducts());
-  
-  readonly allProducts = this.products.asReadonly();
-  
+  private api = inject(ApiService);
+
+  private _products = signal<Product[]>([]);
+  readonly allProducts = this._products.asReadonly();
+
+  readonly isLoading = signal(false);
+  readonly error = signal<string | null>(null);
+
   constructor() {
-    // Inicializar con productos de ejemplo si está vacío
-    if (this.products().length === 0) {
-      this.initializeDefaultProducts();
-    }
+    this.loadProducts();
   }
-  
+
   /**
-   * Cargar productos desde localStorage
+   * Carga productos desde el backend y actualiza la señal
    */
-  private loadProducts(): Product[] {
-    const stored = this.storageService.getLocal(this.PRODUCTS_KEY);
-    return stored || [];
-  }
-  
-  /**
-   * Guardar productos en localStorage
-   */
-  private saveProducts(): void {
-    this.storageService.setLocal(this.PRODUCTS_KEY, this.products());
-  }
-  
-  /**
-   * Inicializar productos por defecto
-   */
-  private initializeDefaultProducts(): void {
-    const defaultProducts: Product[] = [
-      {
-        id: '1',
-        name: 'AirBuds Pro Max',
-        category: 'Auriculares',
-        description: 'Sonido premium con cancelación de ruido activa y 40 horas de batería.',
-        price: 199,
-        originalPrice: 249,
-        rating: 4.8,
-        reviewCount: 1542,
-        badge: 'Oferta',
-        image: '/assets/placeholder-product.png',
-        inStock: true,
-        stockCount: 25
+  loadProducts(): void {
+    this.isLoading.set(true);
+    this.error.set(null);
+    this.api.get<{ count: number; products: RawProduct[] }>('/products').subscribe({
+      next: (res) => {
+        this._products.set(res.products.map(fromApi));
+        this.isLoading.set(false);
       },
-      {
-        id: '2',
-        name: 'SoundPulse Speaker',
-        category: 'Bocinas',
-        description: 'Potencia y claridad en un diseño compacto resistente al agua.',
-        price: 149,
-        rating: 4.7,
-        reviewCount: 892,
-        image: '/assets/placeholder-product.png',
-        inStock: true,
-        stockCount: 18
-      },
-      {
-        id: '3',
-        name: 'ChronoWave Watch',
-        category: 'Smartwatch',
-        description: 'Elegancia inteligente con monitoreo de salud 24/7.',
-        price: 299,
-        originalPrice: 349,
-        rating: 4.9,
-        reviewCount: 2103,
-        badge: 'Popular',
-        image: '/assets/placeholder-product.png',
-        inStock: true,
-        stockCount: 32
-      },
-      {
-        id: '4',
-        name: 'ChargeHub Wireless',
-        category: 'Cargadores',
-        description: 'Carga rápida inalámbrica de última generación para 3 dispositivos.',
-        price: 89,
-        rating: 4.6,
-        reviewCount: 654,
-        badge: 'Nuevo',
-        image: '/assets/placeholder-product.png',
-        inStock: true,
-        stockCount: 45
-      },
-      {
-        id: '5',
-        name: 'Laptop UltraBook Pro',
-        category: 'Laptops',
-        description: 'Rendimiento excepcional con procesador de última generación.',
-        price: 1299,
-        originalPrice: 1499,
-        rating: 4.9,
-        reviewCount: 2341,
-        badge: 'Oferta',
-        image: '/assets/placeholder-product.png',
-        inStock: true,
-        stockCount: 12
-      },
-      {
-        id: '6',
-        name: 'Teclado Mecánico RGB',
-        category: 'Periféricos',
-        description: 'Teclado gaming con switches mecánicos y retroiluminación RGB.',
-        price: 129,
-        rating: 4.7,
-        reviewCount: 856,
-        image: '/assets/placeholder-product.png',
-        inStock: true,
-        stockCount: 23
+      error: (err) => {
+        console.error('Error al cargar productos:', err);
+        this.error.set('No se pudieron cargar los productos');
+        this.isLoading.set(false);
       }
-    ];
-    
-    this.products.set(defaultProducts);
-    this.saveProducts();
+    });
   }
-  
+
   /**
-   * Obtener todos los productos
+   * Obtener todos los productos (señal)
    */
   getAll(): Product[] {
-    return this.products();
+    return this._products();
   }
-  
+
   /**
    * Obtener producto por ID
    */
   getById(id: string): Product | undefined {
-    return this.products().find(p => p.id === id);
+    return this._products().find(p => p.id === id);
   }
-  
+
   /**
-   * Crear nuevo producto
+   * Crear producto — POST /api/products
    */
-  create(product: Omit<Product, 'id'>): Product {
-    const newProduct: Product = {
-      ...product,
-      id: Date.now().toString()
-    };
-    
-    this.products.update(products => [...products, newProduct]);
-    this.saveProducts();
-    
-    return newProduct;
+  create(product: Partial<Product> & { category_id?: number | null }): Observable<Product> {
+    return this.api.post<{ message: string; product: RawProduct }>('/products', toApi(product)).pipe(
+      map(res => fromApi(res.product)),
+      tap(newProduct => this._products.update(list => [...list, newProduct]))
+    );
   }
-  
+
   /**
-   * Actualizar producto existente
+   * Actualizar producto — PUT /api/products/:id
    */
-  update(id: string, updates: Partial<Product>): boolean {
-    const index = this.products().findIndex(p => p.id === id);
-    
-    if (index === -1) return false;
-    
-    this.products.update(products => {
-      const updated = [...products];
-      updated[index] = { ...updated[index], ...updates };
-      return updated;
-    });
-    
-    this.saveProducts();
-    return true;
+  update(id: string, updates: Partial<Product> & { category_id?: number | null }): Observable<Product> {
+    return this.api.put<{ message: string; product: RawProduct }>(`/products/${id}`, toApi(updates)).pipe(
+      map(res => fromApi(res.product)),
+      tap(updated => this._products.update(list => list.map(p => p.id === id ? updated : p)))
+    );
   }
-  
+
   /**
-   * Eliminar producto
+   * Eliminar producto — DELETE /api/products/:id
    */
-  delete(id: string): boolean {
-    const initialLength = this.products().length;
-    
-    this.products.update(products => products.filter(p => p.id !== id));
-    
-    if (this.products().length < initialLength) {
-      this.saveProducts();
-      return true;
-    }
-    
-    return false;
+  delete(id: string): Observable<void> {
+    return this.api.delete<{ message: string }>(`/products/${id}`).pipe(
+      tap(() => this._products.update(list => list.filter(p => p.id !== id))),
+      map(() => void 0)
+    );
   }
-  
+
   /**
-   * Buscar productos
+   * Buscar productos localmente (cliente)
    */
   search(query: string): Product[] {
     const lowerQuery = query.toLowerCase();
-    return this.products().filter(p =>
+    return this._products().filter(p =>
       p.name.toLowerCase().includes(lowerQuery) ||
       p.description.toLowerCase().includes(lowerQuery) ||
       (p.category?.toLowerCase().includes(lowerQuery) || false)
     );
   }
-  
+
   /**
-   * Filtrar por categoría
+   * Filtrar por categoría localmente
    */
   filterByCategory(category: string): Product[] {
-    return this.products().filter(p => 
+    return this._products().filter(p =>
       p.category?.toLowerCase() === category.toLowerCase()
     );
   }
-  
+
   /**
-   * Actualizar stock de un producto
+   * Actualizar stock de un producto en la señal local
    */
   updateProductStock(productId: string, updatedProduct: Product): void {
-    this.products.update(products =>
+    this._products.update(products =>
       products.map(p => p.id === productId ? updatedProduct : p)
     );
-    this.saveProducts();
   }
-  
+
   /**
    * Obtener productos con stock bajo
    */
   getLowStockProducts(): Product[] {
-    return this.products().filter(p => {
+    return this._products().filter(p => {
       const stock = p.stockCount || 0;
       const minStock = p.minStock || 5;
       return stock > 0 && stock <= minStock;
     });
   }
-  
+
   /**
    * Obtener productos agotados
    */
   getOutOfStockProducts(): Product[] {
-    return this.products().filter(p => 
+    return this._products().filter(p =>
       (p.stockCount || 0) === 0 || p.inStock === false
     );
   }

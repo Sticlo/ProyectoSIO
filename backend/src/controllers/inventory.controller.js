@@ -1,28 +1,14 @@
+const InventoryModel = require('../models/inventory.model');
 const ProductModel = require('../models/product.model');
 
 class InventoryController {
   /**
    * Obtener resumen de inventario
    */
-  static getSummary(req, res) {
+  static async getSummary(req, res) {
     try {
-      const products = ProductModel.getAll();
-      
-      const totalProducts = products.length;
-      const inStockCount = products.filter(p => p.inStock).length;
-      const outOfStockCount = products.filter(p => !p.inStock).length;
-      const lowStockCount = products.filter(p => p.stockCount > 0 && p.stockCount < 10).length;
-      const totalValue = products.reduce((sum, p) => sum + (p.price * p.stockCount), 0);
-
-      res.json({
-        summary: {
-          totalProducts,
-          inStockCount,
-          outOfStockCount,
-          lowStockCount,
-          totalValue
-        }
-      });
+      const summary = await InventoryModel.getSummary();
+      res.json({ summary });
     } catch (error) {
       console.error('Error al obtener resumen:', error);
       res.status(500).json({ error: 'Error al obtener resumen de inventario' });
@@ -32,17 +18,14 @@ class InventoryController {
   /**
    * Obtener productos con bajo stock
    */
-  static getLowStock(req, res) {
+  static async getLowStock(req, res) {
     try {
       const threshold = parseInt(req.query.threshold) || 10;
-      const products = ProductModel.getAll();
-      const lowStockProducts = products.filter(
-        p => p.stockCount > 0 && p.stockCount < threshold
-      );
+      const products = await InventoryModel.getLowStock(threshold);
 
       res.json({ 
-        count: lowStockProducts.length,
-        products: lowStockProducts 
+        count: products.length,
+        products
       });
     } catch (error) {
       console.error('Error al obtener productos con bajo stock:', error);
@@ -53,14 +36,13 @@ class InventoryController {
   /**
    * Obtener productos sin stock
    */
-  static getOutOfStock(req, res) {
+  static async getOutOfStock(req, res) {
     try {
-      const products = ProductModel.getAll();
-      const outOfStockProducts = products.filter(p => !p.inStock || p.stockCount === 0);
+      const products = await InventoryModel.getOutOfStock();
 
       res.json({ 
-        count: outOfStockProducts.length,
-        products: outOfStockProducts 
+        count: products.length,
+        products
       });
     } catch (error) {
       console.error('Error al obtener productos sin stock:', error);
@@ -70,10 +52,12 @@ class InventoryController {
 
   /**
    * Ajustar inventario (entrada/salida de stock)
+   * Registra en movimientos_inventario (FK → productos, FK → usuarios)
+   * y actualiza stock del producto en la misma transacción
    */
-  static adjustStock(req, res) {
+  static async adjustStock(req, res) {
     try {
-      const { productId, quantity, type, reason } = req.body;
+      const { productId, quantity, type, reason, notes } = req.body;
 
       // Validar campos requeridos
       if (!productId || quantity === undefined || !type) {
@@ -89,30 +73,61 @@ class InventoryController {
         });
       }
 
-      const product = ProductModel.findById(productId);
+      // Verificar que el producto existe
+      const product = await ProductModel.findById(productId);
       if (!product) {
         return res.status(404).json({ error: 'Producto no encontrado' });
       }
 
-      // Calcular cantidad según el tipo
-      const adjustment = type === 'in' ? quantity : -quantity;
+      // Verificar stock suficiente para salida
+      if (type === 'out' && product.stock_count < quantity) {
+        return res.status(400).json({ 
+          error: `Stock insuficiente. Disponible: ${product.stock_count}` 
+        });
+      }
 
-      // Actualizar stock
-      const updatedProduct = ProductModel.updateStock(productId, adjustment);
+      // Crear movimiento + actualizar stock (transacción)
+      const movement = await InventoryModel.createMovement({
+        product_id: productId,
+        type,
+        quantity,
+        reason,
+        notes,
+        created_by: req.user ? req.user.id : null
+      });
 
       res.json({
         message: `Stock ajustado exitosamente (${type === 'in' ? 'entrada' : 'salida'})`,
-        product: updatedProduct,
-        adjustment: {
-          type,
-          quantity,
-          reason,
-          date: new Date()
-        }
+        movement,
+        newStock: movement.new_stock
       });
     } catch (error) {
       console.error('Error al ajustar inventario:', error);
       res.status(500).json({ error: 'Error al ajustar inventario' });
+    }
+  }
+
+  /**
+   * Obtener historial de movimientos
+   */
+  static async getMovements(req, res) {
+    try {
+      const { productId } = req.query;
+      let movements;
+
+      if (productId) {
+        movements = await InventoryModel.getByProduct(productId);
+      } else {
+        movements = await InventoryModel.getAll();
+      }
+
+      res.json({
+        count: movements.length,
+        movements
+      });
+    } catch (error) {
+      console.error('Error al obtener movimientos:', error);
+      res.status(500).json({ error: 'Error al obtener movimientos' });
     }
   }
 }

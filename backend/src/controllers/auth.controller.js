@@ -18,7 +18,7 @@ class AuthController {
       }
 
       // Verificar si el usuario ya existe
-      const existingUser = UserModel.findByEmail(email);
+      const existingUser = await UserModel.findByEmail(email);
       if (existingUser) {
         return res.status(409).json({ 
           error: 'El usuario ya existe' 
@@ -29,7 +29,7 @@ class AuthController {
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // Crear usuario
-      const newUser = UserModel.create({
+      const newUser = await UserModel.create({
         email,
         password: hashedPassword,
         name,
@@ -61,7 +61,7 @@ class AuthController {
       }
 
       // Buscar usuario
-      const user = UserModel.findByEmail(email);
+      const user = await UserModel.findByEmail(email);
       if (!user) {
         return res.status(401).json({ 
           error: 'Credenciales inválidas' 
@@ -104,9 +104,9 @@ class AuthController {
   /**
    * Obtener perfil del usuario autenticado
    */
-  static getProfile(req, res) {
+  static async getProfile(req, res) {
     try {
-      const user = UserModel.findById(req.user.id);
+      const user = await UserModel.findById(req.user.id);
       if (!user) {
         return res.status(404).json({ error: 'Usuario no encontrado' });
       }
@@ -131,7 +131,7 @@ class AuthController {
         updateData.password = await bcrypt.hash(password, 10);
       }
 
-      const updatedUser = UserModel.update(req.user.id, updateData);
+      const updatedUser = await UserModel.update(req.user.id, updateData);
       if (!updatedUser) {
         return res.status(404).json({ error: 'Usuario no encontrado' });
       }
