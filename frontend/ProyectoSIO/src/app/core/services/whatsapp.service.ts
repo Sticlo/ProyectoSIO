@@ -4,6 +4,7 @@ import { SiteConfig } from '../../config/site.config';
 import { OrderService } from './order.service';
 import { InventoryService } from './inventory.service';
 import { ProductService } from './product.service';
+import { Observable, tap } from 'rxjs';
 
 export interface CustomerInfo {
   name: string;
@@ -27,7 +28,11 @@ export class WhatsAppService {
    * Envía un pedido por WhatsApp con información del cliente
    * Abre WhatsApp con un mensaje pre-formateado incluyendo los datos del cliente
    */
-  sendOrderWithCustomerInfo(
+  /**
+   * Solo abre WhatsApp con el pedido formateado (sin guardar en BD)
+   * Usar DESPUES de que createOrder() haya tenido éxito
+   */
+  openWhatsApp(
     customerInfo: CustomerInfo,
     items: CartItem[],
     total: number,
@@ -36,28 +41,30 @@ export class WhatsAppService {
     const message = this.formatOrderMessageWithCustomer(customerInfo, items, total, shippingCost);
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${this.phoneNumber}?text=${encodedMessage}`;
-    
-    // Registrar la orden en el sistema con el número del CLIENTE
-    const order = this.orderService.createOrder(
+    window.open(whatsappUrl, '_blank');
+  }
+
+  /**
+   * Guarda el pedido en el backend Y luego abre WhatsApp si tiene éxito.
+   * Retorna Observable para que el componente pueda manejar errores de stock.
+   */
+  sendOrderWithCustomerInfo(
+    customerInfo: CustomerInfo,
+    items: CartItem[],
+    total: number,
+    shippingCost: number = 0
+  ): Observable<any> {
+    return this.orderService.createOrder(
       customerInfo.phone,
       items,
       total,
-      shippingCost
-    );
-    
-    // Actualizar la orden con información adicional del cliente
-    this.orderService.updateCustomerInfo(
-      order.id,
+      shippingCost,
       customerInfo.name,
-      customerInfo.notes,
-      customerInfo.address
+      customerInfo.address,
+      customerInfo.notes
+    ).pipe(
+      tap(() => this.openWhatsApp(customerInfo, items, total, shippingCost))
     );
-    
-    // Descontar stock automáticamente
-    this.decreaseStockForOrder(items, order.id);
-    
-    // Abrir WhatsApp en una nueva ventana
-    window.open(whatsappUrl, '_blank');
   }
   
   /**
@@ -68,17 +75,14 @@ export class WhatsAppService {
     const message = this.formatOrderMessage(items, total, shippingCost);
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${this.phoneNumber}?text=${encodedMessage}`;
-    
-    // Registrar la orden en el sistema
-    this.orderService.createOrder(
-      this.phoneNumber,
-      items,
-      total,
-      shippingCost
-    );
-    
-    // Abrir WhatsApp en una nueva ventana
+
+    // Abrir WhatsApp inmediatamente
     window.open(whatsappUrl, '_blank');
+
+    // Guardar en el backend
+    this.orderService.createOrder(this.phoneNumber, items, total, shippingCost).subscribe({
+      error: err => console.error('No se pudo guardar la orden:', err)
+    });
   }
   
   /**

@@ -41,6 +41,7 @@
               <span class="finances-badge warning">⚠️</span>
             }
           </button>
+ santiago
 
           <!-- 🆕 Botón QR Mesas -->
           <button class="btn-qr" (click)="openQrMesas()">
@@ -58,6 +59,18 @@
             📱 QR Mesas
           </button>
 
+=======
+          <button class="btn-notifications" (click)="openNotificationsDashboard()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            Alertas
+            @if (unreadNotifs() > 0) {
+              <span class="notif-badge">{{ unreadNotifs() }}</span>
+            }
+          </button>
+ main
           <button class="btn-secondary" (click)="router.navigate(['/productos'])">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -321,9 +334,16 @@
   <app-inventory-dashboard />
   <app-finances-dashboard />
 
+ santiago
   <!-- 🆕 QR Mesas -->
   <app-qr-mesas />
   
   <!-- Chatbot AI -->
+
+  <!-- Notifications Dashboard -->
+  <app-notifications-dashboard />
+
+  <!-- Chatbot AI Assistant -->
+ main
   <app-chatbot />
 </div>

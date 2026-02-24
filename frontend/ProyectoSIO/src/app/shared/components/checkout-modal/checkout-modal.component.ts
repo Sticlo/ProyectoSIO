@@ -1,8 +1,10 @@
 import { Component, signal, output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
 import { CartService } from '../../../core/services/cart.service';
 import { WhatsAppService } from '../../../core/services/whatsapp.service';
+import { OrderService } from '../../../core/services/order.service';
 import { SiteConfig } from '../../../config/site.config';
 
 export interface CustomerInfo {
@@ -22,9 +24,11 @@ export interface CustomerInfo {
 export class CheckoutModalComponent {
   private cartService = inject(CartService);
   private whatsappService = inject(WhatsAppService);
+  private orderService = inject(OrderService);
   
   isOpen = signal(false);
   isProcessing = signal(false);
+  errorMessage = signal<string | null>(null);
   
   // Customer form data
   customerName = signal('');
@@ -42,6 +46,7 @@ export class CheckoutModalComponent {
   
   open(): void {
     this.isOpen.set(true);
+    this.errorMessage.set(null);
     // Reset form
     this.customerName.set('');
     this.customerPhone.set('');
@@ -117,6 +122,10 @@ export class CheckoutModalComponent {
   
   /**
    * Procesar el checkout
+   * 1. Valida el formulario
+   * 2. Llama al backend (verifica stock y crea la orden)
+   * 3. Solo si el backend responde OK abre WhatsApp
+   * 4. Si hay error de stock muestra mensaje inline (no abre WhatsApp)
    */
   async processCheckout(): Promise<void> {
     const items = this.cartItems();
@@ -135,6 +144,7 @@ export class CheckoutModalComponent {
     }
     
     this.isProcessing.set(true);
+    this.errorMessage.set(null);
     
     try {
       // Preparar info del cliente
@@ -153,16 +163,22 @@ export class CheckoutModalComponent {
       
       const total = subtotal + shippingCost;
       
-      // Enviar pedido por WhatsApp con info del cliente
-      this.whatsappService.sendOrderWithCustomerInfo(
-        customerInfo,
-        items,
-        total,
-        shippingCost
+      // Primero guardar el pedido en el backend (verifica stock)
+      // Si hay error de stock el backend responde 400 y NO se abre WhatsApp
+      await firstValueFrom(
+        this.orderService.createOrder(
+          customerInfo.phone,
+          items,
+          total,
+          shippingCost,
+          customerInfo.name,
+          customerInfo.address,
+          customerInfo.notes
+        )
       );
-      
-      // Pequeña pausa para que el usuario vea que se está procesando
-      await new Promise(resolve => setTimeout(resolve, 800));
+
+      // Stock OK y orden guardada → ahora sí abrir WhatsApp
+      this.whatsappService.openWhatsApp(customerInfo, items, total, shippingCost);
       
       // Limpiar el carrito si está configurado
       if (SiteConfig.orders.clearCartAfterCheckout) {
@@ -171,9 +187,15 @@ export class CheckoutModalComponent {
       
       this.success.emit();
       this.closeModal();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al procesar el pedido:', error);
-      alert('Hubo un error al procesar tu pedido. Por favor intenta nuevamente.');
+      // Intentar extraer el mensaje de error del backend (ej: stock insuficiente)
+      const backendMsg = error?.error?.error || error?.message || null;
+      if (backendMsg) {
+        this.errorMessage.set(backendMsg);
+      } else {
+        this.errorMessage.set('Hubo un error al procesar tu pedido. Por favor intenta nuevamente.');
+      }
     } finally {
       this.isProcessing.set(false);
     }

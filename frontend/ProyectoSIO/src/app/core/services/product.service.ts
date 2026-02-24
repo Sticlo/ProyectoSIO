@@ -174,6 +174,22 @@ export class ProductService {
   }
 
   /**
+   * Actualizar stock en la BD via API (PATCH /products/:id/stock)
+   * quantity: delta positivo (aumentar) o negativo (disminuir)
+   * Actualiza también la señal local con la respuesta del backend
+   */
+  updateStock(productId: string, quantity: number): Observable<Product> {
+    return this.api.patch<{ product: RawProduct }>(`/products/${productId}/stock`, { quantity }).pipe(
+      map(res => fromApi(res.product)),
+      tap(updated => {
+        this._products.update(products =>
+          products.map(p => p.id === productId ? updated : p)
+        );
+      })
+    );
+  }
+
+  /**
    * Obtener productos con stock bajo
    */
   getLowStockProducts(): Product[] {
