@@ -11,11 +11,12 @@ import { ExpenseService } from '../../core/services/expense.service';
 import { OrdersDashboardComponent } from './orders-dashboard/orders-dashboard.component';
 import { InventoryDashboardComponent } from './inventory-dashboard/inventory-dashboard.component';
 import { FinancesDashboardComponent } from './finances-dashboard/finances-dashboard.component';
+import { ChatbotComponent } from './chatbot/chatbot';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, OrdersDashboardComponent, InventoryDashboardComponent, FinancesDashboardComponent],
+  imports: [CommonModule, FormsModule, OrdersDashboardComponent, InventoryDashboardComponent, FinancesDashboardComponent, ChatbotComponent],
   templateUrl: './admin.html',
   styleUrl: './admin.scss'
 })
