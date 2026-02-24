@@ -1,4 +1,4 @@
-import { Component, signal, computed, inject, effect } from '@angular/core';
+import { Component, signal, computed, inject, effect, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProductCardComponent } from '../../shared/components/product-card/product-card.component';
@@ -37,28 +37,58 @@ export class Productos {
   selectedProduct = signal<Product | null>(null);
   showProductModal = signal(false);
 
+  // scroll-lock helpers
+  private scrollLocked = false;
+  private lockedScrollY = 0;
+
   constructor() {
-    // Effect para prevenir scroll cuando el sidebar está abierto en móvil
+    // Effect unificado: bloquear body cuando el modal o el sidebar en móvil están abiertos
     effect(() => {
-      if (typeof window !== 'undefined') {
-        if (this.showFilters() && window.innerWidth <= 968) {
-          document.body.style.overflow = 'hidden';
-        } else {
-          document.body.style.overflow = '';
-        }
+      if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
+      const hide = this.showProductModal() || (this.showFilters() && window.innerWidth <= 968);
+
+      if (hide && !this.scrollLocked) {
+        this.lockedScrollY = window.scrollY || window.pageYOffset || 0;
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${this.lockedScrollY}px`;
+        document.body.style.left = '0';
+        document.body.style.right = '0';
+        document.body.style.width = '100%';
+        // prevent overscroll on iOS
+        document.body.style.overscrollBehavior = 'none';
+        (document.body.style as any).webkitOverflowScrolling = 'auto';
+        this.scrollLocked = true;
+      } else if (!hide && this.scrollLocked) {
+        // restore
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.width = '';
+        document.body.style.overscrollBehavior = '';
+        (document.body.style as any).webkitOverflowScrolling = '';
+        window.scrollTo(0, this.lockedScrollY || 0);
+        this.scrollLocked = false;
       }
     });
-    
-    // Effect para prevenir scroll cuando el modal está abierto
-    effect(() => {
-      if (typeof window !== 'undefined') {
-        if (this.showProductModal()) {
-          document.body.style.overflow = 'hidden';
-        } else {
-          document.body.style.overflow = '';
-        }
+  }
+
+  ngOnDestroy(): void {
+    if (typeof document !== 'undefined') {
+      if (this.scrollLocked) {
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.width = '';
+      } else {
+        document.body.style.overflow = '';
       }
-    });
+      // ensure no residual styles
+      document.body.style.overscrollBehavior = '';
+      (document.body.style as any).webkitOverflowScrolling = '';
+    }
   }
 
   // Todos los productos vienen del servicio
