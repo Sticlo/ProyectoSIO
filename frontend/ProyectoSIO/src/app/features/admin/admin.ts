@@ -12,11 +12,13 @@ import { OrdersDashboardComponent } from './orders-dashboard/orders-dashboard.co
 import { InventoryDashboardComponent } from './inventory-dashboard/inventory-dashboard.component';
 import { FinancesDashboardComponent } from './finances-dashboard/finances-dashboard.component';
 import { ChatbotComponent } from './chatbot/chatbot';
+import { NotificationsDashboardComponent } from './notifications-dashboard/notifications-dashboard.component';
+import { NotificationService } from '../../core/services/notification.service';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, OrdersDashboardComponent, InventoryDashboardComponent, FinancesDashboardComponent, ChatbotComponent],
+  imports: [CommonModule, FormsModule, OrdersDashboardComponent, InventoryDashboardComponent, FinancesDashboardComponent, ChatbotComponent, NotificationsDashboardComponent],
   templateUrl: './admin.html',
   styleUrl: './admin.scss'
 })
@@ -37,6 +39,10 @@ export class Admin {
   // Finances dashboard
   financesDashboard = viewChild.required(FinancesDashboardComponent);
   financialStats = computed(() => this.expenseService.financialStats());
+
+  // Notifications dashboard
+  notifsDashboard = viewChild.required(NotificationsDashboardComponent);
+  unreadNotifs = computed(() => this.notificationService.unreadCount());
   
   showModal = signal(false);
   editingProduct = signal<Product | null>(null);
@@ -74,6 +80,7 @@ export class Admin {
     private orderService: OrderService,
     private inventoryService: InventoryService,
     private expenseService: ExpenseService,
+    private notificationService: NotificationService,
     public router: Router
   ) {}
   
@@ -160,7 +167,11 @@ export class Admin {
   openFinancesDashboard(): void {
     this.financesDashboard().open();
   }
-  
+
+  openNotificationsDashboard(): void {
+    this.notifsDashboard().open();
+  }
+
   logout(): void {
     this.authService.logout();
   }

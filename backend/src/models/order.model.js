@@ -109,16 +109,7 @@ class OrderModel {
             [ordenId, productId || null, item.name || item.product_name, item.quantity, item.price, subtotal]
           );
 
-          // 3. Descontar stock del producto
-          if (productId) {
-            await connection.query(
-              `UPDATE productos 
-               SET stock_count = stock_count - ?, 
-                   in_stock = CASE WHEN (stock_count - ?) > 0 THEN true ELSE false END
-               WHERE id = ?`,
-              [item.quantity, item.quantity, productId]
-            );
-          }
+          // Stock NO se descuenta aquí — se descuenta cuando la orden pasa a 'completed'
         }
       }
 

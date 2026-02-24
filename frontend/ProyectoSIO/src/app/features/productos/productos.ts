@@ -17,17 +17,21 @@ type ViewMode = 'grid' | 'list';
 })
 export class Productos {
   // Servicios
-  private productService = inject(ProductService);
+  productService = inject(ProductService);
   private cartService = inject(CartService);
   
   // Estados de filtros y búsqueda
   searchQuery = signal('');
   selectedCategories = signal<string[]>([]);
-  priceRange = signal({ min: 0, max: 1000 });
+  priceRange = signal({ min: 0, max: 999999 });
   minRating = signal(0);
   sortBy = signal<SortOption>('relevant');
   viewMode = signal<ViewMode>('grid');
   showFilters = signal(false); // Empezar cerrado, especialmente en móvil
+
+  // Loading state expuesto desde el servicio
+  isLoading = this.productService.isLoading;
+  loadError = this.productService.error;
   
   // Modal de producto
   selectedProduct = signal<Product | null>(null);
@@ -59,6 +63,12 @@ export class Productos {
 
   // Todos los productos vienen del servicio
   allProducts = this.productService.allProducts;
+
+  // Precio máximo dinámico basado en los productos cargados
+  maxPrice = computed(() => {
+    const prices = this.allProducts().map(p => p.price);
+    return prices.length > 0 ? Math.ceil(Math.max(...prices) * 1.1) : 999999;
+  });
 
   // Categorías dinámicas basadas en los productos
   categories = computed(() => {
@@ -148,7 +158,7 @@ export class Productos {
   clearFilters() {
     this.searchQuery.set('');
     this.selectedCategories.set([]);
-    this.priceRange.set({ min: 0, max: 1000 });
+    this.priceRange.set({ min: 0, max: this.maxPrice() });
     this.minRating.set(0);
   }
 

@@ -91,47 +91,71 @@ export class InventoryDashboardComponent {
   /**
    * Reabastecer producto
    */
+  /**
+   * Reabastecer producto — persiste en la BD
+   */
   restockProduct(): void {
     const product = this.selectedProduct();
     const quantity = this.restockQuantity();
     const notes = this.restockNotes();
-    
+
     if (!product || quantity <= 0) {
       alert('Por favor ingresa una cantidad válida');
       return;
     }
-    
-    const updatedProduct = this.inventoryService.increaseStock(
+
+    // Registrar movimiento local (historial)
+    const localUpdated = this.inventoryService.increaseStock(
       product,
       quantity,
       notes || `Reabastecimiento de ${quantity} unidades`
     );
-    
-    this.productService.updateProductStock(product.id, updatedProduct);
-    this.selectedProduct.set(updatedProduct);
-    this.restockQuantity.set(0);
-    this.restockNotes.set('');
+    this.selectedProduct.set(localUpdated);
+
+    // Persistir en la BD via API
+    this.productService.updateStock(product.id, quantity).subscribe({
+      next: updated => {
+        this.selectedProduct.set(updated);
+        this.restockQuantity.set(0);
+        this.restockNotes.set('');
+      },
+      error: err => {
+        console.error('Error al guardar stock en BD:', err);
+        alert('No se pudo guardar el stock en la base de datos. Verifica la conexión.');
+      }
+    });
   }
   
   /**
    * Ajustar stock manualmente
    */
+  /**
+   * Ajustar stock manualmente — persiste en la BD
+   */
   adjustStock(product: Product, newStock: number): void {
     const notes = prompt('Motivo del ajuste:', 'Ajuste manual de inventario');
-    
     if (notes === null) return; // Cancelado
-    
-    const updatedProduct = this.inventoryService.adjustStock(
-      product,
-      newStock,
-      notes
-    );
-    
-    this.productService.updateProductStock(product.id, updatedProduct);
-    
+
+    const delta = newStock - (product.stockCount || 0);
+
+    // Registrar movimiento local (historial)
+    const localUpdated = this.inventoryService.adjustStock(product, newStock, notes);
     if (this.selectedProduct()?.id === product.id) {
-      this.selectedProduct.set(updatedProduct);
+      this.selectedProduct.set(localUpdated);
     }
+
+    // Persistir en la BD via API
+    this.productService.updateStock(product.id, delta).subscribe({
+      next: updated => {
+        if (this.selectedProduct()?.id === product.id) {
+          this.selectedProduct.set(updated);
+        }
+      },
+      error: err => {
+        console.error('Error al guardar ajuste de stock en BD:', err);
+        alert('No se pudo guardar el ajuste en la base de datos. Verifica la conexión.');
+      }
+    });
   }
   
   /**

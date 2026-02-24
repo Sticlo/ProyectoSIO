@@ -13,6 +13,7 @@ const inventoryRoutes = require('./routes/inventory.routes');
 const expenseRoutes = require('./routes/expense.routes');
 const categoryRoutes = require('./routes/category.routes');
 const chatRoutes = require('./routes/chat.rutas');
+const notificationRoutes = require('./routes/notification.routes');
 
 // Importar conexión a base de datos
 const { testConnection } = require('./config/database');
@@ -45,7 +46,8 @@ app.get('/', (req, res) => {
       inventory: '/api/inventory',
       expenses: '/api/expenses',
       categories: '/api/categories',
-      chat: '/api/chat'
+      chat: '/api/chat',
+      notifications: '/api/notifications'
     }
   });
 });
@@ -57,6 +59,7 @@ app.use('/api/inventory', inventoryRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Manejo de errores 404
 app.use((req, res) => {

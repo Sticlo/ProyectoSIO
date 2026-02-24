@@ -132,7 +132,7 @@
                 type="range" 
                 class="price-slider"
                 min="0" 
-                max="1000" 
+                [max]="maxPrice()" 
                 [value]="priceRange().max"
                 (input)="priceRange.set({ min: priceRange().min, max: +$any($event.target).value })">
             </div>
@@ -220,7 +220,23 @@
           </div>
 
           <!-- Grid de productos -->
-          @if (filteredProducts().length > 0) {
+          @if (isLoading()) {
+            <div class="loading-state">
+              <div class="spinner"></div>
+              <p>Cargando productos...</p>
+            </div>
+          } @else if (loadError()) {
+            <div class="no-results">
+              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <h3>Error al cargar productos</h3>
+              <p>{{ loadError() }}</p>
+              <button class="reset-btn" (click)="productService.loadProducts()">Reintentar</button>
+            </div>
+          } @else if (filteredProducts().length > 0) {
             <div class="products-grid" [class.list-view]="viewMode() === 'list'">
               @for (product of filteredProducts(); track product.id) {
                 <div class="product-card-wrapper" (click)="openProductModal(product)">
