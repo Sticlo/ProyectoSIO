@@ -12,13 +12,21 @@ import { OrdersDashboardComponent } from './orders-dashboard/orders-dashboard.co
 import { InventoryDashboardComponent } from './inventory-dashboard/inventory-dashboard.component';
 import { FinancesDashboardComponent } from './finances-dashboard/finances-dashboard.component';
 import { ChatbotComponent } from './chatbot/chatbot';
+ santiago
+import { QrMesasComponent } from './qr-mesas/qr-mesas'; // 🆕
+
 import { NotificationsDashboardComponent } from './notifications-dashboard/notifications-dashboard.component';
 import { NotificationService } from '../../core/services/notification.service';
+ main
 
 @Component({
   selector: 'app-admin',
   standalone: true,
+ santiago
+  imports: [CommonModule, FormsModule, OrdersDashboardComponent, InventoryDashboardComponent, FinancesDashboardComponent, ChatbotComponent, QrMesasComponent],
+=======
   imports: [CommonModule, FormsModule, OrdersDashboardComponent, InventoryDashboardComponent, FinancesDashboardComponent, ChatbotComponent, NotificationsDashboardComponent],
+ main
   templateUrl: './admin.html',
   styleUrl: './admin.scss'
 })
@@ -40,9 +48,14 @@ export class Admin {
   financesDashboard = viewChild.required(FinancesDashboardComponent);
   financialStats = computed(() => this.expenseService.financialStats());
 
+ santiago
+  // 🆕 QR Mesas
+  qrMesas = viewChild.required(QrMesasComponent);
+
   // Notifications dashboard
   notifsDashboard = viewChild.required(NotificationsDashboardComponent);
   unreadNotifs = computed(() => this.notificationService.unreadCount());
+ main
   
   showModal = signal(false);
   editingProduct = signal<Product | null>(null);
@@ -87,15 +100,9 @@ export class Admin {
   openCreateModal(): void {
     this.editingProduct.set(null);
     this.formData.set({
-      name: '',
-      category: '',
-      description: '',
-      price: 0,
-      originalPrice: undefined,
-      rating: undefined,
-      reviewCount: undefined,
-      badge: undefined,
-      image: undefined
+      name: '', category: '', description: '', price: 0,
+      originalPrice: undefined, rating: undefined, reviewCount: undefined,
+      badge: undefined, image: undefined
     });
     this.showModal.set(true);
   }
@@ -113,30 +120,19 @@ export class Admin {
   
   saveProduct(): void {
     const data = this.formData();
-    
-    // Validaciones básicas
     if (!data.name || !data.category || !data.description || !data.price) {
       alert('Por favor completa todos los campos obligatorios');
       return;
     }
-    
     if (this.editingProduct()) {
-      // Actualizar
       this.productService.update(this.editingProduct()!.id, data).subscribe({
         next: () => this.closeModal(),
-        error: (err) => {
-          console.error('Error al actualizar producto:', err);
-          alert('Error al actualizar el producto. Verifica los datos e inténtalo de nuevo.');
-        }
+        error: (err) => { console.error(err); alert('Error al actualizar el producto.'); }
       });
     } else {
-      // Crear
       this.productService.create(data).subscribe({
         next: () => this.closeModal(),
-        error: (err) => {
-          console.error('Error al crear producto:', err);
-          alert('Error al crear el producto. Verifica los datos e inténtalo de nuevo.');
-        }
+        error: (err) => { console.error(err); alert('Error al crear el producto.'); }
       });
     }
   }
@@ -144,10 +140,7 @@ export class Admin {
   deleteProduct(id: string): void {
     if (confirm('¿Estás seguro de eliminar este producto?')) {
       this.productService.delete(id).subscribe({
-        error: (err) => {
-          console.error('Error al eliminar producto:', err);
-          alert('Error al eliminar el producto.');
-        }
+        error: (err) => { console.error(err); alert('Error al eliminar el producto.'); }
       });
     }
   }
@@ -156,6 +149,14 @@ export class Admin {
     this.formData.update(data => ({ ...data, [field]: value }));
   }
   
+ santiago
+  openOrdersDashboard(): void { this.ordersDashboard().open(); }
+  openInventoryDashboard(): void { this.inventoryDashboard().open(); }
+  openFinancesDashboard(): void { this.financesDashboard().open(); }
+  openQrMesas(): void { this.qrMesas().open(); } // 🆕
+  
+  logout(): void { this.authService.logout(); }
+
   openOrdersDashboard(): void {
     this.ordersDashboard().open();
   }
@@ -175,6 +176,5 @@ export class Admin {
   logout(): void {
     this.authService.logout();
   }
+ main
 }
-  
-  
