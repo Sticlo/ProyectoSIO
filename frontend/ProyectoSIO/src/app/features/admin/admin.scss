@@ -75,7 +75,8 @@
 .btn-orders,
 .btn-inventory,
 .btn-finances,
-.btn-qr {
+.btn-qr,
+.btn-notifications {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -166,8 +167,7 @@
   }
 }
 
- santiago
-// 🆕 Botón QR Mesas
+// Botón QR Mesas
 .btn-qr {
   background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
   color: white;
@@ -175,7 +175,8 @@
   
   &:hover { background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%); transform: translateY(-2px) scale(1.02); box-shadow: 0 8px 24px rgba(124, 58, 237, 0.4); }
   &:active { transform: translateY(0) scale(0.98); }
-=======
+}
+
 .btn-notifications {
   background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%);
   color: white;
@@ -207,7 +208,6 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     animation: pulse 2s ease-in-out infinite;
   }
- main
 }
 
 .btn-secondary {
