@@ -66,7 +66,7 @@ CREATE TABLE productos (
     rating DECIMAL(3, 2) DEFAULT 0.00,
     review_count INT DEFAULT 0,
     badge VARCHAR(50),
-    image VARCHAR(500),
+    image MEDIUMTEXT,
     in_stock BOOLEAN DEFAULT true,
     stock_count INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
