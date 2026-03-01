@@ -34,6 +34,17 @@ class CategoryModel {
   }
 
   /**
+   * Buscar categoría por nombre y tipo
+   */
+  static async findByNameAndType(name, type) {
+    const [rows] = await pool.query(
+      'SELECT * FROM categorias WHERE name = ? AND type = ?',
+      [name, type]
+    );
+    return rows[0] || null;
+  }
+
+  /**
    * Crear nueva categoría
    */
   static async create(categoryData) {

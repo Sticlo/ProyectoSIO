@@ -31,10 +31,10 @@ USE sistema_gestion;
 -- ============================================
 CREATE TABLE usuarios (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    email VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     name VARCHAR(255) NOT NULL,
-    role VARCHAR(50) DEFAULT 'user',
+    role VARCHAR(50) DEFAULT 'admin',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -186,6 +186,20 @@ CREATE TABLE notificaciones (
     read_at TIMESTAMP NULL DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- ============================================
+-- USUARIO ADMINISTRADOR INICIAL
+-- ============================================
+-- Para crear el usuario administrador inicial, ejecuta:
+--   cd backend
+--   node src/scripts/create-admin.js
+--
+-- Credenciales por defecto:
+--   Email: admin@tienda.com
+--   Password: admin123
+--
+-- IMPORTANTE: Cambia la contraseña después del primer login
+-- ============================================
 
 -- ============================================
 -- FIN DEL SCRIPT

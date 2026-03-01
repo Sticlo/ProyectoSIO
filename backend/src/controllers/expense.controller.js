@@ -1,4 +1,5 @@
 const ExpenseModel = require('../models/expense.model');
+const CategoryModel = require('../models/category.model');
 
 class ExpenseController {
   /**
@@ -50,6 +51,7 @@ class ExpenseController {
   /**
    * Crear nuevo gasto
    * Recibe category_id (FK → categorias) y created_by del token
+   * Si se envía category_name en lugar de category_id, se busca automáticamente
    */
   static async create(req, res) {
     try {
@@ -62,6 +64,17 @@ class ExpenseController {
         return res.status(400).json({ 
           error: 'Descripción y monto son requeridos' 
         });
+      }
+
+      // Si se envió category_name sin category_id, buscar el ID de la categoría
+      if (expenseData.category_name && !expenseData.category_id) {
+        const category = await CategoryModel.findByNameAndType(expenseData.category_name, 'gasto');
+        if (category) {
+          expenseData.category_id = category.id;
+          console.log(`🔍 [Expense] Categoría "${expenseData.category_name}" encontrada con ID: ${category.id}`);
+        } else {
+          console.warn(`⚠️  [Expense] Categoría "${expenseData.category_name}" no encontrada`);
+        }
       }
 
       // created_by siempre null para evitar FK constraint con usuarios inexistentes

@@ -26,8 +26,9 @@ const PORT = process.env.PORT || 3000;
 app.use(cors({
   origin: process.env.CORS_ORIGIN || 'http://localhost:4200'
 }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Aumentar límite para permitir imágenes base64 (10MB)
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Logging middleware
 app.use((req, res, next) => {

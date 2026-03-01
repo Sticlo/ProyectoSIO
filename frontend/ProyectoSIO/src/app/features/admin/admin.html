@@ -43,7 +43,7 @@
           </button>
 
 
-          <!-- 🆕 Botón QR Mesas -->
+         <!--  🆕 Botón QR Mesas 
           <button class="btn-qr" (click)="openQrMesas()">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="3" width="5" height="5"></rect>
@@ -58,6 +58,7 @@
             </svg>
             📱 QR Mesas
           </button>
+          -->
 
           <button class="btn-notifications" (click)="openNotificationsDashboard()">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -253,8 +254,8 @@
 
   <!-- Modal Crear/Editar Producto -->
   @if (showModal()) {
-    <div class="modal-overlay" (click)="closeModal()">
-      <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-overlay">
+      <div class="modal">
         <div class="modal-header">
           <h2>{{ editingProduct() ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
           <button class="close-btn" (click)="closeModal()">
@@ -314,9 +315,36 @@
                 }
               </select>
             </div>
-            <div class="form-group">
-              <label>URL de Imagen</label>
-              <input type="text" [value]="formData().image || ''" (input)="updateField('image', $any($event.target).value || undefined)" placeholder="https://...">
+          </div>
+          <div class="form-group">
+            <label>Imagen del Producto</label>
+            <div class="image-upload-container">
+              <input 
+                type="file" 
+                #fileInput
+                accept="image/*" 
+                (change)="onImageSelected($event)"
+                style="display: none">
+              <button type="button" class="btn-upload" (click)="fileInput.click()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                {{ formData().image ? 'Cambiar Imagen' : 'Seleccionar Imagen' }}
+              </button>
+              <small class="field-hint">Tamaño máximo: 5MB. La imagen será optimizada automáticamente.</small>
+              @if (imagePreview()) {
+                <div class="image-preview">
+                  <img [src]="imagePreview()" alt="Preview">
+                  <button type="button" class="btn-remove-image" (click)="removeImage()" title="Eliminar imagen">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
+              }
             </div>
           </div>
           <div class="modal-actions">
@@ -334,14 +362,12 @@
   <app-finances-dashboard />
 
   <!-- 🆕 QR Mesas -->
-  <app-qr-mesas />
-  
+
   <!-- Chatbot AI -->
 
   <!-- Notifications Dashboard -->
   <app-notifications-dashboard />
 
   <!-- Chatbot AI Assistant -->
- main
   <app-chatbot />
 </div>

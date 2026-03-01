@@ -6,8 +6,11 @@ class ExpenseModel {
    */
   static async getAll() {
     const [rows] = await pool.query(`
-      SELECT g.*, u.name AS created_by_name
+      SELECT g.*, 
+             c.name AS category_name,
+             u.name AS created_by_name
       FROM gastos g
+      LEFT JOIN categorias c ON g.category_id = c.id
       LEFT JOIN usuarios u ON g.created_by = u.id
       ORDER BY g.date DESC
     `);
@@ -19,8 +22,11 @@ class ExpenseModel {
    */
   static async findById(id) {
     const [rows] = await pool.query(`
-      SELECT g.*, u.name AS created_by_name
+      SELECT g.*, 
+             c.name AS category_name,
+             u.name AS created_by_name
       FROM gastos g
+      LEFT JOIN categorias c ON g.category_id = c.id
       LEFT JOIN usuarios u ON g.created_by = u.id
       WHERE g.id = ?
     `, [id]);
@@ -32,8 +38,12 @@ class ExpenseModel {
    */
   static async findByCategory(categoryId) {
     const [rows] = await pool.query(`
-      SELECT g.*
+      SELECT g.*,
+             c.name AS category_name,
+             u.name AS created_by_name
       FROM gastos g
+      LEFT JOIN categorias c ON g.category_id = c.id
+      LEFT JOIN usuarios u ON g.created_by = u.id
       WHERE g.category_id = ?
       ORDER BY g.date DESC
     `, [categoryId]);
@@ -45,8 +55,12 @@ class ExpenseModel {
    */
   static async findByDateRange(startDate, endDate) {
     const [rows] = await pool.query(`
-      SELECT g.*
+      SELECT g.*,
+             c.name AS category_name,
+             u.name AS created_by_name
       FROM gastos g
+      LEFT JOIN categorias c ON g.category_id = c.id
+      LEFT JOIN usuarios u ON g.created_by = u.id
       WHERE g.date BETWEEN ? AND ?
       ORDER BY g.date DESC
     `, [startDate, endDate]);
@@ -58,21 +72,17 @@ class ExpenseModel {
    * FK: category_id → categorias(id), created_by → usuarios(id)
    */
   static async create(expenseData) {
-    const { description, amount, category_id, category_name, type, status, product_name, quantity, date, notes, created_by } = expenseData;
+    const { description, amount, category_id, date, notes, created_by } = expenseData;
 
-    const sql = `INSERT INTO gastos (description, amount, category_id, category_name, type, status, product_name, quantity, date, notes, created_by)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO gastos (description, amount, category_id, date, notes, created_by)
+       VALUES (?, ?, ?, ?, ?, ?)`;
 
     const buildValues = (cbValue) => [
-      description, amount,
-      category_id  || null,
-      category_name || null,
-      type   || 'operational',
-      status || 'paid',
-      product_name || null,
-      quantity     || null,
-      date         || new Date(),
-      notes        || null,
+      description,
+      amount,
+      category_id || null,
+      date || new Date(),
+      notes || null,
       cbValue
     ];
 
@@ -105,11 +115,11 @@ class ExpenseModel {
     const values = [];
 
     const allowedFields = {
-      description: 'description', amount: 'amount',
-      category_id: 'category_id', category_name: 'category_name',
-      type: 'type', status: 'status',
-      product_name: 'product_name', quantity: 'quantity',
-      date: 'date', notes: 'notes'
+      description: 'description',
+      amount: 'amount',
+      category_id: 'category_id',
+      date: 'date',
+      notes: 'notes'
     };
 
     for (const [key, column] of Object.entries(allowedFields)) {

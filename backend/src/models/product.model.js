@@ -93,8 +93,17 @@ class ProductModel {
 
   /**
    * Actualizar producto
+   * Si se actualiza la imagen, la nueva reemplaza automáticamente a la anterior
    */
   static async update(id, productData) {
+    // Si viene una nueva imagen, obtener el producto actual para logging
+    if (productData.image) {
+      const currentProduct = await ProductModel.findById(id);
+      if (currentProduct?.image && currentProduct.image !== productData.image) {
+        console.log(`🖼️  [ProductModel] Reemplazando imagen del producto ${id} (optimización de almacenamiento)`);
+      }
+    }
+
     const fields = [];
     const values = [];
 
@@ -143,8 +152,15 @@ class ProductModel {
 
   /**
    * Eliminar producto
+   * También libera el espacio de la imagen almacenada en base de datos
    */
   static async delete(id) {
+    // Obtener el producto antes de eliminarlo para logging
+    const product = await ProductModel.findById(id);
+    if (product?.image) {
+      console.log(`🗑️  [ProductModel] Eliminando producto ${id} y liberando espacio de imagen (optimización de almacenamiento)`);
+    }
+
     const [result] = await pool.query(
       'DELETE FROM productos WHERE id = ?',
       [id]
