@@ -55,6 +55,8 @@ class ExpenseController {
     try {
       const expenseData = req.body;
 
+      console.log('📥 [Expense] Body recibido:', JSON.stringify(expenseData, null, 2));
+
       // Validar campos requeridos
       if (!expenseData.description || !expenseData.amount) {
         return res.status(400).json({ 
@@ -62,20 +64,23 @@ class ExpenseController {
         });
       }
 
-      // Asignar usuario que crea el gasto (del token JWT)
-      if (req.user && req.user.id) {
-        expenseData.created_by = req.user.id;
-      }
+      // created_by siempre null para evitar FK constraint con usuarios inexistentes
+      expenseData.created_by = null;
 
       const newExpense = await ExpenseModel.create(expenseData);
+      console.log('✅ [Expense] Gasto creado con ID:', newExpense?.id);
 
       res.status(201).json({
         message: 'Gasto creado exitosamente',
         expense: newExpense
       });
     } catch (error) {
-      console.error('Error al crear gasto:', error);
-      res.status(500).json({ error: 'Error al crear gasto' });
+      console.error('❌ [Expense] Error al crear gasto:');
+      console.error('   message:', error.message);
+      console.error('   sqlMessage:', error.sqlMessage);
+      console.error('   sql:', error.sql);
+      console.error('   stack:', error.stack);
+      res.status(500).json({ error: 'Error al crear gasto', detail: error.sqlMessage || error.message });
     }
   }
 

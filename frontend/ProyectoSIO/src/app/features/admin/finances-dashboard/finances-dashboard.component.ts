@@ -111,8 +111,7 @@ export class FinancesDashboardComponent {
     // Get category name
     const category = this.categories().find(c => c.id === form.category);
     
-    try {
-      this.expenseService.addExpense({
+    this.expenseService.addExpense({
         type: form.type as any,
         category: category?.name || form.category,
         description: form.description,
@@ -123,38 +122,44 @@ export class FinancesDashboardComponent {
         productId: form.productId,
         productName: form.productName,
         quantity: form.quantity
+      }).subscribe({
+        next: () => {
+          alert('✅ Gasto agregado exitosamente');
+          this.expenseForm.set({
+            type: 'operational',
+            category: '',
+            description: '',
+            amount: 0,
+            date: new Date(),
+            status: 'paid',
+            notes: '',
+            productName: undefined,
+            quantity: undefined
+          });
+          this.activeTab.set('expenses');
+        },
+        error: (err) => {
+          console.error('Error al agregar gasto:', err);
+          alert('❌ Error al agregar el gasto. Por favor intenta de nuevo.');
+        }
       });
-      
-      // Show success message
-      alert('✅ Gasto agregado exitosamente');
-      
-      // Reset form
-      this.expenseForm.set({
-        type: 'operational',
-        category: '',
-        description: '',
-        amount: 0,
-        date: new Date(),
-        status: 'paid',
-        notes: ''
-      });
-      
-      // Go to expenses tab to see the new expense
-      this.activeTab.set('expenses');
-    } catch (error) {
-      console.error('Error al agregar gasto:', error);
-      alert('❌ Error al agregar el gasto. Por favor intenta de nuevo.');
-    }
   }
   
   deleteExpense(id: string): void {
     if (confirm('¿Estás seguro de que quieres eliminar este gasto?')) {
-      this.expenseService.deleteExpense(id);
+      this.expenseService.deleteExpense(id).subscribe({
+        error: (err) => {
+          console.error('Error al eliminar gasto:', err);
+          alert('❌ Error al eliminar el gasto.');
+        }
+      });
     }
   }
   
   updateExpenseStatus(id: string, status: Expense['status']): void {
-    this.expenseService.updateExpense(id, { status });
+    this.expenseService.updateExpense(id, { status }).subscribe({
+      error: (err) => console.error('Error al actualizar estado del gasto:', err)
+    });
   }
   
   formatCurrency(amount: number): string {
@@ -257,6 +262,25 @@ export class FinancesDashboardComponent {
       ...this.expenseForm(),
       notes
     });
+  }
+
+  updateFormProductName(productName: string): void {
+    this.expenseForm.set({
+      ...this.expenseForm(),
+      productName
+    });
+  }
+
+  updateFormQuantity(value: number | string): void {
+    this.expenseForm.set({
+      ...this.expenseForm(),
+      quantity: typeof value === 'number' ? value : (Number(value) || undefined)
+    });
+  }
+
+  isProductType(): boolean {
+    const t = this.expenseForm().type;
+    return t === 'product' || t === 'inventory';
   }
   
   getFormDateValue(): string {
