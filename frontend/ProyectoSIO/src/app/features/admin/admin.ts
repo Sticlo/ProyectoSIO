@@ -51,6 +51,7 @@ export class Admin {
   showModal = signal(false);
   editingProduct = signal<Product | null>(null);
   searchQuery = signal('');
+  imagePreview = signal<string | undefined>(undefined);
   
   formData = signal<Partial<Product>>({
     name: '',
@@ -95,12 +96,14 @@ export class Admin {
       originalPrice: undefined, rating: undefined, reviewCount: undefined,
       badge: undefined, image: undefined
     });
+    this.imagePreview.set(undefined);
     this.showModal.set(true);
   }
   
   openEditModal(product: Product): void {
     this.editingProduct.set(product);
     this.formData.set({ ...product });
+    this.imagePreview.set(product.image);
     this.showModal.set(true);
   }
   
@@ -138,6 +141,76 @@ export class Admin {
   
   updateField<K extends keyof Product>(field: K, value: Product[K]): void {
     this.formData.update(data => ({ ...data, [field]: value }));
+  }
+
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    
+    if (!file) return;
+    
+    // Validar que sea una imagen
+    if (!file.type.startsWith('image/')) {
+      alert('Por favor selecciona un archivo de imagen válido');
+      return;
+    }
+    
+    // Validar tamaño máximo (5MB para archivo original)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert('La imagen es demasiado grande. Máximo 5MB');
+      return;
+    }
+    
+    // Comprimir y convertir a base64
+    this.compressImage(file, (base64) => {
+      this.imagePreview.set(base64);
+      this.updateField('image', base64);
+    });
+  }
+
+  compressImage(file: File, callback: (base64: string) => void): void {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        // Crear canvas para redimensionar
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d')!;
+        
+        // Calcular nuevas dimensiones (máximo 1200px en el lado más largo)
+        const maxDimension = 1200;
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > height && width > maxDimension) {
+          height = (height * maxDimension) / width;
+          width = maxDimension;
+        } else if (height > maxDimension) {
+          width = (width * maxDimension) / height;
+          height = maxDimension;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Dibujar imagen redimensionada
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Convertir a base64 con compresión (0.8 de calidad para JPEG)
+        const base64 = canvas.toDataURL('image/jpeg', 0.8);
+        
+        console.log(`🖼️  Imagen comprimida: ${Math.round(file.size / 1024)}KB → ${Math.round(base64.length * 0.75 / 1024)}KB`);
+        callback(base64);
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removeImage(): void {
+    this.imagePreview.set(undefined);
+    this.updateField('image', undefined);
   }
   
   openOrdersDashboard(): void { this.ordersDashboard().open(); }
