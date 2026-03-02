@@ -12,21 +12,17 @@ import { OrdersDashboardComponent } from './orders-dashboard/orders-dashboard.co
 import { InventoryDashboardComponent } from './inventory-dashboard/inventory-dashboard.component';
 import { FinancesDashboardComponent } from './finances-dashboard/finances-dashboard.component';
 import { ChatbotComponent } from './chatbot/chatbot';
- santiago
 import { QrMesasComponent } from './qr-mesas/qr-mesas'; // 🆕
 
 import { NotificationsDashboardComponent } from './notifications-dashboard/notifications-dashboard.component';
 import { NotificationService } from '../../core/services/notification.service';
- main
 
 @Component({
   selector: 'app-admin',
   standalone: true,
- santiago
-  imports: [CommonModule, FormsModule, OrdersDashboardComponent, InventoryDashboardComponent, FinancesDashboardComponent, ChatbotComponent, QrMesasComponent],
-=======
-  imports: [CommonModule, FormsModule, OrdersDashboardComponent, InventoryDashboardComponent, FinancesDashboardComponent, ChatbotComponent, NotificationsDashboardComponent],
- main
+ 
+  imports: [CommonModule, FormsModule, OrdersDashboardComponent, InventoryDashboardComponent, FinancesDashboardComponent, ChatbotComponent, QrMesasComponent,NotificationsDashboardComponent],
+ 
   templateUrl: './admin.html',
   styleUrl: './admin.scss'
 })
@@ -48,14 +44,14 @@ export class Admin {
   financesDashboard = viewChild.required(FinancesDashboardComponent);
   financialStats = computed(() => this.expenseService.financialStats());
 
- santiago
+ 
   // 🆕 QR Mesas
   qrMesas = viewChild.required(QrMesasComponent);
 
   // Notifications dashboard
   notifsDashboard = viewChild.required(NotificationsDashboardComponent);
   unreadNotifs = computed(() => this.notificationService.unreadCount());
- main
+ 
   
   showModal = signal(false);
   editingProduct = signal<Product | null>(null);
@@ -149,7 +145,7 @@ export class Admin {
     this.formData.update(data => ({ ...data, [field]: value }));
   }
   
- santiago
+ 
   openOrdersDashboard(): void { this.ordersDashboard().open(); }
   openInventoryDashboard(): void { this.inventoryDashboard().open(); }
   openFinancesDashboard(): void { this.financesDashboard().open(); }
@@ -157,24 +153,10 @@ export class Admin {
   
   logout(): void { this.authService.logout(); }
 
-  openOrdersDashboard(): void {
-    this.ordersDashboard().open();
-  }
-  
-  openInventoryDashboard(): void {
-    this.inventoryDashboard().open();
-  }
-  
-  openFinancesDashboard(): void {
-    this.financesDashboard().open();
-  }
+ 
 
-  openNotificationsDashboard(): void {
-    this.notifsDashboard().open();
-  }
+ openNotificationsDashboard(): void {
+  this.notifsDashboard()?.open();
+ }
 
-  logout(): void {
-    this.authService.logout();
-  }
- main
 }
