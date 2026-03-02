@@ -4,6 +4,7 @@ export * from './storage.service';
 export * from './cart.service';
 export * from './auth.service';
 export * from './product.service';
+export * from './category.service';
 export * from './navigation.service';
 export * from './whatsapp.service';
 export * from './order.service';

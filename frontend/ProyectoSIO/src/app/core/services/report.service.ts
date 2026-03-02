@@ -17,10 +17,10 @@ declare module 'jspdf' {
   providedIn: 'root'
 })
 export class ReportService {
-  private expenseService = inject(ExpenseService);
-  private orderService = inject(OrderService);
-  private inventoryService = inject(InventoryService);
-  private productService = inject(ProductService);
+  private readonly expenseService = inject(ExpenseService);
+  private readonly orderService = inject(OrderService);
+  private readonly inventoryService = inject(InventoryService);
+  private readonly productService = inject(ProductService);
 
   /**
    * Generar reporte financiero completo
@@ -337,8 +337,7 @@ export class ReportService {
       this.formatCurrency(p.price),
       p.cost ? this.formatCurrency(p.cost) : '-',
       p.stockCount?.toString() || '0',
-      p.inStock ? '✓' : '✗',
-      p.minStock ? p.minStock.toString() : '-'
+      p.inStock ? '✓' : '✗'
     ]);
 
     autoTable(doc, {

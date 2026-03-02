@@ -76,16 +76,16 @@ class ProductModel {
   static async create(productData) {
     const {
       name, category_id, description, price, original_price,
-      rating, review_count, badge, image, in_stock, stock_count
+      badge, image, in_stock, stock_count, cost
     } = productData;
 
     const [result] = await pool.query(
       `INSERT INTO productos 
-        (name, category_id, description, price, original_price, rating, review_count, badge, image, in_stock, stock_count) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (name, category_id, description, price, original_price, badge, image, in_stock, stock_count, cost) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [name, category_id || null, description || null, price, original_price || null,
-       rating || 0, review_count || 0, badge || null, image || null,
-       in_stock !== undefined ? in_stock : true, stock_count || 0]
+       badge || null, image || null, in_stock !== undefined ? in_stock : true, 
+       stock_count || 0, cost || null]
     );
 
     return await ProductModel.findById(result.insertId);
@@ -93,16 +93,25 @@ class ProductModel {
 
   /**
    * Actualizar producto
+   * Si se actualiza la imagen, la nueva reemplaza automáticamente a la anterior
    */
   static async update(id, productData) {
+    // Si viene una nueva imagen, obtener el producto actual para logging
+    if (productData.image) {
+      const currentProduct = await ProductModel.findById(id);
+      if (currentProduct?.image && currentProduct.image !== productData.image) {
+        console.log(`🖼️  [ProductModel] Reemplazando imagen del producto ${id} (optimización de almacenamiento)`);
+      }
+    }
+
     const fields = [];
     const values = [];
 
     const allowedFields = {
       name: 'name', category_id: 'category_id', description: 'description',
-      price: 'price', original_price: 'original_price', rating: 'rating',
-      review_count: 'review_count', badge: 'badge', image: 'image',
-      in_stock: 'in_stock', stock_count: 'stock_count'
+      price: 'price', original_price: 'original_price', badge: 'badge', 
+      image: 'image', in_stock: 'in_stock', stock_count: 'stock_count',
+      cost: 'cost'
     };
 
     for (const [key, column] of Object.entries(allowedFields)) {
@@ -143,8 +152,15 @@ class ProductModel {
 
   /**
    * Eliminar producto
+   * También libera el espacio de la imagen almacenada en base de datos
    */
   static async delete(id) {
+    // Obtener el producto antes de eliminarlo para logging
+    const product = await ProductModel.findById(id);
+    if (product?.image) {
+      console.log(`🗑️  [ProductModel] Eliminando producto ${id} y liberando espacio de imagen (optimización de almacenamiento)`);
+    }
+
     const [result] = await pool.query(
       'DELETE FROM productos WHERE id = ?',
       [id]

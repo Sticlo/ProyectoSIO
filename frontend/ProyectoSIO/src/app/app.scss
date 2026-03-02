@@ -1,12 +1,216 @@
 @use '../styles/variables';
 @use '../styles/mixins';
 
+/* =========================================================================
+   SPLASH SCREEN MODAL (Initial App Reveal)
+   ========================================================================= */
+.splash-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background-color: #ffffff;
+  /* SIO Light Theme Base */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+    visibility 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.fade-out {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+.splash-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.splash-logo {
+  animation: splashPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+
+  .logo-text {
+    font-family: 'Outfit', sans-serif;
+    font-size: 4rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    color: #0f172a;
+    /* Main text dark */
+    text-transform: uppercase;
+    line-height: 1;
+
+    @media (max-width: 768px) {
+      font-size: 3rem;
+    }
+  }
+
+  .logo-accent {
+    color: #0E7490;
+    /* SIO Teal primary */
+  }
+
+  .sio-tagline {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #64748b;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    animation: taglineReveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.splash-loader {
+  width: 200px;
+  height: 3px;
+  background: rgba(14, 116, 144, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 30%;
+    background: linear-gradient(90deg, #0E7490, #14B8A6);
+    border-radius: 4px;
+    animation: loaderProgress 1.5s ease-in-out infinite;
+  }
+}
+
+/* Animations */
+@keyframes splashPulse {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.7;
+    transform: scale(0.98);
+  }
+}
+
+@keyframes taglineReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes loaderProgress {
+  0% {
+    left: -30%;
+  }
+
+  100% {
+    left: 100%;
+  }
+}
+
+/* =========================================================================
+   MAIN APP CONTAINER
+   ========================================================================= */
 .app-container {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+
+  /* Initial hidden state, wait for splash screen */
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1) 0.2s,
+    transform 1s cubic-bezier(0.4, 0, 0.2, 1) 0.2s;
+
+  &.content-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .main-content {
   flex: 1;
+}
+
+/* =========================================================================
+   CUSTOM ANIMATED CURSOR
+   ========================================================================= */
+::ng-deep body,
+::ng-deep a,
+::ng-deep button,
+::ng-deep .btn,
+::ng-deep .card,
+::ng-deep .service-card,
+::ng-deep .product-showcase-card,
+::ng-deep .stat-card {
+  cursor: none !important;
+}
+
+::ng-deep input,
+::ng-deep textarea {
+  cursor: text !important;
+}
+
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  margin-top: -4px;
+  background-color: #0E7490;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10000;
+  transition: width 0.2s, height 0.2s, background-color 0.2s, margin 0.2s, opacity 0.3s;
+}
+
+.cursor-outline {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  margin-left: -20px;
+  margin-top: -20px;
+  border: 2px solid rgba(20, 184, 166, 0.5);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transition: width 0.2s, height 0.2s, background-color 0.2s, margin 0.2s, border-color 0.2s, opacity 0.3s;
+}
+
+.cursor-dot.cursor-hover {
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  margin-top: -6px;
+  background-color: #14B8A6;
+}
+
+.cursor-outline.cursor-hover {
+  width: 60px;
+  height: 60px;
+  margin-left: -30px;
+  margin-top: -30px;
+  background-color: rgba(20, 184, 166, 0.1);
+  border-color: rgba(20, 184, 166, 0.8);
 }

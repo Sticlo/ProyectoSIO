@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChildren, QueryList, NgZone } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChildren, QueryList, NgZone, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TestimonialCardComponent, Testimonial } from '../../shared/components/testimonial-card/testimonial-card.component';
@@ -6,13 +6,14 @@ import { ProductService } from '../../core/services/product.service';
 
 @Component({
   selector: 'app-home',
+  standalone: true,
   imports: [CommonModule, RouterLink, TestimonialCardComponent],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
 export class Home implements OnInit, AfterViewInit, OnDestroy {
-  private productService = inject(ProductService);
-  private ngZone = inject(NgZone);
+  private readonly productService = inject(ProductService);
+  private readonly ngZone = inject(NgZone);
   private observer!: IntersectionObserver;
 
   @ViewChildren('animateOnScroll') animatedElements!: QueryList<ElementRef>;
@@ -115,6 +116,14 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
   displayedText = signal('');
   isDeleting = signal(false);
   private typingInterval: any;
+
+  // Parallax properties
+  scrollY = signal(0);
+
+  @HostListener('window:scroll', [])
+  onWindowScroll() {
+    this.scrollY.set(window.pageYOffset || document.documentElement.scrollTop || 0);
+  }
 
   ngOnInit(): void {
     this.startTypingAnimation();

@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@environments/environment';
 
@@ -11,8 +11,8 @@ import { environment } from '@environments/environment';
   providedIn: 'root'
 })
 export class ApiService {
-  private http = inject(HttpClient);
-  private apiUrl = environment.apiUrl;
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = environment.apiUrl;
 
   /**
    * GET request
