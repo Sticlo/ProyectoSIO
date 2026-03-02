@@ -4,18 +4,14 @@ import { AuthService } from '../services/auth.service';
 
 /**
  * Auth Interceptor
- * Agrega el header de autenticación a las peticiones HTTP
+ * Agrega el token JWT real del backend a las peticiones HTTP
  */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
-  const user = authService.user();
+  const token = authService.getToken();
   
-  // Si el usuario está autenticado, agregar header de autorización
-  if (user) {
-    // Crear un token simple basado en el email del usuario
-    // En producción, esto debería ser un JWT real del backend
-    const token = btoa(`${user.email}:${user.id}:${user.role}`);
-    
+  // Si hay un token JWT, agregarlo al header Authorization
+  if (token) {
     const clonedRequest = req.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`

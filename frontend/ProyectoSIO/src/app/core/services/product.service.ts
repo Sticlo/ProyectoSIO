@@ -11,14 +11,10 @@ interface RawProduct {
   price: string;
   original_price: string | null;
   cost: string | null;
-  rating: string | null;
-  review_count: number;
   badge: string | null;
   image: string | null;
   in_stock: number | boolean;
   stock_count: number;
-  min_stock: number;
-  max_stock: number;
   category_id: number | null;
   category_name: string | null;
 }
@@ -33,14 +29,10 @@ function fromApi(raw: RawProduct): Product {
     price: Number(raw.price),
     originalPrice: raw.original_price ? Number(raw.original_price) : undefined,
     cost: raw.cost ? Number(raw.cost) : undefined,
-    rating: raw.rating ? Number(raw.rating) : undefined,
-    reviewCount: raw.review_count ?? 0,
     badge: raw.badge ?? undefined,
     image: raw.image ?? undefined,
     inStock: Boolean(raw.in_stock),
     stockCount: raw.stock_count ?? 0,
-    minStock: raw.min_stock ?? 5,
-    maxStock: raw.max_stock ?? 100,
   };
 }
 
@@ -52,14 +44,10 @@ function toApi(p: Partial<Product> & { category_id?: number | null }): Record<st
     price: p.price,
     original_price: p.originalPrice ?? null,
     cost: p.cost ?? null,
-    rating: p.rating ?? null,
-    review_count: p.reviewCount ?? 0,
     badge: p.badge ?? null,
     image: p.image ?? null,
     in_stock: p.inStock ?? true,
     stock_count: p.stockCount ?? 0,
-    min_stock: p.minStock ?? 5,
-    max_stock: p.maxStock ?? 100,
     category_id: p.category_id ?? null,
   };
 }
@@ -190,13 +178,13 @@ export class ProductService {
   }
 
   /**
-   * Obtener productos con stock bajo
+   * Obtener productos con stock bajo (menos de 10 unidades)
    */
   getLowStockProducts(): Product[] {
+    const LOW_STOCK_THRESHOLD = 10;
     return this._products().filter(p => {
       const stock = p.stockCount || 0;
-      const minStock = p.minStock || 5;
-      return stock > 0 && stock <= minStock;
+      return stock > 0 && stock <= LOW_STOCK_THRESHOLD;
     });
   }
 

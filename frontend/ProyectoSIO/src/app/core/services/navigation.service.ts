@@ -68,14 +68,6 @@ export class NavigationService {
       icon: 'login'
     },
     {
-      title: 'Registrarse',
-      description: 'Crear una cuenta nueva',
-      route: '/register',
-      keywords: ['registro', 'registrarse', 'cuenta nueva', 'crear cuenta', 'signup', 'unirse'],
-      section: 'Cuenta',
-      icon: 'user-plus'
-    },
-    {
       title: 'Panel de Administración',
       description: 'Administrar productos y configuración',
       route: '/admin',

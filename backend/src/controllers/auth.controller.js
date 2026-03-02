@@ -5,10 +5,11 @@ const UserModel = require('../models/user.model');
 class AuthController {
   /**
    * Registro de nuevo usuario
+   * Por defecto, todos los usuarios registrados son administradores
    */
   static async register(req, res) {
     try {
-      const { email, password, name, role } = req.body;
+      const { email, password, name } = req.body;
 
       // Validar campos requeridos
       if (!email || !password || !name) {
@@ -28,12 +29,12 @@ class AuthController {
       // Encriptar contraseña
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Crear usuario
+      // Crear usuario (todos son administradores)
       const newUser = await UserModel.create({
         email,
         password: hashedPassword,
         name,
-        role: role || 'user'
+        role: 'admin'
       });
 
       res.status(201).json({

@@ -6,13 +6,14 @@ import { ProductService } from '../../core/services/product.service';
 
 @Component({
   selector: 'app-home',
+  standalone: true,
   imports: [CommonModule, RouterLink, TestimonialCardComponent],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
 export class Home implements OnInit, AfterViewInit, OnDestroy {
-  private productService = inject(ProductService);
-  private ngZone = inject(NgZone);
+  private readonly productService = inject(ProductService);
+  private readonly ngZone = inject(NgZone);
   private observer!: IntersectionObserver;
 
   @ViewChildren('animateOnScroll') animatedElements!: QueryList<ElementRef>;

@@ -14,29 +14,13 @@ const authenticateToken = (req, res, next) => {
   }
 
   try {
-    // Intentar verificar JWT primero
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
     next();
   } catch (error) {
-    // Si falla JWT, intentar decodificar token simple (para desarrollo)
-    try {
-      const decoded = Buffer.from(token, 'base64').toString('utf-8');
-      const [email, id, role] = decoded.split(':');
-      
-      if (email && id && role) {
-        req.user = { email, id, role };
-        next();
-      } else {
-        return res.status(403).json({ 
-          error: 'Token inválido o expirado' 
-        });
-      }
-    } catch (decodeError) {
-      return res.status(403).json({ 
-        error: 'Token inválido o expirado' 
-      });
-    }
+    return res.status(403).json({ 
+      error: 'Token inválido o expirado' 
+    });
   }
 };
 
