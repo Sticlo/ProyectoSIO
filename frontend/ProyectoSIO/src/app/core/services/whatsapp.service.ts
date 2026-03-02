@@ -248,15 +248,20 @@ export class WhatsAppService {
       const product = this.productService.getById(item.productId);
       
       if (product) {
-        // Descontar stock
-        const updatedProduct = this.inventoryService.decreaseStock(
+        // Descontar stock (el backend actualiza el producto automáticamente)
+        this.inventoryService.decreaseStock(
           product,
           item.quantity,
           orderId
-        );
-        
-        // Actualizar en el servicio de productos
-        this.productService.updateProductStock(product.id, updatedProduct);
+        ).subscribe({
+          next: (updatedProduct) => {
+            // Actualizar en el servicio de productos
+            this.productService.updateProductStock(product.id, updatedProduct);
+          },
+          error: (err) => {
+            console.error(`Error al descontar stock del producto ${product.name}:`, err);
+          }
+        });
       }
     });
   }

@@ -52,6 +52,25 @@ CREATE TABLE categorias (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Insertar categorías de productos
+INSERT INTO categorias (name, type, description) VALUES
+('AURICULARES', 'producto', 'Auriculares y audífonos de todas las gamas'),
+('BOCINAS', 'producto', 'Bocinas y altavoces bluetooth y con cable'),
+('SMARTWATCH', 'producto', 'Relojes inteligentes y accesorios'),
+('CARGADORES', 'producto', 'Cargadores rápidos, cables y adaptadores'),
+('ALMACENAMIENTO', 'producto', 'Memorias USB, tarjetas SD y discos externos'),
+('ACCESORIOS', 'producto', 'Accesorios diversos para dispositivos electrónicos');
+
+-- Insertar categorías de gastos
+INSERT INTO categorias (name, type, description) VALUES
+('Renta', 'gasto', 'Pago de renta del local'),
+('Servicios', 'gasto', 'Luz, agua, internet, etc.'),
+('Inventario', 'gasto', 'Compra de productos para reventa'),
+('Personal', 'gasto', 'Salarios y pagos a empleados'),
+('Marketing', 'gasto', 'Publicidad y promoción'),
+('Mantenimiento', 'gasto', 'Reparaciones y mantenimiento del local'),
+('Otros', 'gasto', 'Gastos varios no categorizados');
+
 -- ============================================
 -- 3. TABLA: productos
 --    FK: category_id → categorias(id)
@@ -63,8 +82,7 @@ CREATE TABLE productos (
     description TEXT,
     price DECIMAL(10, 2) NOT NULL,
     original_price DECIMAL(10, 2),
-    rating DECIMAL(3, 2) DEFAULT 0.00,
-    review_count INT DEFAULT 0,
+    cost DECIMAL(10, 2),
     badge VARCHAR(50),
     image MEDIUMTEXT,
     in_stock BOOLEAN DEFAULT true,
@@ -200,6 +218,14 @@ CREATE TABLE notificaciones (
 --
 -- IMPORTANTE: Cambia la contraseña después del primer login
 -- ============================================
+
+-- ============================================
+-- ACTUALIZAR PRODUCTOS SIN CATEGORÍA
+-- ============================================
+-- Asigna la categoría "ACCESORIOS" a productos que no tienen category_id
+UPDATE productos 
+SET category_id = (SELECT id FROM categorias WHERE name = 'ACCESORIOS' AND type = 'producto' LIMIT 1)
+WHERE category_id IS NULL;
 
 -- ============================================
 -- FIN DEL SCRIPT

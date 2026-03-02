@@ -1,6 +1,9 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, tap, catchError, of, map } from 'rxjs';
 import { StorageService } from './storage.service';
 import { Product } from '../../shared/models/product.model';
+import { environment } from '@environments/environment';
 
 export type MovementType = 'sale' | 'restock' | 'adjustment' | 'return';
 
@@ -21,7 +24,6 @@ export interface StockAlert {
   productId: string;
   productName: string;
   currentStock: number;
-  minStock: number;
   severity: 'low' | 'critical' | 'out';
   date: Date;
 }
@@ -30,9 +32,11 @@ export interface StockAlert {
   providedIn: 'root'
 })
 export class InventoryService {
-  private storage = new StorageService();
+  private http = inject(HttpClient);
+  private storage = inject(StorageService);
   private readonly MOVEMENTS_KEY = 'inventory_movements';
   private readonly ALERTS_KEY = 'stock_alerts';
+  private apiUrl = environment.apiUrl;
   
   // Signals
   private movementsSignal = signal<InventoryMovement[]>([]);
@@ -49,39 +53,82 @@ export class InventoryService {
   );
   
   constructor() {
-    this.loadMovements();
     this.loadAlerts();
+    this.loadMovementsFromAPI();
   }
   
   /**
-   * Cargar movimientos desde localStorage
+   * Cargar movimientos desde el backend API
    */
-  private loadMovements(): void {
-    const raw = this.storage.getItem(this.MOVEMENTS_KEY);
-    if (!raw) {
-      this.movementsSignal.set([]);
-      return;
-    }
+  loadMovementsFromAPI(): void {
+    this.http.get<{ movements: any[] }>(`${this.apiUrl}/inventory/movements`).pipe(
+      map(response => response.movements.map((m: any) => ({
+        id: m.id.toString(),
+        productId: m.product_id.toString(),
+        productName: m.product_name || 'Producto',
+        type: this.mapBackendTypeToFrontend(m.type),
+        quantity: m.quantity,
+        previousStock: 0, // No disponible desde backend
+        newStock: m.new_stock || 0,
+        date: new Date(m.created_at),
+        orderId: m.order_id?.toString(),
+        notes: m.notes || m.reason
+      }))),
+      catchError(error => {
+        console.error('Error loading movements from API:', error);
+        return of([]);
+      })
+    ).subscribe(movements => {
+      this.movementsSignal.set(movements);
+    });
+  }
+  
+  /**
+   * Mapear tipo de backend (in/out) a tipo frontend (sale/restock/adjustment/return)
+   */
+  private mapBackendTypeToFrontend(type: string): MovementType {
+    // El backend usa 'in' o 'out', el frontend usa tipos más específicos
+    // Por ahora mapeamos 'in' a 'restock' y 'out' a 'sale'
+    // El campo 'reason' podría dar más contexto
+    return type === 'in' ? 'restock' : 'sale';
+  }
+  
+  /**
+   * Mapear tipo frontend a tipo backend
+   */
+  private mapFrontendTypeToBackend(type: MovementType): 'in' | 'out' {
+    return (type === 'restock' || type === 'return') ? 'in' : 'out';
+  }
+  
+  /**
+   * Registrar un movimiento de inventario en el backend
+   */
+  private registerMovement(
+    product: Product,
+    type: MovementType,
+    quantity: number,
+    orderId?: string,
+    notes?: string
+  ): Observable<any> {
+    const backendType = this.mapFrontendTypeToBackend(type);
+    const adjustQuantity = Math.abs(quantity); // Backend espera cantidad positiva
     
-    try {
-      const movements = JSON.parse(raw) as InventoryMovement[];
-      // Convertir fechas de string a Date
-      const parsedMovements = movements.map((m: InventoryMovement) => ({
-        ...m,
-        date: new Date(m.date)
-      }));
-      this.movementsSignal.set(parsedMovements);
-    } catch (error) {
-      console.error('Error parsing movements:', error);
-      this.movementsSignal.set([]);
-    }
-  }
-  
-  /**
-   * Guardar movimientos en localStorage
-   */
-  private saveMovements(): void {
-    this.storage.setItem(this.MOVEMENTS_KEY, JSON.stringify(this.movementsSignal()));
+    return this.http.post<any>(`${this.apiUrl}/inventory/adjust`, {
+      productId: product.id,
+      quantity: adjustQuantity,
+      type: backendType,
+      reason: type,
+      notes: notes || `${type} - ${adjustQuantity} unidades`
+    }).pipe(
+      tap(() => {
+        // Recargar movimientos después de registrar uno nuevo
+        this.loadMovementsFromAPI();
+      }),
+      catchError(error => {
+        console.error('Error registering movement:', error);
+        throw error;
+      })
+    );
   }
   
   /**
@@ -115,143 +162,118 @@ export class InventoryService {
   }
   
   /**
-   * Registrar un movimiento de inventario
-   */
-  private registerMovement(
-    product: Product,
-    type: MovementType,
-    quantity: number,
-    orderId?: string,
-    notes?: string
-  ): void {
-    const movement: InventoryMovement = {
-      id: `MOV-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      productId: product.id,
-      productName: product.name,
-      type,
-      quantity,
-      previousStock: product.stockCount || 0,
-      newStock: (product.stockCount || 0) + quantity,
-      date: new Date(),
-      orderId,
-      notes
-    };
-    
-    this.movementsSignal.update(movements => [movement, ...movements]);
-    this.saveMovements();
-  }
-  
-  /**
    * Actualizar stock de un producto (venta)
    */
-  decreaseStock(product: Product, quantity: number, orderId?: string): Product {
-    const currentStock = product.stockCount || 0;
-    const newStock = Math.max(0, currentStock - quantity);
-    
-    // Registrar movimiento
-    this.registerMovement(product, 'sale', -quantity, orderId, `Venta de ${quantity} unidades`);
-    
-    // Actualizar producto
-    const updatedProduct = {
-      ...product,
-      stockCount: newStock,
-      inStock: newStock > 0
-    };
-    
-    // Verificar alertas
-    this.checkStockAlert(updatedProduct);
-    
-    return updatedProduct;
+  decreaseStock(product: Product, quantity: number, orderId?: string): Observable<Product> {
+    return this.registerMovement(product, 'sale', -quantity, orderId, `Venta de ${quantity} unidades`).pipe(
+      map(response => {
+        const currentStock = product.stockCount || 0;
+        const newStock = Math.max(0, currentStock - quantity);
+        
+        const updatedProduct: Product = {
+          ...product,
+          stockCount: newStock,
+          inStock: newStock > 0
+        };
+        
+        // Verificar alertas localmente
+        this.checkStockAlert(updatedProduct);
+        
+        return updatedProduct;
+      })
+    );
   }
   
   /**
    * Aumentar stock (reabastecimiento)
    */
-  increaseStock(product: Product, quantity: number, notes?: string): Product {
-    const currentStock = product.stockCount || 0;
-    const newStock = currentStock + quantity;
-    
-    // Registrar movimiento
-    this.registerMovement(product, 'restock', quantity, undefined, notes || `Reabastecimiento de ${quantity} unidades`);
-    
-    // Actualizar producto
-    const updatedProduct = {
-      ...product,
-      stockCount: newStock,
-      inStock: true,
-      lastRestocked: new Date()
-    };
-    
-    // Eliminar alerta si existe
-    this.removeAlert(product.id);
-    
-    return updatedProduct;
+  increaseStock(product: Product, quantity: number, notes?: string): Observable<Product> {
+    return this.registerMovement(product, 'restock', quantity, undefined, notes || `Reabastecimiento de ${quantity} unidades`).pipe(
+      map(response => {
+        const currentStock = product.stockCount || 0;
+        const newStock = currentStock + quantity;
+        
+        const updatedProduct: Product = {
+          ...product,
+          stockCount: newStock,
+          inStock: true,
+          lastRestocked: new Date()
+        };
+        
+        // Eliminar alerta si existe
+        this.removeAlert(product.id);
+        
+        return updatedProduct;
+      })
+    );
   }
   
   /**
    * Ajustar stock manualmente
    */
-  adjustStock(product: Product, newStock: number, notes: string): Product {
+  adjustStock(product: Product, newStock: number, notes: string): Observable<Product> {
     const currentStock = product.stockCount || 0;
     const difference = newStock - currentStock;
     
-    // Registrar movimiento
-    this.registerMovement(product, 'adjustment', difference, undefined, notes);
-    
-    // Actualizar producto
-    const updatedProduct = {
-      ...product,
-      stockCount: newStock,
-      inStock: newStock > 0
-    };
-    
-    // Verificar alertas
-    if (newStock > 0) {
-      this.removeAlert(product.id);
-    } else {
-      this.checkStockAlert(updatedProduct);
-    }
-    
-    return updatedProduct;
+    return this.registerMovement(product, 'adjustment', difference, undefined, notes).pipe(
+      map(response => {
+        const updatedProduct: Product = {
+          ...product,
+          stockCount: newStock,
+          inStock: newStock > 0
+        };
+        
+        // Verificar alertas
+        if (newStock > 0) {
+          this.removeAlert(product.id);
+        } else {
+          this.checkStockAlert(updatedProduct);
+        }
+        
+        return updatedProduct;
+      })
+    );
   }
   
   /**
    * Registrar devolución
    */
-  returnStock(product: Product, quantity: number, orderId: string): Product {
-    const currentStock = product.stockCount || 0;
-    const newStock = currentStock + quantity;
-    
-    // Registrar movimiento
-    this.registerMovement(product, 'return', quantity, orderId, `Devolución de ${quantity} unidades`);
-    
-    // Actualizar producto
-    const updatedProduct = {
-      ...product,
-      stockCount: newStock,
-      inStock: true
-    };
-    
-    // Eliminar alerta si existe
-    this.removeAlert(product.id);
-    
-    return updatedProduct;
+  returnStock(product: Product, quantity: number, orderId: string): Observable<Product> {
+    return this.registerMovement(product, 'return', quantity, orderId, `Devolución de ${quantity} unidades`).pipe(
+      map(response => {
+        const currentStock = product.stockCount || 0;
+        const newStock = currentStock + quantity;
+        
+        const updatedProduct: Product = {
+          ...product,
+          stockCount: newStock,
+          inStock: true
+        };
+        
+        // Eliminar alerta si existe
+        this.removeAlert(product.id);
+        
+        return updatedProduct;
+      })
+    );
   }
   
   /**
    * Verificar y generar alerta de stock bajo
+   * Umbrales: crítico <= 5, bajo <= 10, agotado = 0
    */
   checkStockAlert(product: Product): void {
     const currentStock = product.stockCount || 0;
-    const minStock = product.minStock || 5; // Default 5 unidades
+    const LOW_STOCK_THRESHOLD = 10;
+    const CRITICAL_STOCK_THRESHOLD = 5;
     
     let severity: 'low' | 'critical' | 'out';
     
     if (currentStock === 0) {
       severity = 'out';
-    } else if (currentStock <= minStock / 2) {
+    } else if (currentStock <= CRITICAL_STOCK_THRESHOLD) {
       severity = 'critical';
-    } else if (currentStock <= minStock) {
+    } else if (currentStock <= LOW_STOCK_THRESHOLD) {
       severity = 'low';
     } else {
       // Stock normal, eliminar alerta si existe
@@ -266,7 +288,6 @@ export class InventoryService {
       productId: product.id,
       productName: product.name,
       currentStock,
-      minStock,
       severity,
       date: new Date()
     };
@@ -323,7 +344,6 @@ export class InventoryService {
     this.movementsSignal.update(movements =>
       movements.filter(m => m.date > ninetyDaysAgo)
     );
-    this.saveMovements();
   }
   
   /**

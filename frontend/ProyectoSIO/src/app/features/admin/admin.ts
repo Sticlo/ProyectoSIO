@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Product } from '../../shared/models/product.model';
 import { ProductService } from '../../core/services/product.service';
+import { CategoryService } from '../../core/services/category.service';
 import { AuthService } from '../../core/services/auth.service';
 import { OrderService } from '../../core/services/order.service';
 import { InventoryService } from '../../core/services/inventory.service';
@@ -57,8 +58,6 @@ export class Admin {
     description: '',
     price: 0,
     originalPrice: undefined,
-    rating: undefined,
-    reviewCount: undefined,
     badge: undefined,
     image: undefined
   });
@@ -75,10 +74,12 @@ export class Admin {
   });
   
   categories = ['AURICULARES', 'BOCINAS', 'SMARTWATCH', 'CARGADORES', 'ALMACENAMIENTO', 'ACCESORIOS'];
+  productCategories = computed(() => this.categoryService.getProductCategories().map(c => c.name));
   badges = ['Nuevo', 'Oferta', 'Popular', 'Exclusivo', 'Pro'];
   
   constructor(
     private productService: ProductService,
+    private categoryService: CategoryService,
     private authService: AuthService,
     private orderService: OrderService,
     private inventoryService: InventoryService,
@@ -91,8 +92,7 @@ export class Admin {
     this.editingProduct.set(null);
     this.formData.set({
       name: '', category: '', description: '', price: 0,
-      originalPrice: undefined, rating: undefined, reviewCount: undefined,
-      badge: undefined, image: undefined
+      originalPrice: undefined, badge: undefined, image: undefined
     });
     this.imagePreview.set(undefined);
     this.showModal.set(true);
@@ -116,13 +116,24 @@ export class Admin {
       alert('Por favor completa todos los campos obligatorios');
       return;
     }
+    
+    // Buscar el category_id correspondiente al nombre de categoría seleccionado
+    const category = this.categoryService.findByNameAndType(data.category, 'producto');
+    if (!category) {
+      alert('Categoría no válida');
+      return;
+    }
+    
+    // Preparar datos con category_id
+    const productData = { ...data, category_id: category.id };
+    
     if (this.editingProduct()) {
-      this.productService.update(this.editingProduct()!.id, data).subscribe({
+      this.productService.update(this.editingProduct()!.id, productData).subscribe({
         next: () => this.closeModal(),
         error: (err) => { console.error(err); alert('Error al actualizar el producto.'); }
       });
     } else {
-      this.productService.create(data).subscribe({
+      this.productService.create(productData).subscribe({
         next: () => this.closeModal(),
         error: (err) => { console.error(err); alert('Error al crear el producto.'); }
       });

@@ -7,8 +7,6 @@ export interface Product {
   price: number;
   originalPrice?: number;
   cost?: number; // Costo de compra/producción del producto
-  rating?: number;
-  reviewCount?: number;
   image?: string;
   images?: string[]; // Multiple images for carousel
   badge?: string;
@@ -16,8 +14,7 @@ export interface Product {
   specifications?: { [key: string]: string }; // Technical specs
   inStock?: boolean;
   stockCount?: number;
-  minStock?: number; // Mínimo para alerta de stock bajo
-  maxStock?: number; // Capacidad máxima de inventario
+
   lastRestocked?: Date; // Última vez que se reabastació
 }
 

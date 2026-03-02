@@ -6,7 +6,7 @@ import { Product } from '../../shared/models/product.model';
 import { ProductService } from '../../core/services/product.service';
 import { CartService } from '../../core/services/cart.service';
 
-type SortOption = 'relevant' | 'price-asc' | 'price-desc' | 'name' | 'rating';
+type SortOption = 'relevant' | 'price-asc' | 'price-desc' | 'name';
 type ViewMode = 'grid' | 'list';
 
 @Component({
@@ -147,14 +147,6 @@ export class Productos {
       p.price >= range.min && p.price <= range.max
     );
     
-    // Filtro de rating
-    const minRate = this.minRating();
-    if (minRate > 0) {
-      products = products.filter(p => 
-        (p.rating || 0) >= minRate
-      );
-    }
-    
     // Ordenamiento
     const sort = this.sortBy();
     switch(sort) {
@@ -166,9 +158,6 @@ export class Productos {
         break;
       case 'name':
         products.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case 'rating':
-        products.sort((a, b) => (b.rating || 0) - (a.rating || 0));
         break;
     }
     

@@ -76,16 +76,16 @@ class ProductModel {
   static async create(productData) {
     const {
       name, category_id, description, price, original_price,
-      rating, review_count, badge, image, in_stock, stock_count
+      badge, image, in_stock, stock_count, cost
     } = productData;
 
     const [result] = await pool.query(
       `INSERT INTO productos 
-        (name, category_id, description, price, original_price, rating, review_count, badge, image, in_stock, stock_count) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (name, category_id, description, price, original_price, badge, image, in_stock, stock_count, cost) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [name, category_id || null, description || null, price, original_price || null,
-       rating || 0, review_count || 0, badge || null, image || null,
-       in_stock !== undefined ? in_stock : true, stock_count || 0]
+       badge || null, image || null, in_stock !== undefined ? in_stock : true, 
+       stock_count || 0, cost || null]
     );
 
     return await ProductModel.findById(result.insertId);
@@ -109,9 +109,9 @@ class ProductModel {
 
     const allowedFields = {
       name: 'name', category_id: 'category_id', description: 'description',
-      price: 'price', original_price: 'original_price', rating: 'rating',
-      review_count: 'review_count', badge: 'badge', image: 'image',
-      in_stock: 'in_stock', stock_count: 'stock_count'
+      price: 'price', original_price: 'original_price', badge: 'badge', 
+      image: 'image', in_stock: 'in_stock', stock_count: 'stock_count',
+      cost: 'cost'
     };
 
     for (const [key, column] of Object.entries(allowedFields)) {
