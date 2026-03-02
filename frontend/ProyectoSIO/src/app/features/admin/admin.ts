@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Product } from '../../shared/models/product.model';
 import { ProductService } from '../../core/services/product.service';
+import { CategoryService } from '../../core/services/category.service';
 import { AuthService } from '../../core/services/auth.service';
 import { OrderService } from '../../core/services/order.service';
 import { InventoryService } from '../../core/services/inventory.service';
@@ -12,17 +13,24 @@ import { OrdersDashboardComponent } from './orders-dashboard/orders-dashboard.co
 import { InventoryDashboardComponent } from './inventory-dashboard/inventory-dashboard.component';
 import { FinancesDashboardComponent } from './finances-dashboard/finances-dashboard.component';
 import { ChatbotComponent } from './chatbot/chatbot';
+<<<<<<< HEAD
 import { QrMesasComponent } from './qr-mesas/qr-mesas'; // 🆕
 
+=======
+>>>>>>> 84aa6ac08f36fc9f10df7f4fcc183e98b1311988
 import { NotificationsDashboardComponent } from './notifications-dashboard/notifications-dashboard.component';
 import { NotificationService } from '../../core/services/notification.service';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
+<<<<<<< HEAD
  
   imports: [CommonModule, FormsModule, OrdersDashboardComponent, InventoryDashboardComponent, FinancesDashboardComponent, ChatbotComponent, QrMesasComponent,NotificationsDashboardComponent],
  
+=======
+  imports: [CommonModule, FormsModule, OrdersDashboardComponent, InventoryDashboardComponent, FinancesDashboardComponent, ChatbotComponent, NotificationsDashboardComponent],
+>>>>>>> 84aa6ac08f36fc9f10df7f4fcc183e98b1311988
   templateUrl: './admin.html',
   styleUrl: './admin.scss'
 })
@@ -44,18 +52,26 @@ export class Admin {
   financesDashboard = viewChild.required(FinancesDashboardComponent);
   financialStats = computed(() => this.expenseService.financialStats());
 
+<<<<<<< HEAD
  
   // 🆕 QR Mesas
   qrMesas = viewChild.required(QrMesasComponent);
+=======
+  // QR Mesas
+>>>>>>> 84aa6ac08f36fc9f10df7f4fcc183e98b1311988
 
   // Notifications dashboard
   notifsDashboard = viewChild.required(NotificationsDashboardComponent);
   unreadNotifs = computed(() => this.notificationService.unreadCount());
+<<<<<<< HEAD
  
+=======
+>>>>>>> 84aa6ac08f36fc9f10df7f4fcc183e98b1311988
   
   showModal = signal(false);
   editingProduct = signal<Product | null>(null);
   searchQuery = signal('');
+  imagePreview = signal<string | undefined>(undefined);
   
   formData = signal<Partial<Product>>({
     name: '',
@@ -63,8 +79,6 @@ export class Admin {
     description: '',
     price: 0,
     originalPrice: undefined,
-    rating: undefined,
-    reviewCount: undefined,
     badge: undefined,
     image: undefined
   });
@@ -81,10 +95,12 @@ export class Admin {
   });
   
   categories = ['AURICULARES', 'BOCINAS', 'SMARTWATCH', 'CARGADORES', 'ALMACENAMIENTO', 'ACCESORIOS'];
+  productCategories = computed(() => this.categoryService.getProductCategories().map(c => c.name));
   badges = ['Nuevo', 'Oferta', 'Popular', 'Exclusivo', 'Pro'];
   
   constructor(
     private productService: ProductService,
+    private categoryService: CategoryService,
     private authService: AuthService,
     private orderService: OrderService,
     private inventoryService: InventoryService,
@@ -97,15 +113,16 @@ export class Admin {
     this.editingProduct.set(null);
     this.formData.set({
       name: '', category: '', description: '', price: 0,
-      originalPrice: undefined, rating: undefined, reviewCount: undefined,
-      badge: undefined, image: undefined
+      originalPrice: undefined, badge: undefined, image: undefined
     });
+    this.imagePreview.set(undefined);
     this.showModal.set(true);
   }
   
   openEditModal(product: Product): void {
     this.editingProduct.set(product);
     this.formData.set({ ...product });
+    this.imagePreview.set(product.image);
     this.showModal.set(true);
   }
   
@@ -120,13 +137,24 @@ export class Admin {
       alert('Por favor completa todos los campos obligatorios');
       return;
     }
+    
+    // Buscar el category_id correspondiente al nombre de categoría seleccionado
+    const category = this.categoryService.findByNameAndType(data.category, 'producto');
+    if (!category) {
+      alert('Categoría no válida');
+      return;
+    }
+    
+    // Preparar datos con category_id
+    const productData = { ...data, category_id: category.id };
+    
     if (this.editingProduct()) {
-      this.productService.update(this.editingProduct()!.id, data).subscribe({
+      this.productService.update(this.editingProduct()!.id, productData).subscribe({
         next: () => this.closeModal(),
         error: (err) => { console.error(err); alert('Error al actualizar el producto.'); }
       });
     } else {
-      this.productService.create(data).subscribe({
+      this.productService.create(productData).subscribe({
         next: () => this.closeModal(),
         error: (err) => { console.error(err); alert('Error al crear el producto.'); }
       });
@@ -144,14 +172,87 @@ export class Admin {
   updateField<K extends keyof Product>(field: K, value: Product[K]): void {
     this.formData.update(data => ({ ...data, [field]: value }));
   }
+
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    
+    if (!file) return;
+    
+    // Validar que sea una imagen
+    if (!file.type.startsWith('image/')) {
+      alert('Por favor selecciona un archivo de imagen válido');
+      return;
+    }
+    
+    // Validar tamaño máximo (5MB para archivo original)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert('La imagen es demasiado grande. Máximo 5MB');
+      return;
+    }
+    
+    // Comprimir y convertir a base64
+    this.compressImage(file, (base64) => {
+      this.imagePreview.set(base64);
+      this.updateField('image', base64);
+    });
+  }
+
+  compressImage(file: File, callback: (base64: string) => void): void {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        // Crear canvas para redimensionar
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d')!;
+        
+        // Calcular nuevas dimensiones (máximo 1200px en el lado más largo)
+        const maxDimension = 1200;
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > height && width > maxDimension) {
+          height = (height * maxDimension) / width;
+          width = maxDimension;
+        } else if (height > maxDimension) {
+          width = (width * maxDimension) / height;
+          height = maxDimension;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Dibujar imagen redimensionada
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Convertir a base64 con compresión (0.8 de calidad para JPEG)
+        const base64 = canvas.toDataURL('image/jpeg', 0.8);
+        
+        console.log(`🖼️  Imagen comprimida: ${Math.round(file.size / 1024)}KB → ${Math.round(base64.length * 0.75 / 1024)}KB`);
+        callback(base64);
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removeImage(): void {
+    this.imagePreview.set(undefined);
+    this.updateField('image', undefined);
+  }
   
+<<<<<<< HEAD
  
+=======
+>>>>>>> 84aa6ac08f36fc9f10df7f4fcc183e98b1311988
   openOrdersDashboard(): void { this.ordersDashboard().open(); }
   openInventoryDashboard(): void { this.inventoryDashboard().open(); }
   openFinancesDashboard(): void { this.financesDashboard().open(); }
-  openQrMesas(): void { this.qrMesas().open(); } // 🆕
-  
+  openNotificationsDashboard(): void { this.notifsDashboard().open(); }
   logout(): void { this.authService.logout(); }
+<<<<<<< HEAD
 
  
 
@@ -160,3 +261,6 @@ export class Admin {
  }
 
 }
+=======
+}
+>>>>>>> 84aa6ac08f36fc9f10df7f4fcc183e98b1311988

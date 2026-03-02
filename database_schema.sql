@@ -31,10 +31,10 @@ USE sistema_gestion;
 -- ============================================
 CREATE TABLE usuarios (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    email VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     name VARCHAR(255) NOT NULL,
-    role VARCHAR(50) DEFAULT 'user',
+    role VARCHAR(50) DEFAULT 'admin',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -52,6 +52,25 @@ CREATE TABLE categorias (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Insertar categorías de productos
+INSERT INTO categorias (name, type, description) VALUES
+('AURICULARES', 'producto', 'Auriculares y audífonos de todas las gamas'),
+('BOCINAS', 'producto', 'Bocinas y altavoces bluetooth y con cable'),
+('SMARTWATCH', 'producto', 'Relojes inteligentes y accesorios'),
+('CARGADORES', 'producto', 'Cargadores rápidos, cables y adaptadores'),
+('ALMACENAMIENTO', 'producto', 'Memorias USB, tarjetas SD y discos externos'),
+('ACCESORIOS', 'producto', 'Accesorios diversos para dispositivos electrónicos');
+
+-- Insertar categorías de gastos
+INSERT INTO categorias (name, type, description) VALUES
+('Renta', 'gasto', 'Pago de renta del local'),
+('Servicios', 'gasto', 'Luz, agua, internet, etc.'),
+('Inventario', 'gasto', 'Compra de productos para reventa'),
+('Personal', 'gasto', 'Salarios y pagos a empleados'),
+('Marketing', 'gasto', 'Publicidad y promoción'),
+('Mantenimiento', 'gasto', 'Reparaciones y mantenimiento del local'),
+('Otros', 'gasto', 'Gastos varios no categorizados');
+
 -- ============================================
 -- 3. TABLA: productos
 --    FK: category_id → categorias(id)
@@ -63,10 +82,9 @@ CREATE TABLE productos (
     description TEXT,
     price DECIMAL(10, 2) NOT NULL,
     original_price DECIMAL(10, 2),
-    rating DECIMAL(3, 2) DEFAULT 0.00,
-    review_count INT DEFAULT 0,
+    cost DECIMAL(10, 2),
     badge VARCHAR(50),
-    image VARCHAR(500),
+    image MEDIUMTEXT,
     in_stock BOOLEAN DEFAULT true,
     stock_count INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -122,6 +140,11 @@ CREATE TABLE gastos (
     description VARCHAR(255) NOT NULL,
     amount DECIMAL(10, 2) NOT NULL,
     category_id INT,
+    category_name VARCHAR(100),
+    type VARCHAR(50) DEFAULT 'operational',
+    status VARCHAR(20) DEFAULT 'paid',
+    product_name VARCHAR(255),
+    quantity INT,
     date DATE NOT NULL,
     notes TEXT,
     created_by INT,
@@ -157,12 +180,56 @@ CREATE TABLE chat_messages (
     id INT PRIMARY KEY AUTO_INCREMENT,
     session_id VARCHAR(255),
     phone_number VARCHAR(20),
-    message TEXT NOT NULL,
+    message TEXT NOT NULL,  
     sender VARCHAR(50) NOT NULL,
     is_bot BOOLEAN DEFAULT false,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ============================================
+<<<<<<< HEAD
+=======
+-- 9. TABLA: notificaciones
+--    Registra eventos del sistema:
+--    - failed_sale: intento de venta sin stock
+--    - new_order:   pedido creado exitosamente
+--    - low_stock:   producto con stock bajo
+--    - comment:     comentario o mensaje recibido
+-- ============================================
+CREATE TABLE notificaciones (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    type ENUM('failed_sale', 'new_order', 'low_stock', 'comment') NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    message TEXT,
+    data JSON,
+    is_read BOOLEAN DEFAULT false,
+    read_at TIMESTAMP NULL DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================
+-- USUARIO ADMINISTRADOR INICIAL
+-- ============================================
+-- Para crear el usuario administrador inicial, ejecuta:
+--   cd backend
+--   node src/scripts/create-admin.js
+--
+-- Credenciales por defecto:
+--   Email: admin@tienda.com
+--   Password: admin123
+--
+-- IMPORTANTE: Cambia la contraseña después del primer login
+-- ============================================
+
+-- ============================================
+-- ACTUALIZAR PRODUCTOS SIN CATEGORÍA
+-- ============================================
+-- Asigna la categoría "ACCESORIOS" a productos que no tienen category_id
+UPDATE productos 
+SET category_id = (SELECT id FROM categorias WHERE name = 'ACCESORIOS' AND type = 'producto' LIMIT 1)
+WHERE category_id IS NULL;
+
+-- ============================================
+>>>>>>> 84aa6ac08f36fc9f10df7f4fcc183e98b1311988
 -- FIN DEL SCRIPT
 -- ============================================

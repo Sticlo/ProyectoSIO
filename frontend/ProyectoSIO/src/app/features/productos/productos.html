@@ -42,8 +42,8 @@
             <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
           </svg>
           Filtros
-          @if (selectedCategories().length > 0 || minRating() > 0) {
-            <span class="filter-badge">{{ selectedCategories().length + (minRating() > 0 ? 1 : 0) }}</span>
+          @if (selectedCategories().length > 0) {
+            <span class="filter-badge">{{ selectedCategories().length }}</span>
           }
         </button>
       </div>
@@ -70,7 +70,7 @@
                 <h3>Filtros</h3>
               </div>
               <div class="header-actions">
-                @if (selectedCategories().length > 0 || minRating() > 0) {
+                @if (selectedCategories().length > 0) {
                   <button class="clear-all" (click)="clearFilters()" type="button">
                     Limpiar todo
                   </button>
@@ -137,27 +137,7 @@
                 (input)="priceRange.set({ min: priceRange().min, max: +$any($event.target).value })">
             </div>
 
-            <!-- Filtro de calificación -->
-            <div class="filter-group">
-              <h4 class="filter-title">Calificación Mínima</h4>
-              <div class="rating-options">
-                @for (rating of [5, 4, 3, 2, 1]; track rating) {
-                  <button 
-                    class="rating-option"
-                    [class.active]="minRating() === rating"
-                    (click)="minRating.set(minRating() === rating ? 0 : rating)">
-                    <div class="stars">
-                      @for (star of [1,2,3,4,5]; track star) {
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" [attr.fill]="star <= rating ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2">
-                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                        </svg>
-                      }
-                    </div>
-                    <span>y más</span>
-                  </button>
-                }
-              </div>
-            </div>
+            <!-- Más filtros pueden agregarse aquí -->
           </div>
         </aside>
 
@@ -184,7 +164,6 @@
                   <option value="price-asc">Precio: Menor a Mayor</option>
                   <option value="price-desc">Precio: Mayor a Menor</option>
                   <option value="name">Nombre</option>
-                  <option value="rating">Mejor Calificados</option>
                 </select>
               </div>
 
@@ -298,23 +277,6 @@
             <h2 class="modal-product-name">{{ selectedProduct()!.name }}</h2>
             
             <p class="modal-product-description">{{ selectedProduct()!.description }}</p>
-            
-            @if (selectedProduct()!.rating) {
-              <div class="modal-rating">
-                <div class="stars">
-                  @for (star of [1,2,3,4,5]; track star) {
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" 
-                         [attr.fill]="star <= selectedProduct()!.rating! ? '#14B8A6' : 'none'" 
-                         stroke="#14B8A6" stroke-width="2">
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                    </svg>
-                  }
-                </div>
-                @if (selectedProduct()!.reviewCount) {
-                  <span class="review-count">({{ selectedProduct()!.reviewCount }} reseñas)</span>
-                }
-              </div>
-            }
             
             <div class="modal-features">
               <h3 class="features-title">Características Principales</h3>

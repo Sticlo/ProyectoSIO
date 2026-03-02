@@ -1,4 +1,4 @@
-import { Component, signal, inject, AfterViewInit, effect, ElementRef, viewChildren, QueryList } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -10,7 +10,7 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './qr-mesas.scss'
 })
 export class QrMesasComponent {
-  private document = inject(DOCUMENT);
+  private readonly document = inject(DOCUMENT);
 
   isOpen = signal(false);
   cantidadMesas = signal(4);

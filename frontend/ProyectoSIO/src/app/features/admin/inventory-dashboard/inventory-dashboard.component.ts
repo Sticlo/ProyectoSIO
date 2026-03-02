@@ -1,7 +1,7 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { InventoryService, InventoryMovement, StockAlert } from '../../../core/services/inventory.service';
+import { InventoryService, InventoryMovement } from '../../../core/services/inventory.service';
 import { ProductService } from '../../../core/services/product.service';
 import { ReportService } from '../../../core/services/report.service';
 import { Product } from '../../../shared/models/product.model';
@@ -14,9 +14,9 @@ import { Product } from '../../../shared/models/product.model';
   styleUrls: ['./inventory-dashboard.component.scss']
 })
 export class InventoryDashboardComponent {
-  private inventoryService = inject(InventoryService);
-  private productService = inject(ProductService);
-  private reportService = inject(ReportService);
+  private readonly inventoryService = inject(InventoryService);
+  private readonly productService = inject(ProductService);
+  private readonly reportService = inject(ReportService);
   
   // State
   isOpen = signal(false);
@@ -61,8 +61,7 @@ export class InventoryDashboardComponent {
     } else if (filter === 'normal') {
       products = products.filter(p => {
         const stock = p.stockCount || 0;
-        const minStock = p.minStock || 5;
-        return stock > minStock;
+        return stock > 0;
       });
     }
     
@@ -89,9 +88,6 @@ export class InventoryDashboardComponent {
   }
   
   /**
-   * Reabastecer producto
-   */
-  /**
    * Reabastecer producto — persiste en la BD
    */
   restockProduct(): void {
@@ -104,31 +100,24 @@ export class InventoryDashboardComponent {
       return;
     }
 
-    // Registrar movimiento local (historial)
-    const localUpdated = this.inventoryService.increaseStock(
+    // Registrar movimiento a través del backend (guarda movimiento + actualiza stock)
+    this.inventoryService.increaseStock(
       product,
       quantity,
       notes || `Reabastecimiento de ${quantity} unidades`
-    );
-    this.selectedProduct.set(localUpdated);
-
-    // Persistir en la BD via API
-    this.productService.updateStock(product.id, quantity).subscribe({
-      next: updated => {
-        this.selectedProduct.set(updated);
+    ).subscribe({
+      next: updatedProduct => {
+        this.selectedProduct.set(updatedProduct);
         this.restockQuantity.set(0);
         this.restockNotes.set('');
       },
       error: err => {
-        console.error('Error al guardar stock en BD:', err);
-        alert('No se pudo guardar el stock en la base de datos. Verifica la conexión.');
+        console.error('Error al reabastecer stock:', err);
+        alert('No se pudo reabastecer el stock. Verifica la conexión.');
       }
     });
   }
   
-  /**
-   * Ajustar stock manualmente
-   */
   /**
    * Ajustar stock manualmente — persiste en la BD
    */
@@ -136,24 +125,16 @@ export class InventoryDashboardComponent {
     const notes = prompt('Motivo del ajuste:', 'Ajuste manual de inventario');
     if (notes === null) return; // Cancelado
 
-    const delta = newStock - (product.stockCount || 0);
-
-    // Registrar movimiento local (historial)
-    const localUpdated = this.inventoryService.adjustStock(product, newStock, notes);
-    if (this.selectedProduct()?.id === product.id) {
-      this.selectedProduct.set(localUpdated);
-    }
-
-    // Persistir en la BD via API
-    this.productService.updateStock(product.id, delta).subscribe({
-      next: updated => {
+    // Registrar ajuste a través del backend (guarda movimiento + actualiza stock)
+    this.inventoryService.adjustStock(product, newStock, notes).subscribe({
+      next: updatedProduct => {
         if (this.selectedProduct()?.id === product.id) {
-          this.selectedProduct.set(updated);
+          this.selectedProduct.set(updatedProduct);
         }
       },
       error: err => {
-        console.error('Error al guardar ajuste de stock en BD:', err);
-        alert('No se pudo guardar el ajuste en la base de datos. Verifica la conexión.');
+        console.error('Error al ajustar stock:', err);
+        alert('No se pudo ajustar el stock. Verifica la conexión.');
       }
     });
   }
@@ -174,10 +155,6 @@ export class InventoryDashboardComponent {
     
     const stock = product.stockCount || 0;
     if (stock === 0) return 'out';
-    
-    const minStock = product.minStock || 5;
-    if (stock <= minStock / 2) return 'critical';
-    if (stock <= minStock) return 'low';
     
     return 'normal';
   }

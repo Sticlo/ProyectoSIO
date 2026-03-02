@@ -35,12 +35,13 @@ class UserModel {
 
   /**
    * Crear nuevo usuario
+   * Por defecto, todos los usuarios son administradores
    */
   static async create(userData) {
     const { email, password, name, role } = userData;
     const [result] = await pool.query(
       'INSERT INTO usuarios (email, password, name, role) VALUES (?, ?, ?, ?)',
-      [email, password, name, role || 'user']
+      [email, password, name, role || 'admin']
     );
     return await UserModel.findById(result.insertId);
   }
