@@ -61,8 +61,7 @@ export class InventoryDashboardComponent {
     } else if (filter === 'normal') {
       products = products.filter(p => {
         const stock = p.stockCount || 0;
-        const minStock = p.minStock || 5;
-        return stock > minStock;
+        return stock > 0;
       });
     }
     
@@ -156,10 +155,6 @@ export class InventoryDashboardComponent {
     
     const stock = product.stockCount || 0;
     if (stock === 0) return 'out';
-    
-    const minStock = product.minStock || 5;
-    if (stock <= minStock / 2) return 'critical';
-    if (stock <= minStock) return 'low';
     
     return 'normal';
   }

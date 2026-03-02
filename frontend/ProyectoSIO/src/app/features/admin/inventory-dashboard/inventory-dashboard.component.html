@@ -176,12 +176,6 @@
                 {{ product.stockCount || 0 }} unidades
               </span>
             </div>
-            @if (product.minStock) {
-              <div class="stock-min">
-                <span class="min-label">Mínimo:</span>
-                <span class="min-value">{{ product.minStock }}</span>
-              </div>
-            }
           </div>
 
           <div class="product-price">
@@ -227,16 +221,6 @@
               <span class="label">Stock Actual:</span>
               <span class="value">{{ selectedProduct()!.stockCount || 0 }}</span>
             </div>
-            <div class="detail-item">
-              <span class="label">Stock Mínimo:</span>
-              <span class="value">{{ selectedProduct()!.minStock || 5 }}</span>
-            </div>
-            @if (selectedProduct()!.maxStock) {
-              <div class="detail-item">
-                <span class="label">Stock Máximo:</span>
-                <span class="value">{{ selectedProduct()!.maxStock }}</span>
-              </div>
-            }
             @if (selectedProduct()!.lastRestocked) {
               <div class="detail-item full-width">
                 <span class="label">Último Reabastecimiento:</span>
