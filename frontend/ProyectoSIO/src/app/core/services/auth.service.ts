@@ -1,28 +1,40 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { User, UserRole } from '../models/user.model';
 import { StorageService } from './storage.service';
+import { environment } from '@environments/environment';
+import { Observable, tap, catchError, of, map } from 'rxjs';
 
 export interface LoginCredentials {
   email: string;
   password: string;
 }
 
-export interface RegisterData {
-  name: string;
-  email: string;
-  password: string;
+interface AuthResponse {
+  message: string;
+  token: string;
+  user: {
+    id: number;
+    email: string;
+    name: string;
+    role: string;
+    created_at: string;
+    updated_at: string;
+  };
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly AUTH_KEY = 'auth_user';
-  private readonly USERS_KEY = 'registered_users';
+  private readonly TOKEN_KEY = 'auth_token';
+  private readonly USER_KEY = 'auth_user';
   
+  private http = inject(HttpClient);
   private storageService = inject(StorageService);
   private router = inject(Router);
+  private apiUrl = environment.apiUrl;
   
   private currentUser = signal<User | null>(this.loadUser());
   
@@ -32,138 +44,66 @@ export class AuthService {
   readonly isAdmin = computed(() => this.currentUser()?.role === UserRole.ADMIN);
   readonly isUser = computed(() => this.currentUser()?.role === UserRole.USER);
   
-  constructor() {
-    // Crear usuario admin por defecto si no existe
-    this.initializeDefaultAdmin();
-  }
-  
-  /**
-   * Inicializar usuario admin por defecto
-   */
-  private initializeDefaultAdmin(): void {
-    const users = this.getRegisteredUsers();
-    const adminExists = users.some(u => u.role === UserRole.ADMIN);
-    
-    if (!adminExists) {
-      const admin: User = {
-        id: '1',
-        email: 'admin@tienda.com',
-        name: 'Administrador',
-        role: UserRole.ADMIN,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-      
-      // Guardar admin con contraseña "admin123"
-      const usersWithCredentials = [
-        {
-          user: admin,
-          password: 'admin123'
-        }
-      ];
-      
-      this.storageService.setLocal(this.USERS_KEY, usersWithCredentials);
-    }
-  }
-  
   /**
    * Cargar usuario desde localStorage
    */
   private loadUser(): User | null {
-    const stored = this.storageService.getLocal(this.AUTH_KEY);
-    return stored || null;
+    const token = this.storageService.getItem(this.TOKEN_KEY);
+    const stored = this.storageService.getLocal(this.USER_KEY);
+    if (token && stored) {
+      return stored;
+    }
+    // Si no hay token, limpiar datos inconsistentes
+    this.storageService.removeLocal(this.USER_KEY);
+    return null;
   }
   
   /**
-   * Obtener usuarios registrados
+   * Obtener token JWT almacenado
    */
-  private getRegisteredUsers(): User[] {
-    const stored = this.storageService.getLocal(this.USERS_KEY);
-    if (!stored) return [];
-    return stored.map((item: any) => item.user);
+  getToken(): string | null {
+    return this.storageService.getItem(this.TOKEN_KEY);
   }
   
   /**
-   * Login de usuario
+   * Login de usuario - llama al backend API
    */
-  login(credentials: LoginCredentials): { success: boolean; message: string } {
-    const usersWithCredentials = this.storageService.getLocal(this.USERS_KEY) || [];
-    
-    // Buscar usuario
-    const found = usersWithCredentials.find(
-      (item: any) => 
-        item.user.email === credentials.email && 
-        item.password === credentials.password
-    );
-    
-    if (found) {
-      this.currentUser.set(found.user);
-      this.storageService.setLocal(this.AUTH_KEY, found.user);
-      
-      // Redirigir según rol
-      if (found.user.role === UserRole.ADMIN) {
-        this.router.navigate(['/admin']);
-      } else {
-        this.router.navigate(['/productos']);
-      }
-      
-      return {
+  login(credentials: LoginCredentials): Observable<{ success: boolean; message: string }> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, credentials).pipe(
+      tap((response) => {
+        // Guardar token JWT
+        this.storageService.setItem(this.TOKEN_KEY, response.token);
+        
+        // Mapear usuario del backend al modelo del frontend
+        const user: User = {
+          id: response.user.id.toString(),
+          email: response.user.email,
+          name: response.user.name,
+          role: response.user.role as UserRole,
+          createdAt: new Date(response.user.created_at),
+          updatedAt: new Date(response.user.updated_at)
+        };
+        
+        // Guardar usuario
+        this.currentUser.set(user);
+        this.storageService.setLocal(this.USER_KEY, user);
+        
+        // Redirigir según rol
+        if (user.role === UserRole.ADMIN) {
+          this.router.navigate(['/admin']);
+        } else {
+          this.router.navigate(['/productos']);
+        }
+      }),
+      map((response) => ({
         success: true,
-        message: `Bienvenido ${found.user.name}!`
-      };
-    }
-    
-    return {
-      success: false,
-      message: 'Email o contraseña incorrectos'
-    };
-  }
-  
-  /**
-   * Registro de nuevo usuario
-   */
-  register(data: RegisterData): { success: boolean; message: string } {
-    const usersWithCredentials = this.storageService.getLocal(this.USERS_KEY) || [];
-    
-    // Verificar si el email ya existe
-    const emailExists = usersWithCredentials.some(
-      (item: any) => item.user.email === data.email
+        message: response.message || `Bienvenido ${response.user.name}!`
+      })),
+      catchError((error) => {
+        const message = error.error?.error || 'Error al iniciar sesión. Verifica tus credenciales.';
+        return of({ success: false, message });
+      })
     );
-    
-    if (emailExists) {
-      return {
-        success: false,
-        message: 'Este email ya está registrado'
-      };
-    }
-    
-    // Crear nuevo usuario
-    const newUser: User = {
-      id: Date.now().toString(),
-      email: data.email,
-      name: data.name,
-      role: UserRole.USER,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    
-    // Guardar usuario con contraseña
-    usersWithCredentials.push({
-      user: newUser,
-      password: data.password
-    });
-    
-    this.storageService.setLocal(this.USERS_KEY, usersWithCredentials);
-    
-    // Autologin
-    this.currentUser.set(newUser);
-    this.storageService.setLocal(this.AUTH_KEY, newUser);
-    this.router.navigate(['/productos']);
-    
-    return {
-      success: true,
-      message: 'Registro exitoso! Bienvenido!'
-    };
   }
   
   /**
@@ -171,8 +111,9 @@ export class AuthService {
    */
   logout(): void {
     this.currentUser.set(null);
-    this.storageService.removeLocal(this.AUTH_KEY);
-    this.router.navigate(['/home']);
+    this.storageService.removeItem(this.TOKEN_KEY);
+    this.storageService.removeLocal(this.USER_KEY);
+    this.router.navigate(['/login']);
   }
   
   /**

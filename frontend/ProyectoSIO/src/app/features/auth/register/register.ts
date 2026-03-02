@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { AuthService, RegisterData } from '../../../core/services/auth.service';
+import { AuthService, } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -12,7 +12,11 @@ import { AuthService, RegisterData } from '../../../core/services/auth.service';
   styleUrl: './register.scss'
 })
 export class Register {
-  formData = signal<RegisterData>({
+  formData = signal<{
+    name: string;
+    email: string;
+    password: string;
+  }>({
     name: '',
     email: '',
     password: ''
@@ -41,14 +45,7 @@ export class Register {
     }
     
     this.isLoading.set(true);
-    
-    const result = this.authService.register(this.formData());
-    
-    this.isLoading.set(false);
-    
-    if (!result.success) {
-      this.errorMessage.set(result.message);
-    }
+
   }
   
   updateName(value: string): void {
