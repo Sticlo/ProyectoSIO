@@ -12,14 +12,13 @@ import { OrdersDashboardComponent } from './orders-dashboard/orders-dashboard.co
 import { InventoryDashboardComponent } from './inventory-dashboard/inventory-dashboard.component';
 import { FinancesDashboardComponent } from './finances-dashboard/finances-dashboard.component';
 import { ChatbotComponent } from './chatbot/chatbot';
-import { QrMesasComponent } from './qr-mesas/qr-mesas';
 import { NotificationsDashboardComponent } from './notifications-dashboard/notifications-dashboard.component';
 import { NotificationService } from '../../core/services/notification.service';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, OrdersDashboardComponent, InventoryDashboardComponent, FinancesDashboardComponent, ChatbotComponent, QrMesasComponent, NotificationsDashboardComponent],
+  imports: [CommonModule, FormsModule, OrdersDashboardComponent, InventoryDashboardComponent, FinancesDashboardComponent, ChatbotComponent, NotificationsDashboardComponent],
   templateUrl: './admin.html',
   styleUrl: './admin.scss'
 })
@@ -42,7 +41,6 @@ export class Admin {
   financialStats = computed(() => this.expenseService.financialStats());
 
   // QR Mesas
-  qrMesas = viewChild.required(QrMesasComponent);
 
   // Notifications dashboard
   notifsDashboard = viewChild.required(NotificationsDashboardComponent);
@@ -216,7 +214,6 @@ export class Admin {
   openOrdersDashboard(): void { this.ordersDashboard().open(); }
   openInventoryDashboard(): void { this.inventoryDashboard().open(); }
   openFinancesDashboard(): void { this.financesDashboard().open(); }
-  openQrMesas(): void { this.qrMesas().open(); }
   openNotificationsDashboard(): void { this.notifsDashboard().open(); }
   logout(): void { this.authService.logout(); }
 }

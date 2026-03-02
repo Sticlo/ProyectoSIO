@@ -27,13 +27,18 @@ export class Login {
     this.errorMessage.set('');
     this.isLoading.set(true);
     
-    const result = this.authService.login(this.credentials());
-    
-    this.isLoading.set(false);
-    
-    if (!result.success) {
-      this.errorMessage.set(result.message);
-    }
+    this.authService.login(this.credentials()).subscribe({
+      next: (result) => {
+        this.isLoading.set(false);
+        if (!result.success) {
+          this.errorMessage.set(result.message);
+        }
+      },
+      error: () => {
+        this.isLoading.set(false);
+        this.errorMessage.set('Error de conexión con el servidor');
+      }
+    });
   }
   
   updateEmail(value: string): void {
