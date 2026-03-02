@@ -337,8 +337,7 @@ export class ReportService {
       this.formatCurrency(p.price),
       p.cost ? this.formatCurrency(p.cost) : '-',
       p.stockCount?.toString() || '0',
-      p.inStock ? '✓' : '✗',
-      p.minStock ? p.minStock.toString() : '-'
+      p.inStock ? '✓' : '✗'
     ]);
 
     autoTable(doc, {
