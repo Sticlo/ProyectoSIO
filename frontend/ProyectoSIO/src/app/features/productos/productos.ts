@@ -11,14 +11,15 @@ type ViewMode = 'grid' | 'list';
 
 @Component({
   selector: 'app-productos',
+  standalone: true,
   imports: [ProductCardComponent, CommonModule, FormsModule],
   templateUrl: './productos.html',
   styleUrl: './productos.scss',
 })
-export class Productos {
+export class Productos implements OnDestroy {
   // Servicios
   productService = inject(ProductService);
-  private cartService = inject(CartService);
+  private readonly cartService = inject(CartService);
   
   // Estados de filtros y búsqueda
   searchQuery = signal('');
@@ -44,12 +45,12 @@ export class Productos {
   constructor() {
     // Effect unificado: bloquear body cuando el modal o el sidebar en móvil están abiertos
     effect(() => {
-      if (typeof window === 'undefined' || typeof document === 'undefined') return;
+      if (typeof globalThis.window === 'undefined' || typeof document === 'undefined') return;
 
-      const hide = this.showProductModal() || (this.showFilters() && window.innerWidth <= 968);
+      const hide = this.showProductModal() || (this.showFilters() && globalThis.window.innerWidth <= 968);
 
       if (hide && !this.scrollLocked) {
-        this.lockedScrollY = window.scrollY || window.pageYOffset || 0;
+        this.lockedScrollY = globalThis.window.scrollY || globalThis.window.pageYOffset || 0;
         document.body.style.position = 'fixed';
         document.body.style.top = `-${this.lockedScrollY}px`;
         document.body.style.left = '0';
@@ -68,7 +69,7 @@ export class Productos {
         document.body.style.width = '';
         document.body.style.overscrollBehavior = '';
         (document.body.style as any).webkitOverflowScrolling = '';
-        window.scrollTo(0, this.lockedScrollY || 0);
+        globalThis.window.scrollTo(0, this.lockedScrollY || 0);
         this.scrollLocked = false;
       }
     });

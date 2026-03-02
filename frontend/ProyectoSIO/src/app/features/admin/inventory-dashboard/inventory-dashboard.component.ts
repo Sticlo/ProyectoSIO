@@ -1,7 +1,7 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { InventoryService, InventoryMovement, StockAlert } from '../../../core/services/inventory.service';
+import { InventoryService, InventoryMovement } from '../../../core/services/inventory.service';
 import { ProductService } from '../../../core/services/product.service';
 import { ReportService } from '../../../core/services/report.service';
 import { Product } from '../../../shared/models/product.model';
@@ -14,9 +14,9 @@ import { Product } from '../../../shared/models/product.model';
   styleUrls: ['./inventory-dashboard.component.scss']
 })
 export class InventoryDashboardComponent {
-  private inventoryService = inject(InventoryService);
-  private productService = inject(ProductService);
-  private reportService = inject(ReportService);
+  private readonly inventoryService = inject(InventoryService);
+  private readonly productService = inject(ProductService);
+  private readonly reportService = inject(ReportService);
   
   // State
   isOpen = signal(false);

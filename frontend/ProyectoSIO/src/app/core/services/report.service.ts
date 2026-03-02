@@ -17,10 +17,10 @@ declare module 'jspdf' {
   providedIn: 'root'
 })
 export class ReportService {
-  private expenseService = inject(ExpenseService);
-  private orderService = inject(OrderService);
-  private inventoryService = inject(InventoryService);
-  private productService = inject(ProductService);
+  private readonly expenseService = inject(ExpenseService);
+  private readonly orderService = inject(OrderService);
+  private readonly inventoryService = inject(InventoryService);
+  private readonly productService = inject(ProductService);
 
   /**
    * Generar reporte financiero completo
