@@ -1,4 +1,4 @@
-import { Component, signal, output, inject } from '@angular/core';
+import { Component, signal, output, inject, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
@@ -6,6 +6,7 @@ import { CartService } from '../../../core/services/cart.service';
 import { WhatsAppService } from '../../../core/services/whatsapp.service';
 import { OrderService } from '../../../core/services/order.service';
 import { SiteConfig } from '../../../config/site.config';
+import { PaymentModalComponent, PaymentData } from '../payment-modal/payment-modal.component';
 
 export interface CustomerInfo {
   name: string;
@@ -17,7 +18,7 @@ export interface CustomerInfo {
 @Component({
   selector: 'app-checkout-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PaymentModalComponent],
   templateUrl: './checkout-modal.component.html',
   styleUrls: ['./checkout-modal.component.scss']
 })
@@ -25,14 +26,18 @@ export class CheckoutModalComponent {
   private cartService = inject(CartService);
   private whatsappService = inject(WhatsAppService);
   private orderService = inject(OrderService);
-  
+
+  // Payment modal ref
+  paymentModal = viewChild(PaymentModalComponent);
+
   isOpen = signal(false);
   isProcessing = signal(false);
   errorMessage = signal<string | null>(null);
-  
+
   // Customer form data
   customerName = signal('');
   customerPhone = signal('');
+  customerEmail = signal('');
   customerAddress = signal('');
   customerNotes = signal('');
   
@@ -50,6 +55,7 @@ export class CheckoutModalComponent {
     // Reset form
     this.customerName.set('');
     this.customerPhone.set('');
+    this.customerEmail.set('');
     this.customerAddress.set('');
     this.customerNotes.set('');
   }
@@ -220,4 +226,77 @@ export class CheckoutModalComponent {
     
     this.customerPhone.set(value);
   }
+
+  /**
+   * Abre el modal de pago online (Wompi) tras validar el formulario
+   */
+  async openOnlinePayment(): Promise<void> {
+    const items = this.cartItems();
+
+    if (items.length === 0) {
+      alert('Tu carrito está vacío');
+      return;
+    }
+
+    const validation = this.validateForm();
+    if (!validation.valid) {
+      alert(validation.message);
+      return;
+    }
+
+    const subtotal = this.totalPrice();
+    const shippingCost = SiteConfig.orders.shipping.isFree ||
+                        subtotal >= SiteConfig.orders.shipping.freeShippingThreshold
+      ? 0
+      : SiteConfig.orders.shipping.cost;
+
+    const total = subtotal + shippingCost;
+
+    const paymentData: PaymentData = {
+      amount: total,
+      customerName: this.customerName().trim(),
+      customerEmail: this.customerEmail().trim() || undefined,
+      customerPhone: this.formatPhoneNumber(this.customerPhone().trim()),
+    };
+
+    this.paymentModal()?.open(paymentData);
+  }
+
+  /**
+   * Callback cuando el pago online fue exitoso
+   */
+  async onPaymentSuccess(event: { transactionId: string; status: string }): Promise<void> {
+    const items = this.cartItems();
+    const subtotal = this.totalPrice();
+    const shippingCost = SiteConfig.orders.shipping.isFree ||
+                        subtotal >= SiteConfig.orders.shipping.freeShippingThreshold
+      ? 0
+      : SiteConfig.orders.shipping.cost;
+    const total = subtotal + shippingCost;
+
+    try {
+      // Crear la orden en el backend marcada como pagada
+      await firstValueFrom(
+        this.orderService.createOrder(
+          this.formatPhoneNumber(this.customerPhone().trim()),
+          items,
+          total,
+          shippingCost,
+          this.customerName().trim(),
+          this.customerAddress().trim() || undefined,
+          `[PAGO WOMPI ${event.status} - ID: ${event.transactionId}] ${this.customerNotes().trim()}`
+        )
+      );
+    } catch (err) {
+      console.warn('Orden no pudo guardarse en backend:', err);
+    }
+
+    if (SiteConfig.orders.clearCartAfterCheckout) {
+      this.cartService.clearCart();
+    }
+
+    this.success.emit();
+    this.closeModal();
+  }
 }
+

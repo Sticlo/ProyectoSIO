@@ -1,0 +1,92 @@
+﻿<div class="payment-overlay" *ngIf="isOpen()" (click)="close()"></div>
+
+<div class="payment-modal" *ngIf="isOpen()">
+
+  <!-- Header -->
+  <div class="modal-header">
+    <div class="header-left">
+      <span class="lock-icon">🔒</span>
+      <div>
+        <h2>Pago seguro</h2>
+        <p class="powered-by">Procesado por <strong>Wompi</strong></p>
+      </div>
+    </div>
+    <button class="btn-close" (click)="close()" aria-label="Cerrar">&times;</button>
+  </div>
+
+  <!-- Monto -->
+  <div class="amount-banner" *ngIf="paymentData()">
+    <span class="amount-label">Total a pagar</span>
+    <span class="amount-value">{{ formatCurrency(paymentData()!.amount) }}</span>
+  </div>
+
+  <!-- ─── Resumen del pedido ───────────────────────────────── -->
+  <div class="modal-body" *ngIf="step() === 'summary'">
+    <p class="step-title">Resumen del pago</p>
+
+    <div class="summary-card" *ngIf="paymentData()">
+      <div class="summary-row">
+        <span class="summary-label">Cliente</span>
+        <span class="summary-value">{{ paymentData()!.customerName }}</span>
+      </div>
+      <div class="summary-row" *ngIf="paymentData()!.customerEmail">
+        <span class="summary-label">Correo</span>
+        <span class="summary-value">{{ paymentData()!.customerEmail }}</span>
+      </div>
+      <div class="summary-row" *ngIf="paymentData()!.orderId">
+        <span class="summary-label">Pedido</span>
+        <span class="summary-value">#{{ paymentData()!.orderId }}</span>
+      </div>
+    </div>
+
+    <div class="methods-info">
+      <p class="methods-title">Metodos de pago disponibles</p>
+      <div class="method-chips">
+        <span class="chip">💳 Tarjeta credito/debito</span>
+        <span class="chip">🏦 PSE</span>
+        <span class="chip">📱 Nequi</span>
+        <span class="chip">🏪 Bancolombia</span>
+      </div>
+    </div>
+
+    <button class="btn-primary btn-wompi" (click)="pay()">
+      <span class="btn-lock">🔒</span>
+      Pagar {{ paymentData() ? formatCurrency(paymentData()!.amount) : '' }}
+    </button>
+
+    <div class="security-note">
+      <span>Tus datos estan cifrados. Podras elegir tarjeta, PSE y mas.</span>
+    </div>
+  </div>
+
+  <!-- ─── Procesando ──────────────────────────────────────── -->
+  <div class="modal-body center" *ngIf="step() === 'processing'">
+    <div class="spinner"></div>
+    <p class="processing-text">Abriendo Wompi...</p>
+    <p class="processing-sub">Por favor no cierres esta ventana</p>
+  </div>
+
+  <!-- ─── Exito ───────────────────────────────────────────── -->
+  <div class="modal-body center" *ngIf="step() === 'success'">
+    <div class="success-icon">✅</div>
+    <h3>
+      {{ lastTransaction()?.status === 'APPROVED' ? 'Pago aprobado' : 'Pago en proceso' }}
+    </h3>
+    <p *ngIf="lastTransaction()?.status === 'APPROVED'">
+      Tu pago fue procesado correctamente. Ref: <strong>{{ lastTransaction()?.id }}</strong>
+    </p>
+    <p *ngIf="lastTransaction()?.status === 'PENDING'">
+      Tu pago esta siendo procesado. Te notificaremos cuando se confirme.
+    </p>
+    <button class="btn-primary" (click)="close()">Cerrar</button>
+  </div>
+
+  <!-- ─── Error ────────────────────────────────────────────── -->
+  <div class="modal-body center" *ngIf="step() === 'error'">
+    <div class="error-icon">❌</div>
+    <h3>Pago no completado</h3>
+    <p class="error-detail">{{ errorMessage() }}</p>
+    <button class="btn-primary" (click)="retry()">Intentar de nuevo</button>
+  </div>
+
+</div>

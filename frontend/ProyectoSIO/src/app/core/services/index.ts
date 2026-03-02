@@ -14,3 +14,4 @@ export * from './report.service';
 export * from './chat.service';
 export * from './servicio-chat';
 export * from './notification.service';
+export * from './wompi.service';

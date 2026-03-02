@@ -15,6 +15,9 @@ const categoryRoutes = require('./routes/category.routes');
 const chatRoutes = require('./routes/chat.rutas');
 const mesaRoutes = require('./routes/mesa.routes');
 const notificationRoutes = require('./routes/notification.routes');
+const paymentRoutes = require('./routes/payment.routes');
+const PaymentController = require('./controllers/payment.controller');
+const wompiRoutes = require('./routes/wompi.routes');
 
 // Importar conexión a base de datos
 const { testConnection } = require('./config/database');
@@ -26,6 +29,10 @@ const PORT = process.env.PORT || 3000;
 app.use(cors({
   origin: process.env.CORS_ORIGIN || 'http://localhost:4200'
 }));
+
+// ⚠️ Webhook de Stripe necesita el body RAW (antes de express.json)
+app.post('/api/payments/webhook', express.raw({ type: 'application/json' }), PaymentController.webhook);
+
 // Aumentar límite para permitir imágenes base64 (10MB)
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -64,6 +71,8 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/mesa', mesaRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/wompi', wompiRoutes);
 
 // Manejo de errores 404
 app.use((req, res) => {
