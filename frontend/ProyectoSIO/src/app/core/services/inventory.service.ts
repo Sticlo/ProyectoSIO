@@ -32,15 +32,15 @@ export interface StockAlert {
   providedIn: 'root'
 })
 export class InventoryService {
-  private http = inject(HttpClient);
-  private storage = inject(StorageService);
+  private readonly http = inject(HttpClient);
+  private readonly storage = inject(StorageService);
   private readonly MOVEMENTS_KEY = 'inventory_movements';
   private readonly ALERTS_KEY = 'stock_alerts';
-  private apiUrl = environment.apiUrl;
+  private readonly apiUrl = environment.apiUrl;
   
   // Signals
-  private movementsSignal = signal<InventoryMovement[]>([]);
-  private alertsSignal = signal<StockAlert[]>([]);
+  private readonly movementsSignal = signal<InventoryMovement[]>([]);
+  private readonly alertsSignal = signal<StockAlert[]>([]);
   
   // Computed values
   movements = this.movementsSignal.asReadonly();
