@@ -50,7 +50,7 @@ export class Terminos {
     },
     {
       titulo: '10. Contacto',
-      contenido: `Si tiene preguntas sobre estos Términos y Condiciones, puede contactarnos en: contacto@tuempresa.com o a través del formulario de contacto disponible en nuestra plataforma. Responderemos su consulta en un plazo máximo de 48 horas hábiles.`
+      contenido: `Si tiene preguntas sobre estos Términos y Condiciones, puede contactarnos en: gestiondecomprassio@gmail.com o a través del formulario de contacto disponible en nuestra plataforma. Responderemos su consulta en un plazo máximo de 48 horas hábiles.`
     }
   ];
 }
