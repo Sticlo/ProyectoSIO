@@ -12,14 +12,9 @@ const orderRoutes = require('./routes/order.routes');
 const inventoryRoutes = require('./routes/inventory.routes');
 const expenseRoutes = require('./routes/expense.routes');
 const categoryRoutes = require('./routes/category.routes');
-<<<<<<< HEAD
 const chatRoutes = require('./routes/chat.routes');
 const mesaRoutes = require('./routes/mesa.routes'); // 🆕 Mesero digital QR
 
-=======
-const chatRoutes = require('./routes/chat.rutas');
-const mesaRoutes = require('./routes/mesa.routes');
->>>>>>> 84aa6ac08f36fc9f10df7f4fcc183e98b1311988
 const notificationRoutes = require('./routes/notification.routes');
 
 // Importar conexión a base de datos
@@ -29,8 +24,29 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middlewares
+// Configuración de CORS para desarrollo
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:4200'
+  origin: function(origin, callback) {
+    // Permitir solicitudes sin origin (como Postman) o desde localhost
+    const allowedOrigins = [
+      'http://localhost:4200',
+      'http://localhost:4000',
+      'http://localhost:3000',
+      'http://127.0.0.1:4200',
+      'http://127.0.0.1:4000',
+      'http://127.0.0.1:3000'
+    ];
+    
+    // En desarrollo, permitir todas las solicitudes de localhost
+    if (!origin || allowedOrigins.includes(origin) || origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      callback(null, true);
+    } else {
+      callback(null, true); // En desarrollo, permitir todos los orígenes
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 // Aumentar límite para permitir imágenes base64 (10MB)
 app.use(express.json({ limit: '10mb' }));
@@ -55,11 +71,7 @@ app.get('/', (req, res) => {
       expenses: '/api/expenses',
       categories: '/api/categories',
       chat: '/api/chat',
-<<<<<<< HEAD
       mesa: '/api/mesa/:mesaId/chat', // 
-=======
-      mesa: '/api/mesa/:mesaId/chat',
->>>>>>> 84aa6ac08f36fc9f10df7f4fcc183e98b1311988
       notifications: '/api/notifications'
     }
   });
@@ -72,11 +84,7 @@ app.use('/api/inventory', inventoryRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/chat', chatRoutes);
-<<<<<<< HEAD
 app.use('/api/mesa', mesaRoutes); // 🆕 Ruta pública del mesero
-=======
-app.use('/api/mesa', mesaRoutes);
->>>>>>> 84aa6ac08f36fc9f10df7f4fcc183e98b1311988
 app.use('/api/notifications', notificationRoutes);
 
 // Manejo de errores 404

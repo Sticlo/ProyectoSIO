@@ -53,9 +53,12 @@ class AuthController {
   static async login(req, res) {
     try {
       const { email, password } = req.body;
+      
+      console.log('🔐 Intento de login:', { email, passwordLength: password?.length });
 
       // Validar campos
       if (!email || !password) {
+        console.log('❌ Campos faltantes');
         return res.status(400).json({ 
           error: 'Email y contraseña son requeridos' 
         });
@@ -64,14 +67,20 @@ class AuthController {
       // Buscar usuario
       const user = await UserModel.findByEmail(email);
       if (!user) {
+        console.log('❌ Usuario no encontrado:', email);
         return res.status(401).json({ 
           error: 'Credenciales inválidas' 
         });
       }
+      
+      console.log('✅ Usuario encontrado:', { id: user.id, email: user.email, role: user.role });
 
       // Verificar contraseña
       const isValidPassword = await bcrypt.compare(password, user.password);
+      console.log('🔑 Contraseña válida:', isValidPassword);
+      
       if (!isValidPassword) {
+        console.log('❌ Contraseña incorrecta para:', email);
         return res.status(401).json({ 
           error: 'Credenciales inválidas' 
         });
@@ -90,6 +99,8 @@ class AuthController {
 
       // Remover password del objeto usuario
       const { password: _, ...userWithoutPassword } = user;
+      
+      console.log('✅ Login exitoso para:', email);
 
       res.json({
         message: 'Login exitoso',
@@ -97,7 +108,7 @@ class AuthController {
         user: userWithoutPassword
       });
     } catch (error) {
-      console.error('Error en login:', error);
+      console.error('❌ Error en login:', error);
       res.status(500).json({ error: 'Error al iniciar sesión' });
     }
   }
