@@ -14,7 +14,6 @@ const expenseRoutes = require('./routes/expense.routes');
 const categoryRoutes = require('./routes/category.routes');
 const chatRoutes = require('./routes/chat.routes');
 const mesaRoutes = require('./routes/mesa.routes'); // 🆕 Mesero digital QR
-
 const notificationRoutes = require('./routes/notification.routes');
 
 // Importar conexión a base de datos
@@ -60,7 +59,7 @@ app.use((req, res, next) => {
 
 // Rutas
 app.get('/', (req, res) => {
-  res.json({ 
+  res.json({
     message: 'API Backend - Sistema de Gestión',
     version: '1.0.0',
     endpoints: {
@@ -71,7 +70,7 @@ app.get('/', (req, res) => {
       expenses: '/api/expenses',
       categories: '/api/categories',
       chat: '/api/chat',
-      mesa: '/api/mesa/:mesaId/chat', // 
+      mesa: '/api/mesa/:mesaId/chat', // 🆕
       notifications: '/api/notifications'
     }
   });
@@ -89,7 +88,7 @@ app.use('/api/notifications', notificationRoutes);
 
 // Manejo de errores 404
 app.use((req, res) => {
-  res.status(404).json({ 
+  res.status(404).json({
     error: 'Ruta no encontrada',
     path: req.path
   });
@@ -109,7 +108,7 @@ app.listen(PORT, async () => {
   console.log(`🚀 Servidor ejecutándose en http://localhost:${PORT}`);
   console.log(`📝 Modo: ${process.env.NODE_ENV || 'development'}`);
   console.log(`📱 Mesero digital: http://localhost:${PORT}/api/mesa/:mesaId/chat`);
-  
+
   // Verificar conexión a base de datos
   const dbConnected = await testConnection();
   if (!dbConnected) {

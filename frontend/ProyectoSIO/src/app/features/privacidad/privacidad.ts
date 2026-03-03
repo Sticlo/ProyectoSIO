@@ -40,7 +40,7 @@ export class Privacidad {
     {
       icono: '⚖️',
       titulo: 'Sus derechos',
-      contenido: `Usted tiene derecho a: (a) acceder a la información personal que tenemos sobre usted; (b) corregir datos inexactos o incompletos; (c) solicitar la eliminación de sus datos en los casos previstos por la ley; (d) oponerse al procesamiento de sus datos para ciertos propósitos; (e) solicitar la portabilidad de sus datos. Para ejercer estos derechos, contáctenos en contacto@tuempresa.com.`
+      contenido: `Usted tiene derecho a: (a) acceder a la información personal que tenemos sobre usted; (b) corregir datos inexactos o incompletos; (c) solicitar la eliminación de sus datos en los casos previstos por la ley; (d) oponerse al procesamiento de sus datos para ciertos propósitos; (e) solicitar la portabilidad de sus datos. Para ejercer estos derechos, contáctenos en gestiondecomprassio@gmail.com.`
     },
     {
       icono: '🌍',
@@ -55,7 +55,7 @@ export class Privacidad {
     {
       icono: '📬',
       titulo: 'Contacto y consultas',
-      contenido: `Si tiene preguntas, inquietudes o solicitudes relacionadas con esta Política de Privacidad o el tratamiento de sus datos personales, puede contactarnos en: contacto@tuempresa.com. Designaremos un responsable de privacidad que atenderá su solicitud en un plazo máximo de 15 días hábiles.`
+      contenido: `Si tiene preguntas, inquietudes o solicitudes relacionadas con esta Política de Privacidad o el tratamiento de sus datos personales, puede contactarnos en: gestiondecomprassio@gmail.com. Designaremos un responsable de privacidad que atenderá su solicitud en un plazo máximo de 15 días hábiles.`
     }
   ];
 }
