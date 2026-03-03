@@ -13,24 +13,13 @@ import { OrdersDashboardComponent } from './orders-dashboard/orders-dashboard.co
 import { InventoryDashboardComponent } from './inventory-dashboard/inventory-dashboard.component';
 import { FinancesDashboardComponent } from './finances-dashboard/finances-dashboard.component';
 import { ChatbotComponent } from './chatbot/chatbot';
-<<<<<<< HEAD
-import { QrMesasComponent } from './qr-mesas/qr-mesas'; // 🆕
-
-=======
->>>>>>> 84aa6ac08f36fc9f10df7f4fcc183e98b1311988
 import { NotificationsDashboardComponent } from './notifications-dashboard/notifications-dashboard.component';
 import { NotificationService } from '../../core/services/notification.service';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-<<<<<<< HEAD
- 
-  imports: [CommonModule, FormsModule, OrdersDashboardComponent, InventoryDashboardComponent, FinancesDashboardComponent, ChatbotComponent, QrMesasComponent,NotificationsDashboardComponent],
- 
-=======
   imports: [CommonModule, FormsModule, OrdersDashboardComponent, InventoryDashboardComponent, FinancesDashboardComponent, ChatbotComponent, NotificationsDashboardComponent],
->>>>>>> 84aa6ac08f36fc9f10df7f4fcc183e98b1311988
   templateUrl: './admin.html',
   styleUrl: './admin.scss'
 })
@@ -52,21 +41,9 @@ export class Admin {
   financesDashboard = viewChild.required(FinancesDashboardComponent);
   financialStats = computed(() => this.expenseService.financialStats());
 
-<<<<<<< HEAD
- 
-  // 🆕 QR Mesas
-  qrMesas = viewChild.required(QrMesasComponent);
-=======
-  // QR Mesas
->>>>>>> 84aa6ac08f36fc9f10df7f4fcc183e98b1311988
-
   // Notifications dashboard
   notifsDashboard = viewChild.required(NotificationsDashboardComponent);
   unreadNotifs = computed(() => this.notificationService.unreadCount());
-<<<<<<< HEAD
- 
-=======
->>>>>>> 84aa6ac08f36fc9f10df7f4fcc183e98b1311988
   
   showModal = signal(false);
   editingProduct = signal<Product | null>(null);
@@ -243,24 +220,10 @@ export class Admin {
     this.updateField('image', undefined);
   }
   
-<<<<<<< HEAD
- 
-=======
->>>>>>> 84aa6ac08f36fc9f10df7f4fcc183e98b1311988
+  
   openOrdersDashboard(): void { this.ordersDashboard().open(); }
   openInventoryDashboard(): void { this.inventoryDashboard().open(); }
   openFinancesDashboard(): void { this.financesDashboard().open(); }
   openNotificationsDashboard(): void { this.notifsDashboard().open(); }
   logout(): void { this.authService.logout(); }
-<<<<<<< HEAD
-
- 
-
- openNotificationsDashboard(): void {
-  this.notifsDashboard()?.open();
- }
-
 }
-=======
-}
->>>>>>> 84aa6ac08f36fc9f10df7f4fcc183e98b1311988
