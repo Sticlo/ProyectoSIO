@@ -210,16 +210,15 @@ CREATE TABLE notificaciones (
 -- ============================================
 -- USUARIO ADMINISTRADOR INICIAL
 -- ============================================
--- Para crear el usuario administrador inicial, ejecuta:
---   cd backend
---   node src/scripts/create-admin.js
---
 -- Credenciales por defecto:
 --   Email: admin@tienda.com
 --   Password: admin123
 --
 -- IMPORTANTE: Cambia la contraseña después del primer login
 -- ============================================
+
+INSERT INTO usuarios (email, password, name, role) VALUES 
+('admin@tienda.com', '$2b$10$S/21gWUz2e1wi8pHKdSQJ.i4uVmpb6DWgsNZwKqzayDhgHaysQMhq', 'Administrador', 'admin');
 
 -- ============================================
 -- ACTUALIZAR PRODUCTOS SIN CATEGORÍA
