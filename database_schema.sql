@@ -187,8 +187,7 @@ CREATE TABLE chat_messages (
 );
 
 -- ============================================
-<<<<<<< HEAD
-=======
+
 -- 9. TABLA: notificaciones
 --    Registra eventos del sistema:
 --    - failed_sale: intento de venta sin stock
@@ -229,6 +228,5 @@ SET category_id = (SELECT id FROM categorias WHERE name = 'ACCESORIOS' AND type 
 WHERE category_id IS NULL;
 
 -- ============================================
->>>>>>> 84aa6ac08f36fc9f10df7f4fcc183e98b1311988
 -- FIN DEL SCRIPT
 -- ============================================
