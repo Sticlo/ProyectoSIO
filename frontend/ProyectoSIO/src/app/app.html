@@ -1,7 +1,23 @@
-<div class="app-container">
+@if (showSplash()) {
+<div class="splash-modal" [class.fade-out]="isFadingOut()">
+  <div class="splash-content">
+    <div class="splash-logo">
+      <span class="logo-text">S<span class="logo-accent">I</span>O</span>
+      <div class="sio-tagline">Sistema Interno Operativo</div>
+    </div>
+    <div class="splash-loader"></div>
+  </div>
+</div>
+}
+
+<div class="app-container" [class.content-visible]="!showSplash()">
   <app-header></app-header>
   <main class="main-content">
     <router-outlet></router-outlet>
   </main>
   <app-footer></app-footer>
 </div>
+
+<!-- Custom Animated Cursor Elements -->
+<div class="cursor-dot"></div>
+<div class="cursor-outline"></div>

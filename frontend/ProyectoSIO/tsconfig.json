@@ -15,7 +15,10 @@
     "target": "ES2022",
     "module": "preserve",
     "baseUrl": "./",
+<<<<<<< HEAD
     "ignoreDeprecations": "5.0",
+=======
+>>>>>>> main
     "paths": {
       "@core/*": ["src/app/core/*"],
       "@shared/*": ["src/app/shared/*"],

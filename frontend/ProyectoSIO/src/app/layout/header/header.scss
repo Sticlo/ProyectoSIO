@@ -10,13 +10,29 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 70px;
-  padding: 0 max(20px, env(safe-area-inset-right)) 0 max(20px, env(safe-area-inset-left));
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: saturate(180%) blur(20px);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
-  border-bottom: 1px solid rgba(14, 116, 144, 0.15);
-  box-shadow: 0 2px 12px rgba(14, 116, 144, 0.08);
+  height: 80px;
+  /* Taller initially */
+  padding: 0 max(40px, env(safe-area-inset-right)) 0 max(40px, env(safe-area-inset-left));
+  background: transparent;
+  /* Transparent at top */
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  border-bottom: 1px solid transparent;
+
+  @media (max-width: 768px) {
+    height: 70px;
+    padding: 0 20px;
+  }
+
+  &.scrolled {
+    height: 60px;
+    /* Shrinks on scroll */
+    padding: 0 max(20px, env(safe-area-inset-right)) 0 max(20px, env(safe-area-inset-left));
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid rgba(14, 116, 144, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  }
 }
 
 // Brand
@@ -29,7 +45,7 @@
   text-decoration: none;
   letter-spacing: 0.5px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   &:hover {
     color: #14B8A6;
     transform: translateY(-1px);
@@ -46,11 +62,11 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  
+
   @media (max-width: 833px) {
     display: none;
   }
-  
+
   li {
     margin: 0;
   }
@@ -67,7 +83,7 @@
   letter-spacing: -0.01em;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  
+
   &::after {
     content: '';
     position: absolute;
@@ -79,19 +95,19 @@
     border-radius: 3px 3px 0 0;
     transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   &:hover {
     color: #0E7490;
-    
+
     &::after {
       width: 100%;
     }
   }
-  
+
   &.active {
     color: #0E7490;
     font-weight: 600;
-    
+
     &::after {
       width: 100%;
     }
@@ -117,21 +133,21 @@
   border-radius: 12px;
   padding: 0 14px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   @media (max-width: 1200px) {
     width: 200px;
   }
-  
+
   @media (max-width: 968px) {
     display: none;
   }
-  
+
   &:focus-within {
     background: rgba(255, 255, 255, 0.95);
     border-color: #14B8A6;
     box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
     width: 320px;
-    
+
     @media (max-width: 1200px) {
       width: 240px;
     }
@@ -156,7 +172,7 @@
   font-size: 14px;
   font-weight: 500;
   color: #334155;
-  
+
   &::placeholder {
     color: #64748B;
     font-weight: 400;
@@ -178,12 +194,12 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
   margin-left: 8px;
-  
+
   svg {
     width: 12px;
     height: 12px;
   }
-  
+
   &:hover {
     background: rgba(14, 116, 144, 0.15);
     color: #14B8A6;
@@ -202,7 +218,7 @@
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-radius: 12px;
   border: 2px solid rgba(14, 116, 144, 0.15);
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(14, 116, 144, 0.15),
     0 2px 8px rgba(0, 0, 0, 0.08);
   overflow: hidden;
@@ -210,19 +226,19 @@
   overflow-y: auto;
   z-index: 10000;
   animation: slideDownFast 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   &::-webkit-scrollbar {
     width: 6px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: rgba(241, 245, 249, 0.5);
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: rgba(14, 116, 144, 0.3);
     border-radius: 3px;
-    
+
     &:hover {
       background: rgba(14, 116, 144, 0.5);
     }
@@ -238,29 +254,29 @@
   text-decoration: none;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
-  
+
   &:last-child {
     border-bottom: none;
   }
-  
+
   &:hover {
     background: linear-gradient(90deg, rgba(20, 184, 166, 0.08), rgba(14, 116, 144, 0.05));
     padding-left: 20px;
   }
-  
+
   .result-title {
     font-size: 14px;
     font-weight: 600;
     color: #334155;
     transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   .result-description {
     font-size: 13px;
     color: #64748B;
     font-weight: 400;
   }
-  
+
   &:hover .result-title {
     color: #0E7490;
   }
@@ -271,6 +287,7 @@
     opacity: 0;
     transform: translateY(-8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -285,7 +302,7 @@
   min-width: 240px;
   z-index: 1100;
   animation: slideDownFast 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   .user-dropdown-content {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px) saturate(180%);
@@ -294,29 +311,29 @@
     border: 1px solid rgba(14, 116, 144, 0.15);
     overflow: hidden;
   }
-  
+
   .user-info {
     padding: 16px;
     background: linear-gradient(135deg, rgba(14, 116, 144, 0.05), rgba(20, 184, 166, 0.05));
-    
+
     .user-name {
       font-size: 15px;
       font-weight: 600;
       color: #334155;
       margin-bottom: 4px;
     }
-    
+
     .user-email {
       font-size: 13px;
       color: #64748b;
     }
   }
-  
+
   .dropdown-divider {
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(14, 116, 144, 0.2), transparent);
   }
-  
+
   .dropdown-item {
     display: flex;
     align-items: center;
@@ -331,13 +348,13 @@
     text-decoration: none;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    
+
     svg {
       width: 16px;
       height: 16px;
       color: #0E7490;
     }
-    
+
     &:hover {
       background: linear-gradient(90deg, rgba(14, 116, 144, 0.08), rgba(20, 184, 166, 0.08));
       color: #0E7490;
@@ -360,13 +377,13 @@
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  
+
   &:hover {
     background: rgba(14, 116, 144, 0.1);
     color: #0E7490;
     transform: scale(1.05);
   }
-  
+
   svg {
     width: 20px;
     height: 20px;
@@ -376,7 +393,7 @@
 
 .mobile-menu-btn {
   display: none;
-  
+
   @media (max-width: 833px) {
     display: flex;
   }
@@ -463,17 +480,17 @@
   text-decoration: none;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   svg {
     width: 16px;
     height: 16px;
     opacity: 0.6;
   }
-  
+
   &:hover {
     background: rgba(14, 116, 144, 0.08);
     color: #0E7490;
-    
+
     svg {
       opacity: 1;
     }
@@ -505,14 +522,14 @@
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-radius: 16px;
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(14, 116, 144, 0.12),
     0 2px 8px rgba(0, 0, 0, 0.08),
     0 0 0 1px rgba(14, 116, 144, 0.08);
   overflow: hidden;
   animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 9999;
-  
+
   @media (max-width: 768px) {
     width: 95%;
     top: 75px;
@@ -529,7 +546,7 @@
   padding: 0 18px;
   margin: 16px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   &:focus-within {
     background: rgba(255, 255, 255, 0.9);
     border-color: #14B8A6;
@@ -555,7 +572,7 @@
   font-weight: 500;
   color: #334155;
   outline: none;
-  
+
   &::placeholder {
     color: #64748B;
     font-weight: 400;
@@ -576,12 +593,12 @@
   border-radius: 50%;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
-  
+
   svg {
     width: 16px;
     height: 16px;
   }
-  
+
   &:hover {
     background: rgba(14, 116, 144, 0.15);
     color: #14B8A6;
@@ -594,19 +611,19 @@
   max-height: 400px;
   overflow-y: auto;
   border-top: 1px solid rgba(14, 116, 144, 0.1);
-  
+
   &::-webkit-scrollbar {
     width: 6px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: rgba(241, 245, 249, 0.5);
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: rgba(14, 116, 144, 0.3);
     border-radius: 3px;
-    
+
     &:hover {
       background: rgba(14, 116, 144, 0.5);
     }
@@ -621,11 +638,11 @@
   border-bottom: 1px solid rgba(14, 116, 144, 0.08);
   text-decoration: none;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   &:last-child {
     border-bottom: none;
   }
-  
+
   &:hover {
     background: linear-gradient(90deg, rgba(20, 184, 166, 0.05), rgba(14, 116, 144, 0.05));
     padding-left: 24px;
@@ -638,7 +655,7 @@
   color: #334155;
   margin-bottom: 4px;
   transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   .search-result-item:hover & {
     color: #0E7490;
   }
@@ -654,7 +671,7 @@
   padding: 40px 20px;
   text-align: center;
   border-top: 1px solid rgba(14, 116, 144, 0.1);
-  
+
   p {
     margin: 0;
     font-size: 15px;
@@ -669,6 +686,7 @@
     opacity: 0;
     transform: translateX(-50%) translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
@@ -679,6 +697,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -720,12 +739,12 @@
   border-radius: 12px;
   letter-spacing: -0.022em;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   &:hover {
     background: rgba(14, 116, 144, 0.08);
     color: #0E7490;
   }
-  
+
   &.active {
     font-weight: 600;
     background: rgba(14, 116, 144, 0.12);
@@ -768,7 +787,7 @@
   cursor: pointer;
   border-radius: 12px;
   transition: background 0.2s;
-  
+
   &:hover {
     background: rgba(211, 47, 47, 0.08);
   }
@@ -795,18 +814,18 @@
   text-decoration: none;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 8px rgba(14, 116, 144, 0.3);
-  
+
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(14, 116, 144, 0.4);
   }
-  
+
   &.secondary {
     color: #0E7490;
     background: transparent;
     border: 2px solid #0E7490;
     box-shadow: none;
-    
+
     &:hover {
       background: rgba(14, 116, 144, 0.08);
       border-color: #14B8A6;
@@ -819,6 +838,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }

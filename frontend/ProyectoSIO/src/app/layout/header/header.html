@@ -1,16 +1,16 @@
 <header class="header">
-  <nav class="navbar">
+  <nav class="navbar" [class.scrolled]="isScrolled()">
     <!-- Brand -->
     <a routerLink="/" class="nav-brand">SIO</a>
 
     <!-- Navigation Links (Desktop) -->
     <ul class="nav-list">
       @for (item of navigationItems(); track item.title) {
-        <li>
-          <a [routerLink]="item.route" routerLinkActive="active" class="nav-link">
-            {{ item.title }}
-          </a>
-        </li>
+      <li>
+        <a [routerLink]="item.route" routerLinkActive="active" class="nav-link">
+          {{ item.title }}
+        </a>
+      </li>
       }
     </ul>
 
@@ -18,96 +18,79 @@
     <div class="nav-actions">
       <!-- Barra de Búsqueda Integrada -->
       <div class="search-bar-integrated">
-        <svg class="search-icon-inline" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-          <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+        <svg class="search-icon-inline" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+          viewBox="0 0 16 16">
+          <path
+            d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
         </svg>
-        <input
-          #searchInput
-          type="text"
-          class="search-input-inline"
-          placeholder="Buscar..."
-          [value]="searchQuery()"
-          (input)="searchQuery.set(searchInput.value)"
-          (focus)="searchFocused.set(true)"
-          (blur)="onSearchBlur()"
+        <input #searchInput type="text" class="search-input-inline" placeholder="Buscar..." [value]="searchQuery()"
+          (input)="searchQuery.set(searchInput.value)" (focus)="searchFocused.set(true)" (blur)="onSearchBlur()"
           autocomplete="off">
         @if (searchQuery()) {
-          <button
-            type="button"
-            class="search-clear-inline"
-            (click)="clearSearch()"
-            aria-label="Limpiar">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
-            </svg>
-          </button>
+        <button type="button" class="search-clear-inline" (click)="clearSearch()" aria-label="Limpiar">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+            <path
+              d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z" />
+          </svg>
+        </button>
         }
-        
+
         <!-- Dropdown de resultados -->
         @if (searchFocused() && searchQuery() && searchResults().length > 0) {
-          <div class="search-results-dropdown">
-            @for (result of searchResults(); track result.title) {
-              <a
-                [routerLink]="result.route"
-                class="search-result-inline"
-                (mousedown)="$event.preventDefault()"
-                (click)="onResultClick()">
-                <div class="result-title">{{ result.title }}</div>
-                <div class="result-description">{{ result.description }}</div>
-              </a>
-            }
-          </div>
+        <div class="search-results-dropdown">
+          @for (result of searchResults(); track result.title) {
+          <a [routerLink]="result.route" class="search-result-inline" (mousedown)="$event.preventDefault()"
+            (click)="onResultClick()">
+            <div class="result-title">{{ result.title }}</div>
+            <div class="result-description">{{ result.description }}</div>
+          </a>
+          }
+        </div>
         }
       </div>
 
       <!-- User Icon / Login -->
       @if (isLoggedIn()) {
-        <button 
-          type="button" 
-          class="nav-icon-btn" 
-          [class.active]="userMenuVisible()"
-          (click)="userMenuVisible.set(!userMenuVisible())"
-          aria-label="Usuario">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
-          </svg>
-        </button>
+      <button type="button" class="nav-icon-btn" [class.active]="userMenuVisible()"
+        (click)="userMenuVisible.set(!userMenuVisible())" aria-label="Usuario">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path
+            d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z" />
+        </svg>
+      </button>
       } @else {
-        <a routerLink="/login" class="nav-icon-btn" aria-label="Iniciar sesión">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
-          </svg>
-        </a>
+      <a routerLink="/login" class="nav-icon-btn" aria-label="Iniciar sesión">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path
+            d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z" />
+        </svg>
+      </a>
       }
 
       <!-- Cart Icon with Badge -->
-      <button 
-        type="button" 
-        class="nav-icon-btn cart-btn" 
-        (click)="toggleCart()"
-        aria-label="Carrito">
+      <button type="button" class="nav-icon-btn cart-btn" (click)="toggleCart()" aria-label="Carrito">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-          <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+          <path
+            d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
         </svg>
         @if (cartCount() > 0) {
-          <span class="cart-badge">{{ cartCount() }}</span>
+        <span class="cart-badge">{{ cartCount() }}</span>
         }
       </button>
 
       <!-- Mobile Menu Icon -->
-      <button 
-        type="button" 
-        class="nav-icon-btn mobile-menu-btn" 
-        (click)="mobileMenuVisible.set(!mobileMenuVisible())"
+      <button type="button" class="nav-icon-btn mobile-menu-btn" (click)="mobileMenuVisible.set(!mobileMenuVisible())"
         aria-label="Menú">
         @if (!mobileMenuVisible()) {
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
-          </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+          <path fill-rule="evenodd"
+            d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z" />
+        </svg>
         } @else {
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
-          </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+          <path
+            d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z" />
+        </svg>
         }
       </button>
     </div>
@@ -115,82 +98,74 @@
 
   <!-- User Dropdown Menu -->
   @if (isLoggedIn() && userMenuVisible()) {
-    <div class="user-dropdown">
-      <div class="user-dropdown-content">
-        <div class="user-info">
-          <div class="user-name">{{ currentUser()?.name }}</div>
-          <div class="user-email">{{ currentUser()?.email }}</div>
-        </div>
-        <div class="dropdown-divider"></div>
-        @if (isAdmin()) {
-          <a routerLink="/admin" class="dropdown-item" (click)="userMenuVisible.set(false)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
-              <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
-            </svg>
-            Panel Admin
-          </a>
-        }
-        <button type="button" class="dropdown-item" (click)="logout()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
-            <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
-          </svg>
-          Cerrar Sesión
-        </button>
+  <div class="user-dropdown">
+    <div class="user-dropdown-content">
+      <div class="user-info">
+        <div class="user-name">{{ currentUser()?.name }}</div>
+        <div class="user-email">{{ currentUser()?.email }}</div>
       </div>
+      <div class="dropdown-divider"></div>
+      @if (isAdmin()) {
+      <a routerLink="/admin" class="dropdown-item" (click)="userMenuVisible.set(false)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path
+            d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z" />
+          <path
+            d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z" />
+        </svg>
+        Panel Admin
+      </a>
+      }
+      <button type="button" class="dropdown-item" (click)="logout()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path fill-rule="evenodd"
+            d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z" />
+          <path fill-rule="evenodd"
+            d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z" />
+        </svg>
+        Cerrar Sesión
+      </button>
     </div>
+  </div>
   }
 
   <!-- Mobile Menu Overlay -->
   @if (mobileMenuVisible()) {
-    <div class="mobile-menu">
-      <div class="mobile-menu-content">
-        <nav class="mobile-nav">
-          @for (item of navigationItems(); track item.title) {
-            <a 
-              [routerLink]="item.route" 
-              routerLinkActive="active"
-              class="mobile-nav-link"
-              (click)="mobileMenuVisible.set(false)">
-              {{ item.title }}
-            </a>
-          }
-        </nav>
-
-        @if (isLoggedIn()) {
-          <div class="mobile-user-section">
-            <div class="mobile-user-info">
-              <div class="mobile-user-name">{{ currentUser()?.name }}</div>
-              <div class="mobile-user-email">{{ currentUser()?.email }}</div>
-            </div>
-            @if (isAdmin()) {
-              <a 
-                routerLink="/admin" 
-                class="mobile-nav-link"
-                (click)="mobileMenuVisible.set(false)">
-                Panel Admin
-              </a>
-            }
-            <button 
-              type="button" 
-              class="mobile-logout-btn"
-              (click)="logout()">
-              Cerrar Sesión
-            </button>
-          </div>
-        } @else {
-          <div class="mobile-auth-section">
-            <a 
-              routerLink="/login" 
-              class="mobile-auth-btn"
-              (click)="mobileMenuVisible.set(false)">
-              Iniciar Sesión
-            </a>
-          </div>
+  <div class="mobile-menu">
+    <div class="mobile-menu-content">
+      <nav class="mobile-nav">
+        @for (item of navigationItems(); track item.title) {
+        <a [routerLink]="item.route" routerLinkActive="active" class="mobile-nav-link"
+          (click)="mobileMenuVisible.set(false)">
+          {{ item.title }}
+        </a>
         }
+      </nav>
+
+      @if (isLoggedIn()) {
+      <div class="mobile-user-section">
+        <div class="mobile-user-info">
+          <div class="mobile-user-name">{{ currentUser()?.name }}</div>
+          <div class="mobile-user-email">{{ currentUser()?.email }}</div>
+        </div>
+        @if (isAdmin()) {
+        <a routerLink="/admin" class="mobile-nav-link" (click)="mobileMenuVisible.set(false)">
+          Panel Admin
+        </a>
+        }
+        <button type="button" class="mobile-logout-btn" (click)="logout()">
+          Cerrar Sesión
+        </button>
       </div>
+      } @else {
+      <div class="mobile-auth-section">
+        <a routerLink="/login" class="mobile-auth-btn" (click)="mobileMenuVisible.set(false)">
+          Iniciar Sesión
+        </a>
+      </div>
+      }
     </div>
+  </div>
   }
 </header>
 

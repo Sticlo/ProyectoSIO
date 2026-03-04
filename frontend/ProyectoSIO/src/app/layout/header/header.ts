@@ -1,4 +1,4 @@
-import { Component, signal, effect, computed, viewChild } from '@angular/core';
+import { Component, signal, effect, computed, viewChild, HostListener } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
@@ -22,28 +22,29 @@ export class Header {
   mobileMenuVisible = signal(false);
   userMenuVisible = signal(false);
   searchQuery = signal('');
-  
+  isScrolled = signal(false);
+
   // Computed properties
   currentUser = computed(() => this.authService.user());
   isLoggedIn = computed(() => this.authService.isAuthenticated());
   isAdmin = computed(() => this.authService.isAdmin());
   cartCount = computed(() => this.cartService.itemCount());
-  
+
   // Navigation items
-  navigationItems = computed(() => this.navigationService.getAllItems().filter(item => 
+  navigationItems = computed(() => this.navigationService.getAllItems().filter(item =>
     item.section === 'Navegación'
   ));
-  
+
   // Search results (filtered by search query)
   searchResults = computed(() => {
     const query = this.searchQuery().toLowerCase().trim();
     if (!query) return [];
-    
-    return this.navigationService.getAllItems().filter((item: any) => 
+
+    return this.navigationService.getAllItems().filter((item: any) =>
       item.title.toLowerCase().includes(query)
     );
   });
-  
+
   constructor(
     private authService: AuthService,
     private cartService: CartService,
@@ -58,7 +59,7 @@ export class Header {
         document.body.style.overflow = '';
       }
     });
-    
+
     // Close search when navigating
     effect(() => {
       if (this.searchVisible()) {
@@ -69,28 +70,28 @@ export class Header {
       }
     });
   }
-  
+
   closeSearch() {
     this.searchVisible.set(false);
     this.searchQuery.set('');
   }
-  
+
   clearSearch() {
     this.searchQuery.set('');
   }
-  
+
   onSearchBlur() {
     // Delay to allow click on result
     setTimeout(() => {
       this.searchFocused.set(false);
     }, 200);
   }
-  
+
   onResultClick() {
     this.searchQuery.set('');
     this.searchFocused.set(false);
   }
-  
+
   toggleCart() {
     const cart = this.cartSidebar();
     if (cart) {
@@ -101,10 +102,20 @@ export class Header {
       }
     }
   }
-  
+
   logout() {
     this.authService.logout();
     this.mobileMenuVisible.set(false);
     this.userMenuVisible.set(false);
+  }
+
+  @HostListener('window:scroll', [])
+  onWindowScroll() {
+    const scrollPosition = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    if (scrollPosition > 50) {
+      this.isScrolled.set(true);
+    } else {
+      this.isScrolled.set(false);
+    }
   }
 }
