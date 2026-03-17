@@ -148,3 +148,10 @@
     }
   }
 }
+
+// Dark mode — use inside component SCSS
+@mixin dark-mode {
+  :host-context([data-theme="dark"]) {
+    @content;
+  }
+}

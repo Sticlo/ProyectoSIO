@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 import { CartService } from '../../core/services/cart.service';
 import { NavigationService } from '../../core/services/navigation.service';
+import { ThemeService } from '../../core/services/theme.service';
 import { CartSidebarComponent } from '../../shared/components/cart-sidebar/cart-sidebar.component';
 
 @Component({
@@ -29,6 +30,7 @@ export class Header {
   isLoggedIn = computed(() => this.authService.isAuthenticated());
   isAdmin = computed(() => this.authService.isAdmin());
   cartCount = computed(() => this.cartService.itemCount());
+  isDarkMode = computed(() => this.themeService.isDarkMode());
 
   // Navigation items
   navigationItems = computed(() => this.navigationService.getAllItems().filter(item =>
@@ -49,6 +51,7 @@ export class Header {
     private authService: AuthService,
     private cartService: CartService,
     private navigationService: NavigationService,
+    private themeService: ThemeService,
     private router: Router
   ) {
     // Prevent scroll when mobile menu is open
@@ -90,6 +93,10 @@ export class Header {
   onResultClick() {
     this.searchQuery.set('');
     this.searchFocused.set(false);
+  }
+
+  toggleTheme() {
+    this.themeService.toggleTheme();
   }
 
   toggleCart() {

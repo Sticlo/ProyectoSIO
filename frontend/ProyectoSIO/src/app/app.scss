@@ -149,10 +149,29 @@
   flex: 1;
 }
 
+// ── DARK MODE ──
+@include mixins.dark-mode {
+  .splash-modal {
+    background-color: #0f172a;
+  }
+
+  .splash-logo .logo-text {
+    color: #f1f5f9;
+  }
+
+  .splash-logo .sio-tagline {
+    color: #94a3b8;
+  }
+
+  .splash-loader {
+    background: rgba(14, 116, 144, 0.15);
+  }
+}
+
 /* =========================================================================
    CUSTOM ANIMATED CURSOR
    ========================================================================= */
-::ng-deep body,
+/* ::ng-deep body,
 ::ng-deep a,
 ::ng-deep button,
 ::ng-deep .btn,
@@ -196,7 +215,7 @@
   pointer-events: none;
   z-index: 9999;
   transition: width 0.2s, height 0.2s, background-color 0.2s, margin 0.2s, border-color 0.2s, opacity 0.3s;
-}
+} */
 
 .cursor-dot.cursor-hover {
   width: 12px;

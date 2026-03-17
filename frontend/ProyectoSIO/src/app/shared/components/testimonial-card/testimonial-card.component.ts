@@ -127,6 +127,21 @@ export interface Testimonial {
         margin: 0;
       }
     }
+
+    :host-context([data-theme="dark"]) {
+      .testimonial-card {
+        background: #1e293b;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+        &:hover {
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+      }
+
+      .testimonial-content { color: #94a3b8; }
+      .author-name { color: #f1f5f9 !important; }
+      .author-role { color: #64748b !important; }
+    }
   `]
 })
 export class TestimonialCardComponent {

@@ -1,3 +1,5 @@
+@use '../../../styles/mixins';
+
 .nosotros-page {
   min-height: 100vh;
   padding-top: 70px;
@@ -208,5 +210,49 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+// ── DARK MODE ──
+@include mixins.dark-mode {
+  .story-section {
+    background: #0f172a;
+
+    .story-content {
+      p { color: #94a3b8; }
+      p strong { color: #22d3ee; }
+    }
+  }
+
+  .values-section {
+    background: #1e293b;
+
+    .section-title { color: #f1f5f9; }
+
+    .value-card {
+      background: #0f172a;
+      border-color: rgba(51, 65, 85, 0.4);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+
+      h3 { color: #22d3ee; }
+      p { color: #94a3b8; }
+    }
+  }
+
+  .team-section {
+    background: #0f172a;
+
+    .section-title { color: #f1f5f9; }
+
+    .team-card {
+      background: #1e293b;
+
+      &:hover {
+        background: linear-gradient(135deg, rgba(14, 116, 144, 0.15), rgba(20, 184, 166, 0.15));
+      }
+
+      .member-name { color: #f1f5f9; }
+      .member-role { color: #22d3ee; }
+    }
   }
 }
