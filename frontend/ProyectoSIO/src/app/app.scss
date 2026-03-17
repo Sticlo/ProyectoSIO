@@ -152,7 +152,7 @@
 /* =========================================================================
    CUSTOM ANIMATED CURSOR
    ========================================================================= */
-::ng-deep body,
+/* ::ng-deep body,
 ::ng-deep a,
 ::ng-deep button,
 ::ng-deep .btn,
@@ -196,7 +196,7 @@
   pointer-events: none;
   z-index: 9999;
   transition: width 0.2s, height 0.2s, background-color 0.2s, margin 0.2s, border-color 0.2s, opacity 0.3s;
-}
+} */
 
 .cursor-dot.cursor-hover {
   width: 12px;
