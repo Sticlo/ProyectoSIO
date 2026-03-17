@@ -31,12 +31,12 @@ export class AuthService {
   private readonly TOKEN_KEY = 'auth_token';
   private readonly USER_KEY = 'auth_user';
   
-  private http = inject(HttpClient);
-  private storageService = inject(StorageService);
-  private router = inject(Router);
-  private apiUrl = environment.apiUrl;
+  private readonly http = inject(HttpClient);
+  private readonly storageService = inject(StorageService);
+  private readonly router = inject(Router);
+  private readonly apiUrl = environment.apiUrl;
   
-  private currentUser = signal<User | null>(this.loadUser());
+  private readonly currentUser = signal<User | null>(this.loadUser());
   
   // Computed signals
   readonly user = this.currentUser.asReadonly();
@@ -51,11 +51,66 @@ export class AuthService {
     const token = this.storageService.getItem(this.TOKEN_KEY);
     const stored = this.storageService.getLocal(this.USER_KEY);
     if (token && stored) {
+      // Verificar si el token está expirado
+      if (this.isTokenExpired(token)) {
+        this.storageService.removeItem(this.TOKEN_KEY);
+        this.storageService.removeLocal(this.USER_KEY);
+        return null;
+      }
       return stored;
     }
     // Si no hay token, limpiar datos inconsistentes
     this.storageService.removeLocal(this.USER_KEY);
     return null;
+  }
+  
+  /**
+   * Verificar si un token JWT está expirado
+   */
+  private isTokenExpired(token: string): boolean {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.exp * 1000 < Date.now();
+    } catch {
+      return true;
+    }
+  }
+
+  /**
+   * Verificar si el token expira pronto (dentro de 1 hora)
+   */
+  isTokenExpiringSoon(): boolean {
+    const token = this.getToken();
+    if (!token) return true;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const oneHourMs = 60 * 60 * 1000;
+      return (payload.exp * 1000) - Date.now() < oneHourMs;
+    } catch {
+      return true;
+    }
+  }
+
+  /**
+   * Renovar el token JWT con el backend
+   * Guarda el nuevo token y retorna true si fue exitoso
+   */
+  refreshToken(): Observable<boolean> {
+    const token = this.getToken();
+    if (!token) return of(false);
+
+    return this.http.post<{ token: string }>(
+      `${this.apiUrl}/auth/refresh`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    ).pipe(
+      tap((response) => {
+        this.storageService.setItem(this.TOKEN_KEY, response.token);
+        console.log('🔄 Token renovado automáticamente');
+      }),
+      map(() => true),
+      catchError(() => of(false))
+    );
   }
   
   /**
@@ -114,6 +169,13 @@ export class AuthService {
     this.storageService.removeItem(this.TOKEN_KEY);
     this.storageService.removeLocal(this.USER_KEY);
     this.router.navigate(['/login']);
+  }
+
+  /**
+   * Guardar token directamente (usado por el interceptor al renovar)
+   */
+  saveToken(token: string): void {
+    this.storageService.setItem(this.TOKEN_KEY, token);
   }
   
   /**

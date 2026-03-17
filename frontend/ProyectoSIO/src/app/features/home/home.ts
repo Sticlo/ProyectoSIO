@@ -25,45 +25,37 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
 
   // Animated counters
   counters = signal([
-    { target: 500, current: 0, suffix: '+', label: 'Clientes Activos', icon: 'users' },
-    { target: 15000, current: 0, suffix: '+', label: 'Pedidos Procesados', icon: 'package' },
-    { target: 99, current: 0, suffix: '%', label: 'Uptime Garantizado', icon: 'shield' },
-    { target: 4.9, current: 0, suffix: '/5', label: 'Satisfacción', icon: 'star', decimals: 1 }
+    { target: 10, current: 0, suffix: '+', label: 'Proyectos Entregados', icon: 'package' },
+    { target: 5, current: 0, suffix: '', label: 'Profesionales en el Equipo', icon: 'users' },
+    { target: 100, current: 0, suffix: '%', label: 'Compromiso Total', icon: 'shield' },
+    { target: 5, current: 0, suffix: '/5', label: 'Satisfacción Clientes', icon: 'star', decimals: 1 }
   ]);
   countersAnimated = false;
 
-  // Testimonios
+  // Testimonios de clientes reales
   testimonials: Testimonial[] = [
     {
       id: '1',
-      name: 'Carlos Méndez',
-      role: 'Director General',
-      company: 'Fashion Boutique',
-      content: 'La plataforma e-commerce que desarrollaron transformó nuestro negocio. Las ventas en línea aumentaron un 300% en los primeros 3 meses. La experiencia de usuario es excepcional.',
+      name: 'Operadores Asociados Bogotá',
+      role: 'Empresa de Maquinaria',
+      company: 'Operadores Asociados',
+      content: 'SIO nos creó un sitio web profesional que refleja la seriedad de nuestra empresa. Ahora nuestros clientes pueden ver nuestro catálogo de maquinaria y contactarnos fácilmente. Excelente trabajo.',
       rating: 5
     },
     {
       id: '2',
-      name: 'Laura Sánchez',
-      role: 'Dueña',
-      company: 'Tienda Local',
-      content: 'El panel de administración es intuitivo y completo. Puedo gestionar inventario, pedidos y finanzas desde cualquier lugar. Ha sido un cambio radical para mi negocio.',
+      name: 'Sempiternox',
+      role: 'Empresa de Ropa',
+      company: 'Sempiternox',
+      content: 'Gracias a SIO nuestra tienda en línea luce increíble y las ventas se han disparado. El equipo entendió perfectamente nuestra marca y la plasmo al sitio de manera impecable.',
       rating: 5
     },
     {
       id: '3',
-      name: 'Roberto Jiménez',
-      role: 'CEO',
-      company: 'TechStore',
-      content: 'La integración con WhatsApp fue un cambio radical. Nuestros clientes ahora realizan pedidos fácilmente y gestionamos todo desde un solo lugar.',
-      rating: 5
-    },
-    {
-      id: '4',
-      name: 'Ana Martínez',
-      role: 'Gerente de Operaciones',
-      company: 'MegaShop',
-      content: 'El sistema de gestión financiera nos permite tener control total sobre ingresos y gastos. Los reportes automáticos nos ahorran horas de trabajo.',
+      name: 'Fresquitox',
+      role: 'Empresa de Granizados',
+      company: 'Fresquitox',
+      content: 'Queríamos una página donde nuestros clientes pudieran ver nuestros productos y hacer pedidos. SIO lo hizo realidad con un diseño fresco y moderno que encanta a todos.',
       rating: 5
     }
   ];
@@ -98,10 +90,10 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
 
   // Stats for about section
   stats = [
-    { value: '50+', label: 'Proyectos Exitosos' },
-    { value: '99%', label: 'Satisfacción Cliente' },
-    { value: '24/7', label: 'Soporte Técnico' },
-    { value: '3x', label: 'Más Ventas Promedio' }
+    { value: '10+', label: 'Proyectos Entregados' },
+    { value: '100%', label: 'Compromiso' },
+    { value: '5', label: 'Profesionales' },
+    { value: 'Bogotá', label: 'Colombia' }
   ];
 
   // Technologies
@@ -111,7 +103,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
   ];
 
   // Typed text animation
-  typedTexts = ['tu e-commerce', 'tu negocio', 'tus ventas', 'tu marca'];
+  typedTexts = ['tu sitio web', 'tu negocio', 'tus ventas', 'tu presencia digital'];
   currentTypedIndex = signal(0);
   displayedText = signal('');
   isDeleting = signal(false);

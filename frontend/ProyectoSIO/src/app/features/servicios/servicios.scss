@@ -1,3 +1,5 @@
+@use '../../../styles/mixins';
+
 .servicios-page {
   min-height: 100vh;
   padding-top: 70px;
@@ -130,5 +132,26 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+// ── DARK MODE ──
+@include mixins.dark-mode {
+  .services-grid {
+    background: #0f172a;
+
+    .service-card {
+      background: rgba(30, 41, 59, 0.9);
+      border-color: rgba(51, 65, 85, 0.4);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+
+      &:hover {
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        border-color: rgba(14, 116, 144, 0.3);
+      }
+    }
+
+    .service-title { color: #f1f5f9; }
+    .service-description { color: #94a3b8; }
   }
 }

@@ -20,24 +20,33 @@ export class Contacto {
   submitted = signal(false);
   
   contactInfo = [
-    { icon: '📧', label: 'Email', value: 'contacto@sio.com' },
-    { icon: '📱', label: 'Teléfono', value: '+1 234 567 8900' },
-    { icon: '📍', label: 'Dirección', value: 'Ciudad, País' },
+    { icon: '📧', label: 'Email', value: 'gestiondecomprassio@gmail.com' },
+    { icon: '📱', label: 'Teléfono', value: '+57 322 7067516' },
+    { icon: '📍', label: 'Dirección', value: 'Bogotá, Colombia' },
     { icon: '🕐', label: 'Horario', value: 'Lun - Vie: 9:00 - 18:00' }
   ];
   
+  private readonly WHATSAPP_NUMBER = '573227067516'; // sin +
+
   onSubmit() {
-    console.log('Formulario enviado:', this.formData());
+    const data = this.formData();
+
+    // Construir mensaje para WhatsApp
+    const text = [
+      `Hola, me contacto desde el sitio web.`,
+      `*Nombre:* ${data.name}`,
+      `*Email:* ${data.email}`,
+      data.phone ? `*Teléfono:* ${data.phone}` : '',
+      `*Mensaje:* ${data.message}`
+    ].filter(Boolean).join('\n');
+
+    const url = `https://wa.me/${this.WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+
     this.submitted.set(true);
-    
     setTimeout(() => {
       this.submitted.set(false);
-      this.formData.set({
-        name: '',
-        email: '',
-        phone: '',
-        message: ''
-      });
+      this.formData.set({ name: '', email: '', phone: '', message: '' });
     }, 3000);
   }
 }

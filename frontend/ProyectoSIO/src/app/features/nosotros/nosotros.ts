@@ -10,16 +10,17 @@ import { CommonModule } from '@angular/common';
 })
 export class Nosotros {
   team = [
-    { name: 'María González', role: 'CEO & Fundadora', image: '👩‍💼' },
-    { name: 'Carlos Rodríguez', role: 'CTO', image: '👨‍💻' },
-    { name: 'Ana Martínez', role: 'Directora de Diseño', image: '👩‍🎨' },
-    { name: 'Juan López', role: 'Líder de Desarrollo', image: '👨‍🔧' }
+    { name: 'Marlon Pérez', role: 'CEO & Marketing', image: '👨‍💼' },
+    { name: 'Juan Aguilar', role: 'Desarrollador', image: '👨‍💻' },
+    { name: 'Thomas Cortés', role: 'Desarrollador', image: '👨‍💻' },
+    { name: 'Santiago Gómez', role: 'Desarrollador', image: '👨‍💻' },
+    { name: 'Jair Erazo', role: 'Diseñador UI/UX', image: '🎨' }
   ];
-  
+
   values = [
-    { icon: '🎯', title: 'Innovación', description: 'Buscamos constantemente nuevas formas de resolver problemas' },
-    { icon: '💎', title: 'Calidad', description: 'Excelencia en cada proyecto que entregamos' },
-    { icon: '🤝', title: 'Colaboración', description: 'Trabajamos estrechamente con nuestros clientes' },
-    { icon: '⚡', title: 'Agilidad', description: 'Respuesta rápida y adaptación al cambio' }
+    { icon: '💻', title: 'Desarrollo Web', description: 'Creamos sitios y aplicaciones web a medida con las últimas tecnologías' },
+    { icon: '🚀', title: 'Potencia tus Ventas', description: 'Diseñamos soluciones digitales que impulsan el crecimiento de tu negocio' },
+    { icon: '🤝', title: 'Asesoría Personalizada', description: 'Acompañamos a cada cliente desde la idea hasta el lanzamiento' },
+    { icon: '⚡', title: 'Agilidad', description: 'Entregas rápidas, iterativas y adaptadas a tus necesidades' }
   ];
 }

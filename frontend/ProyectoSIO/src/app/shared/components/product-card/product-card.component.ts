@@ -262,6 +262,46 @@ export interface Product {
         cursor: not-allowed;
       }
     }
+
+    :host-context([data-theme="dark"]) {
+      .product-card {
+        background: #1e293b;
+        border-color: rgba(51, 65, 85, 0.4);
+
+        &:hover {
+          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+          border-color: rgba(14, 116, 144, 0.3);
+        }
+      }
+
+      .product-image {
+        background: linear-gradient(135deg, #263048 0%, #1e293b 100%);
+      }
+
+      .favorite-btn {
+        background: rgba(30, 41, 59, 0.9);
+        border-color: rgba(51, 65, 85, 0.4);
+        svg { color: #64748b; }
+        &:hover { background: #1e293b; }
+      }
+
+      .product-category { color: #64748b; }
+      .product-name { color: #f1f5f9; }
+
+      .product-price {
+        .price-current { color: #f1f5f9; }
+        .price-original { color: #64748b; }
+      }
+
+      .add-to-cart-btn {
+        background: linear-gradient(135deg, #0E7490, #14B8A6);
+
+        &:hover:not(:disabled) {
+          background: linear-gradient(135deg, #14B8A6, #0E7490);
+          box-shadow: 0 4px 12px rgba(14, 116, 144, 0.3);
+        }
+      }
+    }
   `]
 })
 export class ProductCardComponent {

@@ -149,6 +149,25 @@
   flex: 1;
 }
 
+// ── DARK MODE ──
+@include mixins.dark-mode {
+  .splash-modal {
+    background-color: #0f172a;
+  }
+
+  .splash-logo .logo-text {
+    color: #f1f5f9;
+  }
+
+  .splash-logo .sio-tagline {
+    color: #94a3b8;
+  }
+
+  .splash-loader {
+    background: rgba(14, 116, 144, 0.15);
+  }
+}
+
 /* =========================================================================
    CUSTOM ANIMATED CURSOR
    ========================================================================= */

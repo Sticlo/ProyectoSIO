@@ -3,6 +3,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { Header } from './layout/header/header';
 import { Footer } from './layout/footer/footer';
+import { ThemeService } from './core/services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -17,9 +18,10 @@ export class App implements OnInit, AfterViewInit {
   showSplash = signal(true);
   isFadingOut = signal(false);
 
-  constructor(private ngZone: NgZone, @Inject(PLATFORM_ID) private platformId: Object) { }
+  constructor(private ngZone: NgZone, @Inject(PLATFORM_ID) private platformId: Object, private themeService: ThemeService) { }
 
   ngOnInit() {
+    this.themeService.init();
     // Elegant splash screen removal sequence
     // 1. Wait a bit for the user to see the logo (1.5 seconds)
     setTimeout(() => {

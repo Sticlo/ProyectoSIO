@@ -1,4 +1,5 @@
 @use '../../../styles/variables' as *;
+@use '../../../styles/mixins';
 @use 'sass:color';
 
 .productos-page {
@@ -1455,5 +1456,148 @@
   to {
     opacity: 1;
     transform: translateX(0);
+  }
+}
+
+// ── DARK MODE ──
+@include mixins.dark-mode {
+  .productos-page {
+    background: #0f172a;
+  }
+
+  .search-bar-section {
+    background: #1e293b;
+    border-bottom-color: rgba(51, 65, 85, 0.4);
+
+    .search-input {
+      background: #0f172a;
+      border-color: rgba(51, 65, 85, 0.5);
+      color: #f1f5f9;
+
+      &:focus {
+        background: #162032;
+        border-color: #0E7490;
+        box-shadow: 0 0 0 3px rgba(14, 116, 144, 0.2);
+      }
+
+      &::placeholder { color: #64748b; }
+    }
+
+    .filter-toggle-btn {
+      background: rgba(14, 116, 144, 0.1);
+      border-color: rgba(14, 116, 144, 0.3);
+      color: #22d3ee;
+
+      &:hover {
+        background: rgba(14, 116, 144, 0.2);
+      }
+    }
+  }
+
+  .sidebar {
+    background: #1e293b;
+    border-color: rgba(51, 65, 85, 0.4);
+
+    .filters-header {
+      border-bottom-color: rgba(51, 65, 85, 0.4);
+      h3 { color: #f1f5f9; }
+    }
+
+    .filter-title { color: #f1f5f9; }
+
+    .filter-option {
+      &:hover { background: rgba(14, 116, 144, 0.1); }
+      .option-label { color: #94a3b8; }
+      .option-count { color: #64748b; }
+    }
+
+    .price-inputs input {
+      background: #0f172a;
+      border-color: rgba(51, 65, 85, 0.5);
+      color: #f1f5f9;
+    }
+
+    .rating-option {
+      background: rgba(15, 23, 42, 0.5);
+      border-color: rgba(51, 65, 85, 0.4);
+      span { color: #94a3b8; }
+
+      &:hover {
+        background: rgba(14, 116, 144, 0.1);
+        border-color: #0E7490;
+      }
+    }
+  }
+
+  .products-area {
+    .toolbar {
+      background: #1e293b;
+      border-color: rgba(51, 65, 85, 0.4);
+
+      .search-term { color: #94a3b8; strong { color: #f1f5f9; } }
+
+      .sort-select-wrapper label { color: #94a3b8; }
+
+      .sort-select {
+        background-color: #0f172a;
+        border-color: rgba(51, 65, 85, 0.5);
+        color: #f1f5f9;
+
+        &:focus {
+          background-color: #162032;
+          border-color: #0E7490;
+        }
+      }
+
+      .view-toggle {
+        background: #0f172a;
+        border-color: rgba(51, 65, 85, 0.4);
+        .view-btn { color: #94a3b8; &:hover { background: rgba(14,116,144,0.15); color: #22d3ee; } }
+      }
+    }
+
+    .no-results {
+      background: #1e293b;
+      border-color: rgba(51, 65, 85, 0.4);
+      h3 { color: #f1f5f9; }
+      p { color: #94a3b8; }
+    }
+
+    .loading-state {
+      p { color: #94a3b8; }
+      .spinner { border-color: rgba(51, 65, 85, 0.5); border-top-color: #14B8A6; }
+    }
+  }
+
+  .product-modal {
+    background: #1e293b;
+
+    .modal-close-btn {
+      background: rgba(30, 41, 59, 0.95);
+      border-color: rgba(51, 65, 85, 0.5);
+      color: #94a3b8;
+
+      &:hover { background: #0E7490; color: white; border-color: #0E7490; }
+    }
+
+    .modal-image-section {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    }
+
+    .modal-product-name { color: #f1f5f9; }
+    .modal-product-description { color: #94a3b8; }
+    .modal-review-count { color: #64748b; }
+
+    .modal-features {
+      background: rgba(14, 116, 144, 0.08);
+      border-color: rgba(14, 116, 144, 0.2);
+      .features-title { color: #f1f5f9; }
+      li { color: #94a3b8; }
+    }
+
+    .modal-price-section {
+      border-top-color: rgba(51, 65, 85, 0.4);
+      .modal-original-price { color: #64748b; }
+    }
   }
 }

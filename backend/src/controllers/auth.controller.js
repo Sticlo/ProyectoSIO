@@ -114,6 +114,58 @@ class AuthController {
   }
 
   /**
+   * Renovar token JWT
+   * Acepta token válido o expirado (hasta 7 días después de expirar)
+   */
+  static async refresh(req, res) {
+    try {
+      const authHeader = req.headers['authorization'];
+      const token = authHeader && authHeader.split(' ')[1];
+
+      if (!token) {
+        return res.status(401).json({ error: 'Token no proporcionado' });
+      }
+
+      let decoded;
+      try {
+        // Intentar verificar normalmente
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
+      } catch (err) {
+        if (err.name === 'TokenExpiredError') {
+          // Permitir renovar tokens expirados recientemente (máx 7 días)
+          decoded = jwt.verify(token, process.env.JWT_SECRET, { ignoreExpiration: true });
+          const expiredAt = decoded.exp * 1000;
+          const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+          if (Date.now() - expiredAt > sevenDaysMs) {
+            return res.status(401).json({ error: 'Token demasiado antiguo para renovar. Inicia sesión nuevamente.' });
+          }
+        } else {
+          return res.status(403).json({ error: 'Token inválido' });
+        }
+      }
+
+      // Verificar que el usuario todavía existe en la BD
+      const user = await UserModel.findById(decoded.id);
+      if (!user) {
+        return res.status(401).json({ error: 'Usuario no encontrado' });
+      }
+
+      // Generar nuevo token
+      const newToken = jwt.sign(
+        { id: user.id, email: user.email, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+      );
+
+      console.log('🔄 Token renovado para:', user.email);
+      res.json({ token: newToken });
+    } catch (error) {
+      console.error('Error al renovar token:', error);
+      res.status(500).json({ error: 'Error al renovar token' });
+    }
+  }
+
+  /**
    * Obtener perfil del usuario autenticado
    */
   static async getProfile(req, res) {
