@@ -37,7 +37,7 @@ export class NavigationService {
       title: 'Servicios',
       description: 'Nuestros servicios digitales',
       route: '/servicios',
-      keywords: ['servicios', 'soluciones', 'desarrollo', 'web', 'apps'],
+      keywords: ['servicios', 'soluciones', 'desarrollo', 'web', 'apps'],  
       section: 'Navegación',
       icon: 'briefcase'
     },

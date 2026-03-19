@@ -165,10 +165,12 @@ export class AuthService {
    * Logout
    */
   logout(): void {
+    const wasAuthenticated = this.currentUser() !== null;
     this.currentUser.set(null);
     this.storageService.removeItem(this.TOKEN_KEY);
     this.storageService.removeLocal(this.USER_KEY);
-    this.router.navigate(['/login']);
+    // Solo redirigir al login si el usuario estaba autenticado
+    this.router.navigate([wasAuthenticated ? '/login' : '/home']);
   }
 
   /**
