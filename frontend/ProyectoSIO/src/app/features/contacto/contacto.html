@@ -1,0 +1,164 @@
+<div class="sio-contacto clone-web-sio-layout">
+  <!-- Hero Section -->
+  <section class="contacto-hero">
+    <div class="container contacto-hero-wrap">
+      <p class="hero-badge">CONTÁCTANOS</p>
+      <h1>
+        Hablemos sobre tu
+        <span>próximo proyecto</span>
+      </h1>
+      <p class="hero-text">
+        Nuestro equipo está listo para ayudarte. Elige el canal que prefieras y nos pondremos en contacto lo antes posible.
+      </p>
+    </div>
+  </section>
+
+  <!-- Contact Channels -->
+  <section class="contact-channels">
+    <div class="container">
+      <div class="channels-grid">
+        @for (channel of contactChannels; track channel.title) {
+        <a [href]="channel.link" target="_blank" rel="noopener noreferrer" class="channel-card">
+          <div class="channel-icon">{{ channel.icon }}</div>
+          <h3>{{ channel.title }}</h3>
+          <p class="channel-description">{{ channel.description }}</p>
+          <p class="channel-value">{{ channel.value }}</p>
+          <span class="arrow">→</span>
+        </a>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Contact Form -->
+  <section class="contact-form-section">
+    <div class="container">
+      <div class="form-wrapper">
+        <div class="form-header">
+          <h2>Envíanos un Mensaje</h2>
+          <p>Completa el formulario y nos contactaremos en 24-48 horas</p>
+        </div>
+
+        @if (submitted()) {
+        <div class="success-message">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+          <div class="success-content">
+            <h4>¡Mensaje enviado!</h4>
+            <p>Nos pondremos en contacto pronto. También puedes escribirnos a hello@sio.com</p>
+          </div>
+        </div>
+        } @else {
+        <form class="contact-form" (ngSubmit)="onSubmit()">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Nombre Completo *</label>
+              <input
+                type="text"
+                id="name"
+                [(ngModel)]="formData().name"
+                name="name"
+                required
+                placeholder="Tu nombre"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email *</label>
+              <input
+                type="email"
+                id="email"
+                [(ngModel)]="formData().email"
+                name="email"
+                required
+                placeholder="tu@email.com"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="subject">Asunto</label>
+            <input
+              type="text"
+              id="subject"
+              [(ngModel)]="formData().subject"
+              name="subject"
+              placeholder="¿Sobre qué quieres hablar?"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="message">Mensaje *</label>
+            <textarea
+              id="message"
+              [(ngModel)]="formData().message"
+              name="message"
+              rows="6"
+              required
+              placeholder="Cuéntanos acerca de tu proyecto, necesidades o preguntas..."
+            ></textarea>
+          </div>
+
+          <div class="form-footer">
+            <p class="form-note">* Campos requeridos</p>
+            <button type="submit" class="btn btn-primary" [disabled]="loading()">
+              @if (loading()) {
+              <span>Enviando...</span>
+              } @else {
+              <span>Enviar Mensaje</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M1 8H15M15 8L8 1M15 8L8 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              }
+            </button>
+          </div>
+        </form>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Quick Section -->
+  <section class="faq-quick">
+    <div class="container">
+      <div class="section-head">
+        <h2>Preguntas frecuentes</h2>
+      </div>
+
+      <div class="faq-grid">
+        <div class="faq-item">
+          <h4>¿Cuánto tarda en responder el equipo?</h4>
+          <p>Responden en máximo 24-48 horas. Para asuntos urgentes, contáctanos por WhatsApp.</p>
+        </div>
+        <div class="faq-item">
+          <h4>¿Cuál es el horario de atención?</h4>
+          <p>Lunes a viernes de 9:00 AM a 6:00 PM (GMT-5). WhatsApp disponible 24/7.</p>
+        </div>
+        <div class="faq-item">
+          <h4>¿Ofrecen consulta inicial gratuita?</h4>
+          <p>Sí, contáctanos e intenta agendar una llamada para discutir tu proyecto sin compromiso.</p>
+        </div>
+        <div class="faq-item">
+          <h4>¿Trabajan con clientes internacionales?</h4>
+          <p>Absolutamente. Tenemos experiencia trabajando con equipos en diferentes zonas horarias.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="contacto-cta">
+    <div class="container">
+      <div class="cta-wrap">
+        <h2>¿No estás seguro por dónde empezar?</h2>
+        <p>Revisa nuestros planes o descubre casos de éxito de otros clientes</p>
+        <div class="cta-buttons">
+          <a routerLink="/pricing" class="btn btn-primary">Ver planes</a>
+          <a routerLink="/portfolio" class="btn btn-outline">Ver casos de éxito</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

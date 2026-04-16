@@ -1,0 +1,458 @@
+@use '../../shared/styles/design-tokens.scss' as *;
+
+.sio-about {
+  --bg: #000000;
+  --surface: #07090d;
+  --surface-2: #0a0d11;
+  --line: #1a1f27;
+  --text: #eef1f6;
+  --muted: #8f98a6;
+  --brand: #6ef3c0;
+
+  background:
+    radial-gradient(circle at 75% 25%, rgba(110, 243, 192, 0.06), transparent 40%),
+    radial-gradient(circle at 25% 75%, rgba(110, 243, 192, 0.03), transparent 50%),
+    var(--bg);
+  color: var(--text);
+  font-family: 'Manrope', 'Segoe UI', sans-serif;
+}
+
+.about-hero,
+.mission-section,
+.stats-section,
+.values-section,
+.timeline-section,
+.team-section,
+.about-cta {
+  padding: clamp(2rem, 5vw, 4rem) 0;
+}
+
+.about-hero {
+  padding: clamp(2.1rem, 4.6vw, 4rem) 0 clamp(2.9rem, 5vw, 4.2rem);
+}
+
+.about-hero-wrap {
+  display: grid;
+  justify-items: start;
+  text-align: left;
+  gap: 1rem;
+  width: min(100%, 800px);
+  margin-inline: auto;
+}
+
+.about-hero h1 {
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: 0;
+
+  span {
+    background: linear-gradient(120deg, var(--brand), #5ee0b0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+.hero-text {
+  font-size: 1.125rem;
+  color: var(--muted);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+.hero-badge {
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+
+// Mission Cards
+.mission-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.mission-card {
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(110, 243, 192, 0.08), transparent);
+  border: 1px solid rgba(110, 243, 192, 0.2);
+  border-radius: 0.75rem;
+  text-align: center;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: var(--brand);
+    transform: translateY(-4px);
+  }
+}
+
+.mission-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  display: inline-block;
+}
+
+.mission-card h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  color: var(--text);
+}
+
+.mission-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+// Stats Section
+.stats-section {
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 1.5rem 0;
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--brand);
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.stat-label {
+  font-size: 0.95rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+// Section Head
+.section-head {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.kicker {
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brand);
+  margin: 0 0 0.5rem;
+}
+
+.section-head h2 {
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 800;
+  margin: 0;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: var(--muted);
+  margin: 1rem 0 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+// Values Grid
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.value-card {
+  padding: 2rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: rgba(110, 243, 192, 0.3);
+    background: linear-gradient(135deg, rgba(110, 243, 192, 0.05), transparent);
+  }
+}
+
+.value-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  display: inline-block;
+}
+
+.value-card h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  color: var(--text);
+}
+
+.value-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+// Timeline
+.timeline {
+  position: relative;
+  padding: 2rem 0;
+}
+
+.timeline-item {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+  position: relative;
+
+  &:last-child {
+    margin-bottom: 0;
+
+    .marker-line {
+      display: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    gap: 1rem;
+
+    .timeline-marker {
+      position: relative;
+    }
+  }
+}
+
+.timeline-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.marker-dot {
+  width: 16px;
+  height: 16px;
+  background: var(--brand);
+  border: 3px solid var(--bg);
+  border-radius: 50%;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 0 20px rgba(110, 243, 192, 0.4);
+}
+
+.marker-line {
+  width: 2px;
+  background: linear-gradient(180deg, var(--brand), transparent);
+  height: 80px;
+  margin-top: 8px;
+}
+
+.timeline-content {
+  padding: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: rgba(110, 243, 192, 0.2);
+  }
+}
+
+.timeline-year {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--brand);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0 0 0.5rem;
+}
+
+.timeline-content h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  color: var(--text);
+}
+
+.timeline-content p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+// Team Section
+.team-section {
+  text-align: center;
+}
+
+.team-cta {
+  margin-top: 2rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(110, 243, 192, 0.1), transparent);
+  border: 1px solid rgba(110, 243, 192, 0.2);
+  border-radius: 0.75rem;
+
+  p {
+    font-size: 1rem;
+    color: var(--text);
+    margin: 0 0 1rem;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.75rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 1px solid var(--line);
+    color: var(--text);
+    background: transparent;
+
+    &:hover {
+      border-color: var(--brand);
+      color: var(--brand);
+    }
+  }
+}
+
+// CTA Final
+.about-cta {
+  text-align: center;
+}
+
+.cta-wrap {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(110, 243, 192, 0.08), rgba(110, 243, 192, 0.02));
+  border: 1px solid rgba(110, 243, 192, 0.2);
+  border-radius: 0.75rem;
+
+  h2 {
+    font-size: clamp(1.75rem, 3vw, 2rem);
+    font-weight: 800;
+    margin: 0 0 0.5rem;
+    color: var(--text);
+  }
+
+  p {
+    font-size: 1rem;
+    color: var(--muted);
+    margin: 0 0 1.5rem;
+  }
+}
+
+.cta-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+
+  @media (min-width: 600px) {
+    flex-direction: row;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+
+    &.btn-primary {
+      background: var(--brand);
+      color: #000;
+
+      &:hover {
+        background: #5ee0b0;
+        transform: translateY(-2px);
+      }
+    }
+
+    &.btn-outline {
+      border: 1px solid var(--line);
+      color: var(--text);
+
+      &:hover {
+        border-color: var(--brand);
+        color: var(--brand);
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .about-hero-wrap {
+    width: 100%;
+  }
+
+  .about-hero h1 {
+    font-size: 1.75rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .timeline-item {
+    grid-template-columns: 40px 1fr;
+    gap: 1rem;
+  }
+
+  .cta-buttons {
+    flex-direction: column;
+
+    .btn {
+      width: 100%;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .mission-card {
+    padding: 1.5rem;
+  }
+
+  .value-card {
+    padding: 1.5rem;
+  }
+}

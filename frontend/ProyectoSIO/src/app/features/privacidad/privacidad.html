@@ -1,0 +1,39 @@
+<div class="privacidad-page">
+
+  <!-- Hero -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="hero-icon">🔐</div>
+      <h1 class="hero-title">Política de Privacidad</h1>
+      <p class="hero-subtitle">Última actualización: {{ ultimaActualizacion }}</p>
+    </div>
+  </section>
+
+  <!-- Contenido -->
+  <section class="contenido-section">
+    <div class="container">
+
+      <div class="intro-box">
+        <p>En <strong>SIO</strong>, su privacidad es nuestra prioridad. Esta política describe cómo recopilamos, usamos y protegemos su información personal cuando utiliza nuestra plataforma. Nos comprometemos a ser transparentes sobre nuestras prácticas.</p>
+      </div>
+
+      <div class="secciones-grid">
+        @for (s of secciones; track s.titulo) {
+          <div class="seccion-card">
+            <div class="seccion-icono">{{ s.icono }}</div>
+            <div class="seccion-body">
+              <h2 class="seccion-titulo">{{ s.titulo }}</h2>
+              <p class="seccion-contenido">{{ s.contenido }}</p>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="footer-nota">
+        <p>¿Tiene preguntas sobre su privacidad? <a routerLink="/contacto">Contáctenos</a> y le responderemos en menos de 48 horas.</p>
+      </div>
+
+    </div>
+  </section>
+
+</div>

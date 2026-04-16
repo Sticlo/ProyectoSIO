@@ -1,0 +1,130 @@
+<div class="sio-pricing clone-web-sio-layout">
+  <!-- Hero Section -->
+  <section class="pricing-hero">
+    <div class="container pricing-hero-wrap">
+      <p class="hero-badge">PLANES Y PRECIOS</p>
+      <h1>
+        Planes diseñados para
+        <span>empresas de todos los tamaños</span>
+      </h1>
+      <p class="hero-text">
+        Desde empresas con presupuesto limitado hasta negocios listos para escalar. SIO tiene la solución web perfecta para ti. Sin contratos, solo resultados.
+      </p>
+    </div>
+  </section>
+
+  <!-- Pricing Cards -->
+  <section class="pricing-cards">
+    <div class="container">
+      <div class="cards-grid">
+        @for (plan of pricingPlans; track plan.name) {
+        <article class="pricing-card" [class.popular]="plan.popular">
+          @if (plan.popular) {
+          <div class="popular-badge">MÁS POPULAR</div>
+          }
+          
+          <div class="card-header">
+            <span class="plan-icon">{{ plan.icon }}</span>
+            <h3>{{ plan.name }}</h3>
+            <p class="plan-description">{{ plan.description }}</p>
+          </div>
+
+          <div class="card-pricing">
+            <div class="price">
+              <div class="price-main">${{ plan.priceCOP }}</div>
+              <div class="price-currency">Pesos Colombianos</div>
+              <div class="price-divider">o</div>
+              <div class="price-alt">${{ plan.priceUSD }} USD</div>
+            </div>
+            <div class="price-period">{{ plan.period }}</div>
+          </div>
+
+          <a [routerLink]="plan.ctaLink" class="btn" [class.btn-primary]="plan.popular" [class.btn-outline]="!plan.popular">
+            {{ plan.cta }}
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M1 8H15M15 8L8 1M15 8L8 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+
+          <div class="divider"></div>
+
+          <ul class="features-list">
+            @for (feature of plan.features; track feature) {
+            <li>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M16.667 5L7.5 14.167L3.333 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span>{{ feature }}</span>
+            </li>
+            }
+          </ul>
+        </article>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Included in All Plans -->
+  <section class="included-all">
+    <div class="container">
+      <div class="section-head">
+        <p class="kicker">EN TODOS LOS PLANES</p>
+        <h2>Características incluidas sin importar el plan</h2>
+      </div>
+
+      <div class="included-grid">
+        @for (feature of includedFeatures; track feature) {
+        <div class="included-item">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="11" stroke="var(--brand)" stroke-width="2"/>
+            <path d="M7 12.5L10.5 16L17 9" stroke="var(--brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p>{{ feature }}</p>
+        </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Quick -->
+  <section class="pricing-faq">
+    <div class="container">
+      <div class="section-head">
+        <h2>Preguntas frecuentes sobre precios</h2>
+      </div>
+
+      <div class="faq-grid">
+        <div class="faq-item">
+          <h4>¿Cuánto tiempo toma desarrollar mi web?</h4>
+          <p>Landing pages: 2-3 semanas. Plataformas completas: 4-6 semanas según la complejidad. Primero tenemos una consultoría para definir el alcance exacto.</p>
+        </div>
+        <div class="faq-item">
+          <h4>¿Qué pasa después del lanzamiento?</h4>
+          <p>Incluye soporte por 3-6 meses según el plan. Puedes contratar mantenimiento adicional si lo necesitas. Siempre entregamos documentación para que entiendas tu web.</p>
+        </div>
+        <div class="faq-item">
+          <h4>¿Puedo pedir cambios durante el desarrollo?</h4>
+          <p>Claro. Trabajamos con metodología ágil e iterativa. Puedes ver avances constantemente y solicitar ajustes. El precio se negocia según los cambios solicitados.</p>
+        </div>
+        <div class="faq-item">
+          <h4>¿Qué sucede con mi de dominio y hosting?</h4>
+          <p>Transfer gratis de tu dominio y hosting 1 año incluido. Después puedes renovar directamente o deixar que nosotros lo manejemos. Opción flexible según tus necesidades.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Final -->
+  <section class="pricing-cta">
+    <div class="container">
+      <div class="cta-wrap">
+        <h2>¿Listo para llevar tu negocio al siguiente nivel?</h2>
+        <p>Empieza con plan Professional o agenda una demo de Enterprise</p>
+        <div class="cta-buttons">
+          <a routerLink="/contacto" class="btn btn-primary">Comenzar ahora</a>
+          <a routerLink="/contacto" class="btn btn-outline">Agendar demo</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

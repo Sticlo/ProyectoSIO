@@ -1,0 +1,149 @@
+<div class="sio-portfolio clone-web-sio-layout">
+  <!-- Hero Section -->
+  <section class="portfolio-hero">
+    <div class="container portfolio-hero-wrap">
+      <p class="hero-badge">CASOS DE ÉXITO</p>
+      <h1>
+        Empresas que
+        <span>transformamos con IA</span>
+      </h1>
+      <p class="hero-text">
+        Desde startups hasta grandes operaciones, nuestros clientes reportan mejoras dramáticas en eficiencia y ROI.
+      </p>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="portfolio-stats">
+    <div class="container">
+      <div class="stats-grid">
+        @for (stat of stats; track stat.label) {
+        <div class="stat-item">
+          <p class="stat-value">{{ stat.value }}</p>
+          <p class="stat-label">{{ stat.label }}</p>
+        </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Case Studies Grid -->
+  <section class="case-studies">
+    <div class="container">
+      <div class="studies-grid">
+        @for (caseStudy of caseStudies; track caseStudy.id) {
+        <article class="case-card">
+          <div class="case-header">
+            <div class="case-icon">{{ caseStudy.icon }}</div>
+            <div class="case-title">
+              <h3>{{ caseStudy.company }}</h3>
+              <p class="case-industry">{{ caseStudy.industry }}</p>
+            </div>
+          </div>
+
+          <div class="case-content">
+            <div class="case-section">
+              <p class="section-label">Desafío</p>
+              <p class="section-text">{{ caseStudy.challenge }}</p>
+            </div>
+
+            <div class="case-section">
+              <p class="section-label">Solución</p>
+              <p class="section-text">{{ caseStudy.solution }}</p>
+            </div>
+
+            <div class="case-section">
+              <p class="section-label">Resultado</p>
+              <p class="section-text highlight">{{ caseStudy.result }}</p>
+            </div>
+          </div>
+
+          <div class="case-metrics">
+            <div class="metrics-grid">
+              @for (metric of caseStudy.metrics; track metric.label) {
+              <div class="metric">
+                <p class="metric-value">{{ metric.value }}</p>
+                <p class="metric-label">{{ metric.label }}</p>
+              </div>
+              }
+            </div>
+          </div>
+
+          @if (caseStudy.testimonial) {
+          <div class="case-testimonial">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M3 8C3 6.9 3.9 6 5 6h1V4c0-.55-.45-1-1-1h-1C2.9 3 1 5.2 1 8v6c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2v-6c0-1.1-.9-2-2-2H3zM15 8c0-1.1.9-2 2-2h1V4c0-.55.45-1 1-1h1c1.1 0 2 2.2 2 5.2v6c0 1.1-.9 2-2 2h-6c-1.1 0-2-.9-2-2v-6c0-1.1.9-2 2-2h1z"/>
+            </svg>
+            <p class="testimonial-text">{{ caseStudy.testimonial.quote }}</p>
+            <div class="testimonial-author">
+              <p class="author-name">{{ caseStudy.testimonial.author }}</p>
+              <p class="author-role">{{ caseStudy.testimonial.role }}</p>
+            </div>
+          </div>
+          }
+        </article>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Industries Served -->
+  <section class="industries-served">
+    <div class="container">
+      <div class="section-head">
+        <p class="kicker">INDUSTRIAS</p>
+        <h2>Servimos a empresas en diversos sectores</h2>
+      </div>
+
+      <div class="industries-list">
+        @for (industry of industries; track industry) {
+        <div class="industry-tag">
+          <span>{{ industry }}</span>
+        </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Quick -->
+  <section class="portfolio-faq">
+    <div class="container">
+      <div class="section-head">
+        <h2>¿Cómo empezamos?</h2>
+      </div>
+
+      <div class="faq-grid">
+        <div class="faq-item">
+          <h4>1. Consulta Inicial (Gratis)</h4>
+          <p>Analizamos tu caso y te mostramos cómo SIO puede ayudarte específicamente.</p>
+        </div>
+        <div class="faq-item">
+          <h4>2. Plan Personalizado</h4>
+          <p>Diseñamos una solución a medida de tus objetivos, presupuesto y timeline.</p>
+        </div>
+        <div class="faq-item">
+          <h4>3. Implementación Rápida</h4>
+          <p>Desplegamos el sistema en 2-4 semanas con soporte dedicado del equipo.</p>
+        </div>
+        <div class="faq-item">
+          <h4>4. Optimización Continua</h4>
+          <p>Monitoreamos, ajustamos y optimizamos permanentemente para máximo ROI.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Final -->
+  <section class="portfolio-cta">
+    <div class="container">
+      <div class="cta-wrap">
+        <h2>¿Listo para ser el siguiente caso de éxito?</h2>
+        <p>Hablemos sobre cómo SIO puede transformar tu empresa hoy</p>
+        <div class="cta-buttons">
+          <a routerLink="/contacto" class="btn btn-primary">Agendar consulta gratis</a>
+          <a href="mailto:hello@sio.com" class="btn btn-outline">Enviar email</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

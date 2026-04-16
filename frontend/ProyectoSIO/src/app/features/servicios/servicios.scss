@@ -1,0 +1,157 @@
+@use '../../../styles/mixins';
+
+.servicios-page {
+  min-height: 100vh;
+  padding-top: 70px;
+}
+
+.hero-section {
+  background: linear-gradient(135deg, #0E7490 0%, #14B8A6 100%);
+  padding: 80px 20px;
+  text-align: center;
+  color: white;
+  
+  .hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .hero-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    margin-bottom: 16px;
+    animation: fadeInDown 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .hero-subtitle {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    opacity: 0.95;
+    animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s backwards;
+  }
+}
+
+.services-grid {
+  padding: 80px 20px;
+  background: #F1F5F9;
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 32px;
+  }
+  
+  .service-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-radius: 16px;
+    padding: 32px;
+    border: 1px solid rgba(14, 116, 144, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+    
+    @for $i from 1 through 6 {
+      &:nth-child(#{$i}) {
+        animation-delay: #{$i * 0.1}s;
+      }
+    }
+    
+    &:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 40px rgba(14, 116, 144, 0.2);
+      border-color: rgba(14, 116, 144, 0.3);
+    }
+  }
+  
+  .service-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    display: inline-block;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    .service-card:hover & {
+      transform: scale(1.1) rotate(5deg);
+    }
+  }
+  
+  .service-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 12px;
+  }
+  
+  .service-description {
+    font-size: 15px;
+    color: #64748b;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  
+  .service-btn {
+    width: 100%;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #0E7490, #14B8A6);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(14, 116, 144, 0.3);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ── DARK MODE ──
+@include mixins.dark-mode {
+  .services-grid {
+    background: #0f172a;
+
+    .service-card {
+      background: rgba(30, 41, 59, 0.9);
+      border-color: rgba(51, 65, 85, 0.4);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+
+      &:hover {
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        border-color: rgba(14, 116, 144, 0.3);
+      }
+    }
+
+    .service-title { color: #f1f5f9; }
+    .service-description { color: #94a3b8; }
+  }
+}

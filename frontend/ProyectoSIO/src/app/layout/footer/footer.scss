@@ -1,0 +1,161 @@
+.sio-footer {
+  border-top: 1px solid #090e14;
+  background: #020508;
+  color: #aeb7c1;
+  margin-top: 0;
+}
+
+.footer-top-grid {
+  padding: 3rem 0 2rem;
+  display: grid;
+  grid-template-columns: 80px repeat(3, 1fr) 80px;
+  gap: 3rem;
+}
+
+.brand-col {
+  padding-top: 0.2rem;
+}
+
+.brand-mark {
+  width: 44px;
+  height: 28px;
+  display: flex;
+  align-items: end;
+  gap: 6px;
+}
+
+.brand-mark span {
+  width: 10px;
+  border-radius: 10px;
+  background: #f1f4f7;
+}
+
+.brand-mark span:nth-child(1) {
+  height: 16px;
+}
+
+.brand-mark span:nth-child(2) {
+  height: 24px;
+}
+
+.brand-mark span:nth-child(3) {
+  height: 18px;
+}
+
+.link-col h4 {
+  margin: 0 0 0.5rem;
+  color: #8f97a1;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.link-col a {
+  display: block;
+  text-decoration: none;
+  color: #cad2db;
+  margin-bottom: 0.22rem;
+  font-size: 0.78rem;
+  line-height: 1.38;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+}
+
+.link-col a:hover {
+  color: #ffffff;
+}
+
+.footer-bottom {
+  border-top: 1px solid #070d14;
+  min-height: 92px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1.1rem 0 1.35rem;
+}
+
+.status-group {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.status-item {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.52rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+}
+
+.dot.gray {
+  background: #7f848a;
+}
+
+.dot.green {
+  background: #67f16e;
+  box-shadow: 0 0 10px rgba(103, 241, 110, 0.45);
+}
+
+.legal-group {
+  display: grid;
+  gap: 0.35rem;
+  text-align: right;
+}
+
+.legal-group a {
+  text-decoration: none;
+  color: #c7d0da;
+  font-size: 0.8rem;
+}
+
+.legal-group a:hover {
+  color: #ffffff;
+}
+
+@media (max-width: 1200px) {
+  .footer-top-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .brand-col {
+    grid-column: 1 / -1;
+  }
+
+  .link-col h4 {
+    font-size: 0.95rem;
+  }
+
+  .link-col a,
+  .status-item,
+  .legal-group a {
+    font-size: 0.78rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .footer-top-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding-top: 1.8rem;
+    padding-bottom: 1.8rem;
+  }
+
+  .footer-bottom {
+    min-height: auto;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding-top: 1rem;
+    padding-bottom: 1.2rem;
+  }
+
+  .legal-group {
+    text-align: left;
+  }
+}

@@ -1,0 +1,222 @@
+import { Component, signal, computed, inject, effect, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ProductCardComponent } from '../../shared/components/product-card/product-card.component';
+import { Product } from '../../shared/models/product.model';
+import { ProductService } from '../../core/services/product.service';
+import { CartService } from '../../core/services/cart.service';
+
+type SortOption = 'relevant' | 'price-asc' | 'price-desc' | 'name';
+type ViewMode = 'grid' | 'list';
+
+@Component({
+  selector: 'app-productos',
+  standalone: true,
+  imports: [ProductCardComponent, CommonModule, FormsModule],
+  templateUrl: './productos.html',
+  styleUrl: './productos.scss',
+})
+export class Productos implements OnDestroy {
+  // Servicios
+  productService = inject(ProductService);
+  private readonly cartService = inject(CartService);
+  
+  // Estados de filtros y búsqueda
+  searchQuery = signal('');
+  selectedCategories = signal<string[]>([]);
+  priceRange = signal({ min: 0, max: 999999 });
+  minRating = signal(0);
+  sortBy = signal<SortOption>('relevant');
+  viewMode = signal<ViewMode>('grid');
+  showFilters = signal(false); // Empezar cerrado, especialmente en móvil
+
+  // Loading state expuesto desde el servicio
+  isLoading = this.productService.isLoading;
+  loadError = this.productService.error;
+  
+  // Modal de producto
+  selectedProduct = signal<Product | null>(null);
+  showProductModal = signal(false);
+
+  // scroll-lock helpers
+  private scrollLocked = false;
+  private lockedScrollY = 0;
+
+  constructor() {
+    // Effect unificado: bloquear body cuando el modal o el sidebar en móvil están abiertos
+    effect(() => {
+      if (typeof globalThis.window === 'undefined' || typeof document === 'undefined') return;
+
+      const hide = this.showProductModal() || (this.showFilters() && globalThis.window.innerWidth <= 968);
+
+      if (hide && !this.scrollLocked) {
+        this.lockedScrollY = globalThis.window.scrollY || globalThis.window.pageYOffset || 0;
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${this.lockedScrollY}px`;
+        document.body.style.left = '0';
+        document.body.style.right = '0';
+        document.body.style.width = '100%';
+        // prevent overscroll on iOS
+        document.body.style.overscrollBehavior = 'none';
+        (document.body.style as any).webkitOverflowScrolling = 'auto';
+        this.scrollLocked = true;
+      } else if (!hide && this.scrollLocked) {
+        // restore
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.width = '';
+        document.body.style.overscrollBehavior = '';
+        (document.body.style as any).webkitOverflowScrolling = '';
+        globalThis.window.scrollTo(0, this.lockedScrollY || 0);
+        this.scrollLocked = false;
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (typeof document !== 'undefined') {
+      if (this.scrollLocked) {
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.width = '';
+      } else {
+        document.body.style.overflow = '';
+      }
+      // ensure no residual styles
+      document.body.style.overscrollBehavior = '';
+      (document.body.style as any).webkitOverflowScrolling = '';
+    }
+  }
+
+  // Todos los productos vienen del servicio
+  allProducts = this.productService.allProducts;
+
+  // Precio máximo dinámico basado en los productos cargados
+  maxPrice = computed(() => {
+    const prices = this.allProducts().map(p => p.price);
+    return prices.length > 0 ? Math.ceil(Math.max(...prices) * 1.1) : 999999;
+  });
+
+  // Categorías dinámicas basadas en los productos
+  categories = computed(() => {
+    const categoryMap = new Map<string, number>();
+    const products = this.allProducts();
+    
+    products.forEach(p => {
+      if (p.category) {
+        const count = categoryMap.get(p.category) || 0;
+        categoryMap.set(p.category, count + 1);
+      }
+    });
+    
+    return Array.from(categoryMap.entries()).map(([id, count]) => ({
+      id: id.toLowerCase(),
+      name: id,
+      count
+    }));
+  });
+
+  // Productos filtrados (computed)
+  filteredProducts = computed(() => {
+    let products = [...this.allProducts()];
+    
+    // Filtro de búsqueda
+    const query = this.searchQuery().toLowerCase();
+    if (query) {
+      products = products.filter(p => 
+        p.name.toLowerCase().includes(query) ||
+        p.description.toLowerCase().includes(query) ||
+        (p.category?.toLowerCase().includes(query) || false)
+      );
+    }
+    
+    // Filtro de categorías
+    const selectedCats = this.selectedCategories();
+    if (selectedCats.length > 0) {
+      products = products.filter(p => 
+        p.category && selectedCats.includes(p.category.toLowerCase())
+      );
+    }
+    
+    // Filtro de precio
+    const range = this.priceRange();
+    products = products.filter(p => 
+      p.price >= range.min && p.price <= range.max
+    );
+    
+    // Ordenamiento
+    const sort = this.sortBy();
+    switch(sort) {
+      case 'price-asc':
+        products.sort((a, b) => a.price - b.price);
+        break;
+      case 'price-desc':
+        products.sort((a, b) => b.price - a.price);
+        break;
+      case 'name':
+        products.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+    }
+    
+    return products;
+  });
+
+  // Métodos de filtrado
+  toggleCategory(categoryId: string) {
+    this.selectedCategories.update(cats => {
+      if (cats.includes(categoryId)) {
+        return cats.filter(c => c !== categoryId);
+      }
+      return [...cats, categoryId];
+    });
+  }
+
+  clearFilters() {
+    this.searchQuery.set('');
+    this.selectedCategories.set([]);
+    this.priceRange.set({ min: 0, max: this.maxPrice() });
+    this.minRating.set(0);
+  }
+
+  toggleFilters() {
+    this.showFilters.update(show => !show);
+  }
+  
+  closeSidebar() {
+    this.showFilters.set(false);
+  }
+
+  // Utilidad
+  getDiscountPercentage(product: Product): number {
+    if (!product.originalPrice) return 0;
+    return Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
+  }
+  
+  // Modal de producto
+  openProductModal(product: Product) {
+    this.selectedProduct.set(product);
+    this.showProductModal.set(true);
+  }
+  
+  closeProductModal() {
+    this.showProductModal.set(false);
+    setTimeout(() => {
+      this.selectedProduct.set(null);
+    }, 300);
+  }
+  
+  addProductToCart(product: Product) {
+    this.cartService.addToCart({
+      productId: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      category: product.category
+    });
+    this.closeProductModal();
+  }
+}

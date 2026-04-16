@@ -1,0 +1,157 @@
+@use 'variables' as *;
+
+// Responsive breakpoint mixins
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == 'xs' {
+    @media (min-width: #{$breakpoint-xs}) {
+      @content;
+    }
+  }
+  @else if $breakpoint == 'sm' {
+    @media (min-width: #{$breakpoint-sm}) {
+      @content;
+    }
+  }
+  @else if $breakpoint == 'md' {
+    @media (min-width: #{$breakpoint-md}) {
+      @content;
+    }
+  }
+  @else if $breakpoint == 'lg' {
+    @media (min-width: #{$breakpoint-lg}) {
+      @content;
+    }
+  }
+  @else if $breakpoint == 'xl' {
+    @media (min-width: #{$breakpoint-xl}) {
+      @content;
+    }
+  }
+  @else if $breakpoint == 'xxl' {
+    @media (min-width: #{$breakpoint-xxl}) {
+      @content;
+    }
+  }
+}
+
+// Flexbox mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-start {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+@mixin flex-end {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+// Text truncation
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Multi-line truncation
+@mixin line-clamp($lines) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// Box shadow mixin
+@mixin box-shadow($shadow) {
+  -webkit-box-shadow: $shadow;
+  -moz-box-shadow: $shadow;
+  box-shadow: $shadow;
+}
+
+// Border radius mixin
+@mixin border-radius($radius) {
+  -webkit-border-radius: $radius;
+  -moz-border-radius: $radius;
+  border-radius: $radius;
+}
+
+// Transition mixin
+@mixin transition($transition...) {
+  -webkit-transition: $transition;
+  -moz-transition: $transition;
+  -o-transition: $transition;
+  transition: $transition;
+}
+
+// Center absolute element
+@mixin center-absolute {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+// Clear floats
+@mixin clearfix {
+  &::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
+// Placeholder styling
+@mixin placeholder {
+  &::-webkit-input-placeholder {
+    @content;
+  }
+  &:-moz-placeholder {
+    @content;
+  }
+  &::-moz-placeholder {
+    @content;
+  }
+  &:-ms-input-placeholder {
+    @content;
+  }
+}
+
+// Scrollbar styling
+@mixin custom-scrollbar($width: 8px, $track-color: #f1f1f1, $thumb-color: #888) {
+  &::-webkit-scrollbar {
+    width: $width;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: $track-color;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: $thumb-color;
+    border-radius: $width / 2;
+    
+    &:hover {
+      background: darken($thumb-color, 10%);
+    }
+  }
+}
+
+// Dark mode — use inside component SCSS
+@mixin dark-mode {
+  :host-context([data-theme="dark"]) {
+    @content;
+  }
+}

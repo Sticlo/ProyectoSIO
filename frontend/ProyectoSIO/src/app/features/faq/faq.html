@@ -1,0 +1,108 @@
+<div class="sio-faq clone-web-sio-layout">
+  <!-- Hero Section -->
+  <section class="faq-hero">
+    <div class="container faq-hero-wrap">
+      <p class="hero-badge">PREGUNTAS FRECUENTES</p>
+      <h1>
+        Respuestas a las
+        <span>preguntas más comunes</span>
+      </h1>
+      <p class="hero-text">
+        No encuentras tu respuesta aquí? Contacta a nuestro equipo de soporte en support@sio.com o agenda una llamada directa.
+      </p>
+    </div>
+  </section>
+
+  <!-- Category Filter -->
+  <section class="faq-filter">
+    <div class="container">
+      <div class="category-tabs">
+        @for (category of categories; track category) {
+        <button
+          class="tab"
+          [class.active]="selectedCategory() === category"
+          (click)="selectedCategory.set(category)"
+        >
+          {{ category }}
+        </button>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Accordion -->
+  <section class="faq-content">
+    <div class="container">
+      <div class="accordion">
+        @for (item of getFilteredItems(); track item.id) {
+        <div class="accordion-item" [class.expanded]="expandedId() === item.id">
+          <button class="accordion-header" (click)="toggleFAQ(item.id)">
+            <span class="question">{{ item.question }}</span>
+            <span class="icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </button>
+          @if (expandedId() === item.id) {
+          <div class="accordion-body">
+            <p>{{ item.answer }}</p>
+          </div>
+          }
+        </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Search CTA -->
+  <section class="faq-search">
+    <div class="container">
+      <div class="search-wrap">
+        <h3>¿No encontraste lo que buscas?</h3>
+        <p>Nuestro equipo está aquí para ayudarte</p>
+        <div class="search-buttons">
+          <a routerLink="/contacto" class="btn btn-primary">Enviar mensaje</a>
+          <a href="mailto:support@sio.com" class="btn btn-outline">Enviar email</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Resources Section -->
+  <section class="resources-section">
+    <div class="container">
+      <div class="section-head">
+        <p class="kicker">APRENDE MÁS</p>
+        <h2>Recursos y documentación</h2>
+      </div>
+
+      <div class="resources-grid">
+        <a href="#" class="resource-card">
+          <div class="resource-icon">📚</div>
+          <h4>Documentación</h4>
+          <p>Guías técnicas, API docs y ejemplos de código</p>
+          <span class="arrow">→</span>
+        </a>
+        <a href="#" class="resource-card">
+          <div class="resource-icon">🎥</div>
+          <h4>Tutoriales en Video</h4>
+          <p>Aprende paso a paso con nuestros videos</p>
+          <span class="arrow">→</span>
+        </a>
+        <a href="#" class="resource-card">
+          <div class="resource-icon">📖</div>
+          <h4>Blog</h4>
+          <p>Historias de éxito, tips y tendencias de IA</p>
+          <span class="arrow">→</span>
+        </a>
+        <a href="#" class="resource-card">
+          <div class="resource-icon">🎤</div>
+          <h4>Webinars</h4>
+          <p>Sesiones en vivo con expertos cada mes</p>
+          <span class="arrow">→</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</div>

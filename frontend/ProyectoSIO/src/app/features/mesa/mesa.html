@@ -1,0 +1,113 @@
+<div class="mesa-page">
+
+  <!-- ── HEADER ─────────────────────────────────────────── -->
+  <header class="mesa-header">
+    <div class="header-info">
+      <div class="mesa-icon">🍽️</div>
+      <div>
+        <h1>Mesa {{ mesaId() }}</h1>
+        <span class="subtitle">Mesero Digital • Pide aquí</span>
+      </div>
+    </div>
+
+    <!-- Botón resumen del pedido -->
+    @if (pedidoActual().length > 0) {
+      <button class="btn-resumen" (click)="toggleResumen()">
+        🛒 {{ pedidoActual().length }} items — ${{ totalPedido().toLocaleString() }}
+      </button>
+    }
+  </header>
+
+  <!-- ── RESUMEN FLOTANTE DEL PEDIDO ─────────────────────── -->
+  @if (mostrarResumen() && pedidoActual().length > 0) {
+    <div class="resumen-overlay" (click)="toggleResumen()">
+      <div class="resumen-panel" (click)="$event.stopPropagation()">
+        <h3>🛒 Tu pedido actual</h3>
+        <ul>
+          @for (item of pedidoActual(); track item.id) {
+            <li>
+              <span class="item-nombre">{{ item.cantidad }}x {{ item.nombre }}</span>
+              <span class="item-precio">${{ (item.precio * item.cantidad).toLocaleString() }}</span>
+            </li>
+          }
+        </ul>
+        <div class="resumen-total">
+          <strong>Total:</strong>
+          <strong>${{ totalPedido().toLocaleString() }}</strong>
+        </div>
+        <button class="btn-confirmar" (click)="enviarMensaje('confirmar pedido'); toggleResumen()">
+          ✅ Confirmar pedido
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ── MENSAJES ─────────────────────────────────────────── -->
+  <div class="chat-mensajes" #contenedorMensajes>
+
+    @if (mensajes().length === 0) {
+      <div class="bienvenida">
+        <div class="bienvenida-icon">👨‍🍳</div>
+        <h2>¡Bienvenido!</h2>
+        <p>Tu mesero digital está listo para atenderte.</p>
+      </div>
+    }
+
+    @for (msg of mensajes(); track msg.id) {
+      <div class="mensaje" [class.usuario]="msg.rol === 'usuario'" [class.asistente]="msg.rol === 'asistente'">
+        @if (msg.rol === 'asistente') {
+          <div class="avatar">👨‍🍳</div>
+        }
+        <div class="burbuja">
+          @if (msg.rol === 'asistente') {
+            <div class="texto" [innerHTML]="formatearTexto(msg.contenido)"></div>
+          } @else {
+            <div class="texto">{{ msg.contenido }}</div>
+          }
+          <div class="hora">{{ msg.fechaHora | date:'HH:mm' }}</div>
+        </div>
+      </div>
+    }
+
+    @if (estaEscribiendo()) {
+      <div class="mensaje asistente">
+        <div class="avatar">👨‍🍳</div>
+        <div class="burbuja typing">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- ── SUGERENCIAS ─────────────────────────────────────── -->
+  @if (mensajes().length <= 2) {
+    <div class="sugerencias">
+      @for (s of sugerencias; track s) {
+        <button (click)="usarSugerencia(s)">{{ s }}</button>
+      }
+    </div>
+  }
+
+  <!-- ── INPUT ───────────────────────────────────────────── -->
+  <div class="chat-input">
+    <textarea
+      [(ngModel)]="textoUsuario"
+      (keypress)="manejarTecla($event)"
+      placeholder="Escribe aquí... ej: quiero 2 auriculares"
+      rows="1"
+      [disabled]="estaEscribiendo()"
+    ></textarea>
+    <button
+      class="btn-enviar"
+      (click)="enviarMensaje()"
+      [disabled]="!textoUsuario().trim() || estaEscribiendo()"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="22" y1="2" x2="11" y2="13"></line>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+      </svg>
+    </button>
+  </div>
+
+</div>

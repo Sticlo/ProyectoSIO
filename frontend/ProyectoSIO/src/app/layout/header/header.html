@@ -1,0 +1,31 @@
+<header class="sio-header" [class.scrolled]="isScrolled()">
+  <div class="container header-shell">
+    <a routerLink="/home" class="brand" aria-label="Inicio SIO">
+      <span class="brand-name">sio</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="Navegacion principal">
+      @for (item of navItems; track item.label) {
+      <a [routerLink]="item.route" class="nav-link" [routerLinkActive]="'active'" [routerLinkActiveOptions]="{exact: false}">
+        {{ item.label }}
+      </a>
+      }
+    </nav>
+
+    <button type="button" class="mobile-toggle" [class.active]="mobileMenuVisible()" (click)="mobileMenuVisible.set(!mobileMenuVisible())" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+
+  @if (mobileMenuVisible()) {
+  <div class="mobile-nav">
+    <div class="container">
+      @for (item of navItems; track item.label) {
+      <a [routerLink]="item.route" class="mobile-nav-link" [routerLinkActive]="'active'" [routerLinkActiveOptions]="{exact: false}" (click)="mobileMenuVisible.set(false)">{{ item.label }}</a>
+      }
+    </div>
+  </div>
+  }
+</header>

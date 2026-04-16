@@ -1,0 +1,497 @@
+@use '../../shared/styles/design-tokens.scss' as *;
+
+.sio-portfolio {
+  --bg: #000000;
+  --surface: #07090d;
+  --surface-2: #0a0d11;
+  --line: #1a1f27;
+  --text: #eef1f6;
+  --muted: #8f98a6;
+  --brand: #6ef3c0;
+  --accent: #ff6b5b;
+
+  background:
+    radial-gradient(circle at 70% 30%, rgba(110, 243, 192, 0.06), transparent 45%),
+    radial-gradient(circle at 30% 70%, rgba(255, 107, 91, 0.03), transparent 50%),
+    var(--bg);
+  color: var(--text);
+  font-family: 'Manrope', 'Segoe UI', sans-serif;
+}
+
+.portfolio-hero,
+.portfolio-stats,
+.case-studies,
+.industries-served,
+.portfolio-faq,
+.portfolio-cta {
+  padding: clamp(2rem, 5vw, 4rem) 0;
+}
+
+.portfolio-hero {
+  padding: clamp(2.1rem, 4.6vw, 4rem) 0 clamp(2.9rem, 5vw, 4.2rem);
+}
+
+.portfolio-hero-wrap {
+  display: grid;
+  justify-items: start;
+  text-align: left;
+  gap: 1rem;
+  width: min(100%, 800px);
+  margin-inline: auto;
+}
+
+.portfolio-hero h1 {
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: 0;
+
+  span {
+    background: linear-gradient(120deg, var(--brand), #5ee0b0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+.hero-text {
+  font-size: 1.125rem;
+  color: var(--muted);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+.hero-badge {
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+
+// Portfolio Stats
+.portfolio-stats {
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 1.5rem 0;
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--brand);
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.stat-label {
+  font-size: 0.95rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+// Case Studies Grid
+.studies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.case-card {
+  display: flex;
+  flex-direction: column;
+  padding: 1.75rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--brand), transparent);
+  }
+
+  &:hover {
+    border-color: rgba(110, 243, 192, 0.3);
+    transform: translateY(-4px);
+  }
+}
+
+.case-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.case-icon {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+}
+
+.case-title h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem;
+  color: var(--text);
+}
+
+.case-industry {
+  font-size: 0.85rem;
+  color: var(--brand);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.case-content {
+  flex: 1;
+  margin-bottom: 1.5rem;
+}
+
+.case-section {
+  margin-bottom: 1rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.section-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--brand);
+  margin: 0 0 0.4rem;
+}
+
+.section-text {
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0;
+
+  &.highlight {
+    color: var(--text);
+    font-weight: 500;
+  }
+}
+
+.case-metrics {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(110, 243, 192, 0.05), transparent);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(110, 243, 192, 0.1);
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+
+  @media (max-width: 400px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.metric {
+  text-align: center;
+}
+
+.metric-value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--brand);
+  margin: 0 0 0.25rem;
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.3;
+}
+
+// Testimonial
+.case-testimonial {
+  padding: 1.25rem;
+  background: linear-gradient(135deg, rgba(110, 243, 192, 0.08), rgba(110, 243, 192, 0.02));
+  border: 1px solid rgba(110, 243, 192, 0.15);
+  border-radius: 0.5rem;
+  border-left: 3px solid var(--brand);
+}
+
+.case-testimonial svg {
+  width: 20px;
+  height: 20px;
+  color: var(--brand);
+  margin-bottom: 0.5rem;
+  opacity: 0.6;
+}
+
+.testimonial-text {
+  font-size: 0.9rem;
+  color: var(--text);
+  font-style: italic;
+  line-height: 1.6;
+  margin: 0 0 0.75rem;
+}
+
+.testimonial-author {
+  margin: 0;
+}
+
+.author-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 0.1rem;
+}
+
+.author-role {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+// Industries
+.industries-served {
+  text-align: center;
+}
+
+.section-head {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.kicker {
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brand);
+  margin: 0 0 0.5rem;
+}
+
+.section-head h2 {
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 800;
+  margin: 0;
+  color: var(--text);
+}
+
+.industries-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.industry-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  transition: all 0.3s ease;
+
+  span {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  &:hover {
+    border-color: var(--brand);
+    color: var(--brand);
+  }
+}
+
+// FAQ Grid
+.portfolio-faq {
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.faq-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 2rem;
+}
+
+.faq-item {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(110, 243, 192, 0.05), transparent);
+  border: 1px solid rgba(110, 243, 192, 0.1);
+  border-radius: 0.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: rgba(110, 243, 192, 0.2);
+  }
+
+  h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 0.75rem;
+    color: var(--text);
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+}
+
+// CTA Final
+.portfolio-cta {
+  text-align: center;
+}
+
+.cta-wrap {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(110, 243, 192, 0.08), rgba(110, 243, 192, 0.02));
+  border: 1px solid rgba(110, 243, 192, 0.2);
+  border-radius: 0.75rem;
+
+  h2 {
+    font-size: clamp(1.75rem, 3vw, 2rem);
+    font-weight: 800;
+    margin: 0 0 0.5rem;
+    color: var(--text);
+  }
+
+  p {
+    font-size: 1rem;
+    color: var(--muted);
+    margin: 0 0 1.5rem;
+  }
+}
+
+.cta-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+
+  @media (min-width: 600px) {
+    flex-direction: row;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+
+    &.btn-primary {
+      background: var(--brand);
+      color: #000;
+
+      &:hover {
+        background: #5ee0b0;
+        transform: translateY(-2px);
+      }
+    }
+
+    &.btn-outline {
+      border: 1px solid var(--line);
+      color: var(--text);
+
+      &:hover {
+        border-color: var(--brand);
+        color: var(--brand);
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .portfolio-hero-wrap {
+    width: 100%;
+  }
+
+  .portfolio-hero h1 {
+    font-size: 1.75rem;
+  }
+
+  .studies-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .case-card {
+    &::before {
+      display: none;
+    }
+  }
+
+  .cta-buttons {
+    flex-direction: column;
+
+    .btn {
+      width: 100%;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .case-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .case-icon {
+    margin: 0 auto;
+  }
+
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .industries-list {
+    gap: 0.75rem;
+  }
+
+  .industry-tag {
+    padding: 0.5rem 1rem;
+  }
+}
